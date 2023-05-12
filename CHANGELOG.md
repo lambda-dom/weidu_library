@@ -1,3 +1,5 @@
  # Changelog for `weidu_library`
 
-## Unreleased.
+## version v1.0.
+
+Initial release.
