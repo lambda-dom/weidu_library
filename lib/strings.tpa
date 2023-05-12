@@ -1,0 +1,32 @@
+//Libraries.
+INCLUDE "%library_dir%/arrays.tpa"
+
+//Functions.
+DEFINE_DIMORPHIC_FUNCTION repeat_string INT_VAR times = 1 STR_VAR string = "" RET_ARRAY strings BEGIN
+    //Sanitize argument.
+    ACTION_IF (times <= 0) BEGIN
+        FAIL "repeat_string: argument 'times = %times%' must be strictly positive."
+    END
+
+    //Construct array.
+    ACTION_DEFINE_ARRAY strings BEGIN END
+    OUTER_FOR (i = 0; i < times; ++i) BEGIN
+        OUTER_TEXT_SPRINT $strings("%i%") "%string%"
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION join_strings STR_VAR strings = "" sep = " " RET string BEGIN
+    //Get array length.
+    LAF get_array_count STR_VAR array = "%strings%" RET count END
+    
+    //Construct string.
+    OUTER_TEXT_SPRINT string ""
+    OUTER_FOR (i = 0; i < count; ++i) BEGIN
+        OUTER_TEXT_SPRINT value $"%strings%"("%i%")
+        ACTION_IF (i = 0) BEGIN
+            OUTER_TEXT_SPRINT string "%value%"
+        END ELSE BEGIN
+            OUTER_TEXT_SPRINT string "%string%%sep%%value%"
+        END
+    END
+END

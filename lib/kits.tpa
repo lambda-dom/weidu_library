@@ -1,0 +1,497 @@
+//Libraries.
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Elementary functions.
+DEFINE_DIMORPHIC_FUNCTION get_kit_clab STR_VAR kit = "" RET clab BEGIN
+    COPY_EXISTING - ~kitlist.2da~ ~override~
+        //Find clab file of kit.
+        LPF find_column_index STR_VAR key = "abilities" RET col = index END
+        PATCH_IF (col = 0 - 1) BEGIN
+            PATCH_FAIL "get_kit_clab: column 'abilities' not found in 'kitlist.2da'."
+        END
+
+        LPF find_first_row INT_VAR col = 1 STR_VAR key = "%kit%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            COUNT_2DA_COLS cols
+            READ_2DA_ENTRY row col cols clab
+        END ELSE BEGIN
+            TEXT_SPRINT clab "*"
+        END
+END
+
+
+//Descriptions.
+DEFINE_DIMORPHIC_FUNCTION set_class_description INT_VAR descr = 0 STR_VAR class = "" BEGIN
+    COPY_EXISTING ~clastext.2da~ ~override~
+        //Find row.
+        LPF find_first_row STR_VAR key = "%class%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            //Set description.
+            COUNT_2DA_COLS cols
+            SET_2DA_ENTRY row 4 cols (RESOLVE_STR_REF ((AT descr)))
+        END ELSE BEGIN
+            PATCH_FAIL "set_class_description: class '%class%' not found in 'clastext.2da'."
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = "" BEGIN
+    COPY_EXISTING ~kitlist.2da~ ~override~
+        //Find row.
+        LPF find_first_row INT_VAR col = 1 STR_VAR key = "%kit%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            //Set description.
+            COUNT_2DA_COLS cols
+            SET_2DA_ENTRY row 4 cols (RESOLVE_STR_REF ((AT descr)))
+        END ELSE BEGIN
+            PATCH_FAIL "set_kit_description: kit '%kit%' not found in 'kitlist.2da'."
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+
+//Proficiencies.
+DEFINE_PATCH_FUNCTION get_proficiency STR_VAR kit = "" proficiency = "" RET level BEGIN
+    level = 0 - 1
+    //Find kit.
+    LPF find_column_index STR_VAR key = "%kit%" RET col = index END
+    PATCH_IF NOT (col = 0 - 1) BEGIN
+        //Find proficiency: from the end to skip BG1 proficiencies with overlapping names.
+        LPF find_first_row_from_end STR_VAR key = "%proficiency%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            COUNT_2DA_COLS cols
+            READ_2DA_ENTRY row col cols level
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION set_proficiency INT_VAR level = 0 STR_VAR kit = "" proficiency = "" BEGIN
+    //Sanitize level.
+    PATCH_IF (level < 0) BEGIN
+        PATCH_FAIL "set_proficiency: level is '%level%' but must be positive."
+    END
+
+    //Find kit.
+    LPF find_column_index STR_VAR key = "%kit%" RET col = index END
+    PATCH_IF NOT (col = 0 - 1) BEGIN
+        //Find proficiency: from the end to skip BG1 proficiencies.
+        LPF find_first_row_from_end STR_VAR key = "%proficiency%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            COUNT_2DA_COLS cols
+            SET_2DA_ENTRY row col cols level
+        END ELSE BEGIN
+            PATCH_FAIL "set_proficiency: proficiency '%proficiency%' not found in 'weapprof.2da'."
+        END
+    END ELSE BEGIN
+        PATCH_FAIL "set_proficiency: kit '%kit%' not found in 'weapprof.2da'."
+    END
+END
+
+
+//Clab manipulation.
+DEFINE_PATCH_FUNCTION get_ability INT_VAR row = 0 level = 0 RET ability BEGIN
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+
+    //Sanitize.
+    PATCH_IF NOT ((0 <= row) AND (row <= rows)) BEGIN
+        PATCH_FAIL "get_ability: row '%row%' out of bounds."
+    END
+
+    PATCH_IF NOT ((0 <= level) AND (level <= cols)) BEGIN
+        PATCH_FAIL "get_ability: level '%level%' out of bounds."
+    END
+
+    //Read ability.
+    READ_2DA_ENTRY row level cols ability
+END
+
+DEFINE_PATCH_FUNCTION set_ability INT_VAR row = 0 level = 0 STR_VAR ability = "" prefix = "" BEGIN
+    //Sanitize prefix.
+    PATCH_IF NOT (("%prefix%" STRING_EQUAL_CASE "GA") OR ("%prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "set_ability: invalid ability prefix '%prefix%'."
+    END
+
+    //Existence check.
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%ability%.spl") BEGIN
+        PATCH_FAIL "set_ability: ability '%ability%' does not exist in game."
+    END
+
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+
+    PATCH_IF NOT ((0 <= level) AND (level <= cols)) BEGIN
+        PATCH_FAIL "set_ability: level '%level%' out of bounds."
+    END
+
+    //Sanitize.
+    PATCH_IF NOT ((0 <= row) AND (row <= rows)) BEGIN
+        PATCH_FAIL "set_ability: row '%row%' out of bounds."
+    END
+
+    //Normalize ability names.
+    TEXT_SPRINT name "%prefix%_%ability%"
+    TO_UPPER name
+
+    //Set ability.
+    SET_2DA_ENTRY row level cols "%name%"
+END
+
+DEFINE_PATCH_FUNCTION rename_ability STR_VAR old = "" new = "" old_prefix = "" new_prefix = "*" BEGIN
+    //Normalize prefix.
+    PATCH_IF ("%new_prefix%" STRING_EQUAL_CASE "*") BEGIN
+        TEXT_SPRINT new_prefix "%old_prefix%"
+    END
+
+    //Sanitize prefixes.
+    PATCH_IF NOT (("%old_prefix%" STRING_EQUAL_CASE "GA") OR ("%old_prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "rename_ability: invalid old ability prefix '%old_prefix%'."
+    END
+
+    PATCH_IF NOT (("%new_prefix%" STRING_EQUAL_CASE "GA") OR ("%new_prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "rename_ability: invalid new ability prefix '%new_prefix%'."
+    END
+
+    //Existence check.
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%new%.spl") BEGIN
+        PATCH_FAIL "rename_ability: ability '%new%' does not exist in game."
+    END
+
+    //Batch replace.
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "%old_prefix%_%old%" "%new_prefix%_%new%"
+END
+
+DEFINE_PATCH_FUNCTION delete_ability STR_VAR ability = "" prefix = "" BEGIN
+    //Sanitize prefix.
+    PATCH_IF NOT (("%prefix%" STRING_EQUAL_CASE "GA") OR ("%prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "delete_ability: invalid old ability prefix '%prefix%'."
+    END
+
+    //Batch replace.
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "%prefix%_%ability%" "****"
+END
+
+DEFINE_PATCH_FUNCTION append_blank_ability BEGIN
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+    LPF append_blank_row STR_VAR key = "ABILITY%rows%" default = "****" END
+END
+
+
+//HLAs.
+//Table functions.
+DEFINE_DIMORPHIC_FUNCTION get_hla_table STR_VAR kit = "" RET table BEGIN
+    //Read kit HLA tables file.
+    COPY_EXISTING - ~luabbr.2da~ ~override~
+	    COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols rows
+
+        TEXT_SPRINT table "*"
+        //Loop through rows.
+        FOR (i = 0; (i < rows) AND (NOT ("%table%" STRING_EQUAL_CASE "*")); ++i) BEGIN
+            READ_2DA_ENTRY i 0 cols name
+            READ_2DA_ENTRY i 1 cols tbl
+            PATCH_IF ("%name%" STRING_EQUAL_CASE "%kit%") BEGIN
+                //Found matching kit.
+                TEXT_SPRINT table "lu%tbl%"
+            END
+        END
+END
+
+DEFINE_DIMORPHIC_FUNCTION set_hla_table STR_VAR kit = "" table = "" BEGIN
+    //Table name length check.
+    ACTION_IF NOT (3 = STRING_LENGTH "%table%") BEGIN
+        FAIL "set_hla_table: table name '%table%' must be 3 characters long."
+    END
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "lu%table%.2da") BEGIN
+        FAIL "set_hla_table: table 'lu%table%.2da' does not exist in-game."
+    END
+
+    //Read kit HLA tables file.
+    COPY_EXISTING ~luabbr.2da~ ~override~
+	    COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols rows
+        
+        index = 0 - 1
+        //Find kit.
+        FOR (i = 0; (i < rows) AND (index < 0); ++i) BEGIN
+            READ_2DA_ENTRY i 0 cols name
+            PATCH_IF ("%name%" STRING_EQUAL_CASE "%kit%") BEGIN
+                index = i
+            END
+        END
+
+        //Barf if table not found.
+        PATCH_IF NOT (index = 0 - 1) BEGIN
+            //Set new abbreviation.
+            SET_2DA_ENTRY index 1 cols "%table%"
+        END ELSE BEGIN
+            PATCH_FAIL "set_hla_table: kit '%kit%' not found in table 'luabbr.2da'."
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+//Table normalization.
+DEFINE_ACTION_FUNCTION normalize_hla_table STR_VAR kit = "" BEGIN
+    LAF get_hla_table STR_VAR kit = "%kit%" RET table END
+
+    //Sanitize.
+    ACTION_IF ("%table%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "normalize_hla_table: kit '%kit%' not found in 'luabbr.2da'."
+    END
+
+    COPY_EXISTING - "%table%.2da" "override"
+        //Gather data.
+        COUNT_2DA_COLS cols
+
+        //Sanitize number of columns.
+        PATCH_IF (cols >= 11) OR (cols <= 8) BEGIN
+            PATCH_FAIL "normalize_hla_table: table '%table%.2da' has '%cols%' columns, cannot be normalized."
+        END ELSE BEGIN
+            PATCH_IF (cols = 10) BEGIN
+                PATCH_LOG "Log: normalize_hla_table: table '%table%.2da' already normalized."
+            END ELSE BEGIN
+                COUNT_2DA_ROWS cols rows
+            END
+        END
+    
+    //Construct column text.
+    LAF repeat_string INT_VAR times = rows - 1 STR_VAR string = "*" RET_ARRAY values = strings END
+    LAF join_strings STR_VAR strings = "strings" RET s_values END
+    OUTER_TEXT_SPRINT column_text "ALIGNMENT_RESTRICT %s_values%"
+
+    //Append column.
+    APPEND_COL "%table%.2da" "%column_text%"
+END
+
+//HLA table manipulation.
+DEFINE_PATCH_FUNCTION add_hla INT_VAR
+    min_level = 1
+    max_level = 99
+    num_allowed = 1
+STR_VAR
+    hla = ""
+    prefix = ""
+    icon = "*"
+    strref = "*"
+    prerequisite = "*"
+    excluded = "*"
+    alignment = "*"
+BEGIN
+    //Sanitize prefix.
+    PATCH_IF NOT (("%prefix%" STRING_EQUAL_CASE "GA") OR ("%prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "add_hla: invalid ability prefix '%prefix%'."
+    END
+
+    //Existence check.
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%hla%.spl") BEGIN
+        PATCH_FAIL "add_hla: spell '%hla%.spl' does not exist in-game."
+    END
+
+    //Normalize.
+    TEXT_SPRINT ability "%prefix%_%hla%"
+
+    //Check if ability is already in.
+    LPF find_first_row INT_VAR col = 1 STR_VAR key = "%ability%" RET row = index END
+    PATCH_IF (row = 0 - 1) BEGIN
+        COUNT_2DA_COLS cols
+        
+        //Find first empty line.
+        LPF find_first_row INT_VAR col = 1 STR_VAR key = "*" RET row_to_change = index END
+        PATCH_IF NOT (row_to_change = 0 - 1) BEGIN
+            //Fill in ability name.
+            SET_2DA_ENTRY row_to_change 1 cols "%ability%"
+        END ELSE BEGIN
+            //Not found: insert row at the end.
+            COUNT_2DA_ROWS cols row_to_change
+
+            //Fullness check.
+            PATCH_IF (row_to_change >= 24) BEGIN
+                PATCH_FAIL "add_hla: hla table '%table%.2da' already has more than 24 entries."
+            END
+
+            INSERT_2DA_ROW row_to_change cols "%row_to_change% %ability% * * 1 99 1 * * *"
+        END
+
+        //Set attributes: takes care of making extra safety checks.
+        LPF set_hla_attributes INT_VAR
+            min_level = min_level
+            max_level = max_level
+            num_allowed = num_allowed
+        STR_VAR
+            hla = "%hla%"
+            prefix = "%prefix%"
+            icon = "%icon%"
+            strref = "%strref%"
+            prerequisite = "%prerequisite%"
+            excluded = "%excluded%"
+            alignment = "%alignment%"
+        END
+    END ELSE BEGIN
+        PATCH_FAIL "add_hla: ability '%ability%' already listed in table."
+    END
+END
+
+DEFINE_PATCH_FUNCTION rename_hla STR_VAR old = "" new = "" old_prefix = "" new_prefix = "*" BEGIN
+    //Normalize prefix.
+    PATCH_IF ("%new_prefix%" STRING_EQUAL_CASE "*") BEGIN
+        TEXT_SPRINT new_prefix "%old_prefix%"
+    END
+
+    //Sanitize prefixes.
+    PATCH_IF NOT (("%old_prefix%" STRING_EQUAL_CASE "GA") OR ("%old_prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "rename_hla: invalid old hla prefix '%old_prefix%'."
+    END
+
+    PATCH_IF NOT (("%new_prefix%" STRING_EQUAL_CASE "GA") OR ("%new_prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "rename_hla: invalid new hla prefix '%new_prefix%'."
+    END
+
+    //Existence check.
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%new%.spl") BEGIN
+        PATCH_FAIL "rename_hla: hla '%new%' does not exist in game."
+    END
+
+    //Batch replace.
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "%old_prefix%_%old%" "%new_prefix%_%new%"
+END
+
+DEFINE_PATCH_FUNCTION set_hla_attributes INT_VAR
+    min_level = 0 - 1
+    max_level = 0 - 1
+    num_allowed = 0 - 1
+STR_VAR
+    hla = ""
+    prefix = ""
+    icon = "*"
+    strref = "*"
+    prerequisite = "*"
+    excluded = "*"
+    alignment = "*"
+BEGIN
+    //Sanitize prefix.
+    PATCH_IF NOT (("%prefix%" STRING_EQUAL_CASE "GA") OR ("%prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "set_hla_attributes: invalid hla prefix '%prefix%'."
+    END
+
+    //Form hla name.
+    TEXT_SPRINT ability "%prefix%_%hla%"
+
+    //Find hla row.
+    LPF find_first_row INT_VAR col = 1 STR_VAR key = "%ability%" RET row = index END
+    PATCH_IF NOT (row = 0 - 1) BEGIN
+        COUNT_2DA_COLS cols
+        
+        //Write out data.
+        PATCH_IF NOT ("%strref%" STRING_EQUAL_CASE "*") BEGIN
+            SET_2DA_ENTRY row 3 cols "%strref%"
+        END
+        PATCH_IF NOT (min_level = 0 - 1) BEGIN
+            SET_2DA_ENTRY row 4 cols "%min_level%"
+        END
+        PATCH_IF NOT (max_level = 0 - 1) BEGIN
+            SET_2DA_ENTRY row 5 cols "%max_level%"
+        END
+        PATCH_IF NOT (num_allowed = 0 - 1) BEGIN
+            SET_2DA_ENTRY row 6 cols "%num_allowed%"
+        END
+
+        //Alignment.
+        PATCH_IF NOT ("%alignment%" STRING_EQUAL_CASE "*") BEGIN
+            is_in_ids = IDS_OF_SYMBOL ("align" "%alignment%")
+            PATCH_IF is_in_ids = 0 - 1 BEGIN
+                PATCH_FAIL "set_hla_attributes: alignment '%alignment%' not in 'align.ids'."
+            END
+            SET_2DA_ENTRY row 9 cols "%alignment%"
+        END
+
+        //Resources.
+        PATCH_IF NOT ("%icon%" STRING_EQUAL_CASE "*") BEGIN
+            PATCH_IF FILE_EXISTS_IN_GAME "%icon%.bam" BEGIN
+                SET_2DA_ENTRY row 2 cols "%icon%"
+            END
+        END
+
+        PATCH_IF NOT ("%prerequisite%" STRING_EQUAL_CASE "*") BEGIN
+            LPF find_first_row INT_VAR col = 1 STR_VAR key = "%prerequisite%" RET found = index END
+            PATCH_IF found = 0 - 1 BEGIN
+                PATCH_FAIL "set_hla_attributes: pre-requisite '%prerequisite%' is not present in the table."
+            END
+
+            //Fill in attribute.
+            SET_2DA_ENTRY row 7 cols "%prerequisite%"
+        END
+
+        PATCH_IF NOT ("%excluded%" STRING_EQUAL_CASE "*") BEGIN
+            LPF find_first_row INT_VAR col = 1 STR_VAR key = "%excluded%" RET found = index END
+            PATCH_IF found = 0 - 1 BEGIN
+                PATCH_FAIL "set_hla_attributes: excluded-by resource '%excluded%' is not present in the table."
+            END
+
+            //Fill in attribute.
+            SET_2DA_ENTRY row 8 cols "%excluded%"
+        END
+    END ELSE BEGIN
+        PATCH_FAIL "set_hla_attributes: ability '%ability%' not found."
+    END
+END
+
+DEFINE_PATCH_FUNCTION delete_hla STR_VAR kit = "" hla = "" prefix = "" BEGIN
+    //Sanitize prefix.
+    PATCH_IF NOT (("%prefix%" STRING_EQUAL_CASE "GA") OR ("%prefix%" STRING_EQUAL_CASE "AP")) BEGIN
+        PATCH_FAIL "delete_hla: invalid ability prefix '%prefix%'."
+    END
+
+    //Form hla name.
+    TEXT_SPRINT ability "%prefix%_%hla%"
+
+    //Check if listed hla is a pre-requisite.
+    LPF find_column_index STR_VAR key = "prerequisite" RET col_index = index END
+    PATCH_IF NOT (col_index = 0 - 1) BEGIN
+        LPF find_first_row INT_VAR col = col_index STR_VAR key = "%ability%" RET is_prereq = index END
+        PATCH_IF NOT (is_prereq = 0 - 1) BEGIN
+            PATCH_FAIL "delete_hla: ability '%ability%' is a pre-requisite for other abilities."
+        END
+    END ELSE BEGIN
+        PATCH_FAIL "delete_hla: table '%table%.2da' malformed; column 'prerequisite' not found."
+    END
+
+    //Find ability row.
+    LPF find_first_row INT_VAR col = 1 STR_VAR key = "%ability%" RET row = index END
+    PATCH_IF NOT (row = 0 - 1) BEGIN
+        COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols rows
+
+        //Remove row.
+        REMOVE_2DA_ROW row cols
+
+        //Re-index rows.
+        FOR (i = row; i < rows - 1; ++i) BEGIN
+            SET_2DA_ENTRY i 0 cols (i + 1)
+        END
+    END ELSE BEGIN
+        PATCH_WARN "delete_hla: ability '%ability%' not listed in '%kit%' table."
+    END
+END
+
+
+//Miscellaneous utilities.
+DEFINE_DIMORPHIC_FUNCTION get_ability_resource STR_VAR ability = "" RET resource BEGIN
+    OUTER_PATCH "%ability%" BEGIN
+        REPLACE_EVALUATE CASE_INSENSITIVE "^(AP|GA)_(.*)" BEGIN
+            TEXT_SPRINT prefix "%MATCH1%"
+            TEXT_SPRINT resource "%MATCH2%"
+        END ~~
+    END
+
+    //Protect against non-matches.
+    ACTION_IF ("%prefix%" STRING_EQUAL_CASE "AP") OR ("%prefix%" STRING_EQUAL_CASE "GA") BEGIN
+        FAIL "get_ability_resource: ability '%ability%' does not have the correct format."
+    END
+END

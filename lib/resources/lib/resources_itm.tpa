@@ -1,0 +1,486 @@
+//Libraries.
+INCLUDE "%library_dir%/bits.tpa"
+INCLUDE "%library_dir%/components.tpa"
+INCLUDE "%library_dir%/items.tpa"
+
+
+//Patchers.
+DEFINE_PATCH_FUNCTION set_item_flags STR_VAR flags = "" BEGIN
+    //Sanitize.
+    PATCH_IF NOT (("%flags%" STRING_MATCHES_REGEXP "^[01][01][01][01][01][01][01][01][01][01]$") = 0) THEN BEGIN
+        PATCH_FAIL "set_item_flags: string '%flags%' does not have 10 '0' or '1' characters."
+    END
+
+    //Extract values via regexp matching.
+    INNER_PATCH "%flags%" BEGIN
+        REPLACE_EVALUATE "^\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)$" BEGIN
+            TEXT_SPRINT two_handed "%MATCH1%"
+            TEXT_SPRINT cursed "%MATCH2%"
+            TEXT_SPRINT magical "%MATCH3%"
+            TEXT_SPRINT left_handed "%MATCH4%"
+            TEXT_SPRINT silver "%MATCH5%"
+            TEXT_SPRINT cold_iron "%MATCH6%"
+            TEXT_SPRINT off_handed "%MATCH7%"
+            TEXT_SPRINT forbid_off_hand "%MATCH8%"
+            TEXT_SPRINT undispellable "%MATCH9%"
+            TEXT_SPRINT toggle_critical "%MATCH10%"
+        END ~~
+    END
+
+    base = $item_offsets("flags")
+    //Set flags.
+    LPF set_bit INT_VAR
+        offset =  base
+        bit = 1
+        value = two_handed
+    END
+
+    LPF set_bit INT_VAR
+        offset = base
+        bit = 4
+        value = cursed
+    END
+
+    LPF set_bit INT_VAR
+        offset = base
+        bit = 6
+        value = magical
+    END
+
+    LPF set_bit INT_VAR
+        offset = base
+        bit = 7
+        value = left_handed
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 1
+        bit = 0
+        value = silver
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 1
+        bit = 1
+        value = cold_iron
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 1
+        bit = 2
+        value = off_handed
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 1
+        bit = 5
+        value = forbid_off_hand
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 3
+        bit = 0
+        value = undispellable
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 3
+        bit = 1
+        value = toggle_critical
+    END
+END
+
+DEFINE_PATCH_FUNCTION patch_item INT_VAR
+    name = 0 - 1
+    descr = 0 - 1
+    id_name = 0 - 1
+    id_descr = 0 - 1
+    price = 0 - 1
+    stack = 0 - 1
+    lore = 0 - 1
+    weight = 0 - 1
+    enchantment = 0 - 1
+STR_VAR
+    type = "*"
+    proficiency = "*"
+    flags = "*"
+    inventory_icon = "*"
+    ground_icon = "*"
+    description_icon = "*"
+BEGIN
+    //Names and descriptions.
+    PATCH_IF NOT (name = 0 - 1) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            name_ref = RESOLVE_STR_REF ((AT name))
+            LPF set_item_field STR_VAR field = "name" value = "%name_ref%" END
+        END
+    END
+
+    PATCH_IF NOT (descr = 0 - 1) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            descr_ref = RESOLVE_STR_REF ((AT descr))
+            LPF set_item_field STR_VAR field = "descr" value = "%descr_ref%" END
+        END
+    END
+
+    PATCH_IF NOT (id_name = 0 - 1) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            name_ref = RESOLVE_STR_REF ((AT id_name))
+            LPF set_item_field STR_VAR field = "id_name" value = "%name_ref%" END
+        END
+    END
+
+    PATCH_IF NOT (id_descr = 0 - 1) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            descr_ref = RESOLVE_STR_REF ((AT id_descr))
+            LPF set_item_field STR_VAR field = "id_descr" value = "%descr_ref%" END
+        END
+    END
+
+    //Other numeric fields.
+    PATCH_IF NOT (price = 0 - 1) BEGIN
+        LPF set_item_field STR_VAR field = "price" value = "%price%" END
+    END
+
+    PATCH_IF NOT (stack = 0 - 1) BEGIN
+        LPF set_item_field STR_VAR field = "stack" value = "%stack%" END
+    END
+
+    PATCH_IF NOT (lore = 0 - 1) BEGIN
+        LPF set_item_field STR_VAR field = "lore" value = "%lore%" END
+    END
+
+    PATCH_IF NOT (weight = 0 - 1) BEGIN
+        LPF set_item_field STR_VAR field = "weight" value = "%weight%" END
+    END
+
+    PATCH_IF NOT (enchantment = 0 - 1) BEGIN
+        LPF set_item_field STR_VAR field = "enchantment" value = "%enchantment%" END
+    END
+
+    //Item type.
+    PATCH_IF NOT ("%type%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            LPF get_item_type STR_VAR type = "%type%" RET type_id = value END
+            PATCH_IF NOT (type_id = 0 - 1) BEGIN
+                LPF set_item_field STR_VAR field = "type" value = "%type_id%" END
+            END ELSE BEGIN
+                PATCH_FAIL "patch_item: type '%type%' is not valid."
+            END
+        END
+    END
+
+    //Item proficiency.
+    PATCH_IF NOT ("%proficiency%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            LPF get_proficiency_type STR_VAR proficiency = "%proficiency%" RET proficiency_id = value END
+            PATCH_IF NOT (proficiency_id = 0 - 1) BEGIN
+                LPF set_item_field STR_VAR field = "proficiency" value = "%proficiency_id%" END
+            END ELSE BEGIN
+                PATCH_FAIL "patch_item: proficiency '%proficiency%' is not valid."
+            END
+        END
+    END
+
+    //Flags.
+    PATCH_IF NOT ("%flags%" STRING_EQUAL_CASE "*") BEGIN
+        LPF set_item_flags STR_VAR flags = "%flags%" END
+    END
+
+    //Icons.
+    PATCH_IF NOT ("%inventory_icon%" STRING_EQUAL_CASE "*") BEGIN
+        INNER_ACTION BEGIN
+            //Check if mod provides it.
+            ACTION_IF FILE_EXISTS "%component_resources_dir%/bam/%inventory_icon%.bam" BEGIN
+                //Install icon.
+                LAF copy_resource INT_VAR
+                    override = 0
+                STR_VAR
+                    resource = "%inventory_icon%"
+                    ext = "bam"
+                    dir = "%component_resources_dir%/bam"
+                END
+            END
+        END
+
+        //Check existence in game.
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%inventory_icon%.bam") BEGIN
+            PATCH_WARN "Warning: patch_item: icon '%inventory_icon%.bam' does not exist in game."
+        END
+
+        //Set.
+        LPF set_item_field STR_VAR field = "inventory_icon" value = "%inventory_icon%" END
+
+        //Write inventory icon to melee and ranged fields.
+        PATCH_WITH_SCOPE BEGIN
+            LPF get_item_header_count RET headers_count = count END
+            FOR (i = 0; i < headers_count; ++i) BEGIN
+                LPF get_item_header_field INT_VAR header = i STR_VAR field = "type" RET type = value END
+                PATCH_IF (type = 1) OR (type = 2) BEGIN
+                    LPF set_item_header_field INT_VAR header = i STR_VAR field = "icon" value = "%inventory_icon%" END
+                END
+            END
+        END
+    END
+
+    PATCH_IF NOT ("%ground_icon%" STRING_EQUAL_CASE "*") BEGIN
+        INNER_ACTION BEGIN
+            //Check if mod provides it.
+            ACTION_IF FILE_EXISTS "%component_resources_dir%/bam/%ground_icon%.bam" BEGIN
+                //Install icon.
+                LAF copy_resource INT_VAR
+                    override = 0
+                STR_VAR
+                    resource = "%ground_icon%"
+                    ext = "bam"
+                    dir = "%component_resources_dir%/bam"
+                END
+            END
+        END
+
+        //Check existence in game.
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%ground_icon%.bam") BEGIN
+            PATCH_WARN "Warning: patch_item: icon '%ground_icon%.bam' does not exist in game."
+        END
+
+        //Set.
+        LPF set_item_field STR_VAR field = "ground_icon" value = "%ground_icon%" END
+    END
+
+    PATCH_IF NOT ("%description_icon%" STRING_EQUAL_CASE "*") BEGIN
+        INNER_ACTION BEGIN
+            //Check if mod provides it.
+            ACTION_IF FILE_EXISTS "%component_resources_dir%/bam/%description_icon%.bam" BEGIN
+                //Install icon.
+                LAF copy_resource INT_VAR
+                    override = 0
+                STR_VAR
+                    resource = "%description_icon%"
+                    ext = "bam"
+                    dir = "%component_resources_dir%/bam"
+                END
+            END
+        END
+
+        //Check existence in game.
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%description_icon%.bam") BEGIN
+            PATCH_WARN "Warning: patch_item: icon '%description_icon%.bam' does not exist in game."
+        END
+
+        //Set.
+        LPF set_item_field STR_VAR field = "description_icon" value = "%description_icon%" END
+    END
+END
+
+
+//Installers.
+DEFINE_ACTION_FUNCTION copy_items_from_table STR_VAR table = "" patches = "*" tra = "*" subdir = "*" BEGIN
+    //Existence check.
+    OUTER_TEXT_SPRINT table_file "%component_resources_dir%/2da/%table%.2da"
+    ACTION_IF NOT (FILE_EXISTS "%table_file%") BEGIN
+        FAIL "copy_items_from_table: table '%table_file%' does not exist."
+    END
+
+    //Set tra file.
+    OUTER_TEXT_SPRINT tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
+    ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+    END
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS "%tra_file%") BEGIN
+        FAIL "copy_items_from_table: tra file '%tra_file%' does not exist."
+    END
+
+    WITH_TRA "%tra_file%" BEGIN
+        //Load patches file if passed.
+        ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+            ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
+                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+            END ELSE BEGIN
+                FAIL "copy_items_from_table: library file '%component_dir%/lib/%patches%' does not exist."
+            END
+        END
+
+        //Read table.
+        COPY - ~%table_file%~ ~override~
+            COUNT_2DA_COLS cols
+            //Number of columns check.
+            PATCH_IF NOT (cols = 20) BEGIN
+                PATCH_FAIL "copy_items_from_table: number of columns '%cols%' in table '%table_file%' less than the required."
+            END
+
+            //Set subdir where resource spell is located.
+            TEXT_SPRINT dir "%component_resources_dir%/spl"
+            PATCH_IF NOT ("%subdir%" STRING_EQUAL_CASE "*") BEGIN
+                TEXT_SPRINT dir "%subdir%"
+            END
+            //Loop.
+            READ_2DA_ENTRIES_NOW "table#rows" cols
+            FOR (i = 0; i < table#rows; ++i) BEGIN
+                //Collect data.
+                READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
+                READ_2DA_ENTRY_FORMER "table#rows" i 1 install
+                READ_2DA_ENTRY_FORMER "table#rows" i 2 name
+                READ_2DA_ENTRY_FORMER "table#rows" i 3 descr
+                READ_2DA_ENTRY_FORMER "table#rows" i 4 id_name
+                READ_2DA_ENTRY_FORMER "table#rows" i 5 id_descr
+                READ_2DA_ENTRY_FORMER "table#rows" i 6 type
+                READ_2DA_ENTRY_FORMER "table#rows" i 7 proficiency
+                READ_2DA_ENTRY_FORMER "table#rows" i 8 flags
+                READ_2DA_ENTRY_FORMER "table#rows" i 9 inventory_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 ground_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 description_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 12 price
+                READ_2DA_ENTRY_FORMER "table#rows" i 13 stack
+                READ_2DA_ENTRY_FORMER "table#rows" i 14 lore
+                READ_2DA_ENTRY_FORMER "table#rows" i 15 weight
+                READ_2DA_ENTRY_FORMER "table#rows" i 16 enchantment
+                READ_2DA_ENTRY_FORMER "table#rows" i 17 exclusion
+                READ_2DA_ENTRY_FORMER "table#rows" i 18 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 19 override
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Existence check.
+                    TEXT_SPRINT dest "%resource%"
+                    PATCH_IF (override = 0) AND (FILE_EXISTS_IN_GAME "%dest%.itm") BEGIN
+                        PATCH_FAIL "copy_items_from_table: resource '%dest%.itm' already exists in game."
+                    END
+
+                    //Copy.
+                    INNER_ACTION BEGIN
+                        COPY ~%dir%/%resource%.itm~ ~override/%dest%.itm~
+                            //Patch table data.
+                            LPF patch_item INT_VAR
+                                name = name
+                                descr = descr
+                                id_name = id_name
+                                id_descr = id_descr
+                                price = price
+                                stack = stack
+                                lore = lore
+                                weight = weight
+                                enchantment = enchantment
+                            STR_VAR
+                                type = "%type%"
+                                proficiency = "%proficiency%"
+                                flags = "%flags%"
+                                inventory_icon = "%inventory_icon%"
+                                ground_icon = "%ground_icon%"
+                                description_icon = "%description_icon%"
+                            END
+
+                            //Final patching.
+                            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                                LPF "%patch%" END
+                            END
+
+                        //Exclusion.
+                        ACTION_IF NOT (exclusion = 0) BEGIN
+                            LAF set_item_exclusion STR_VAR item = "%resource%" END
+                        END
+                    END
+                END
+            END
+    END
+END
+
+DEFINE_ACTION_FUNCTION patch_items_from_table STR_VAR table = "" patches = "*" tra = "*" BEGIN
+    //Existence check.
+    OUTER_TEXT_SPRINT table_file "%component_resources_dir%/2da/%table%.2da"
+    ACTION_IF NOT (FILE_EXISTS "%table_file%") BEGIN
+        FAIL "patch_items_from_table: table '%table_file%' does not exist."
+    END
+
+    //Set tra file.
+    OUTER_TEXT_SPRINT tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
+    ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+    END
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS "%tra_file%") BEGIN
+        FAIL "patch_items_from_table: tra file '%tra_file%' does not exist."
+    END
+
+    WITH_TRA "%tra_file%" BEGIN
+        //Load patches file if passed.
+        ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+            ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
+                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+            END ELSE BEGIN
+                FAIL "patch_items_from_table: library file '%component_dir%/lib/%patches%' does not exist."
+            END
+        END
+
+        //Read table.
+        COPY - ~%table_file%~ ~override~
+            COUNT_2DA_COLS cols
+            //Number of columns check.
+            PATCH_IF NOT (cols = 19) BEGIN
+                PATCH_FAIL "patch_items_from_table: number of columns '%cols%' in table '%table_file%' less than the required."
+            END
+
+            //Loop.
+            READ_2DA_ENTRIES_NOW "table#rows" cols
+            FOR (i = 0; i < table#rows; ++i) BEGIN
+                //Collect data.
+                READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
+                READ_2DA_ENTRY_FORMER "table#rows" i 1 install
+                READ_2DA_ENTRY_FORMER "table#rows" i 2 name
+                READ_2DA_ENTRY_FORMER "table#rows" i 3 descr
+                READ_2DA_ENTRY_FORMER "table#rows" i 4 id_name
+                READ_2DA_ENTRY_FORMER "table#rows" i 5 id_descr
+                READ_2DA_ENTRY_FORMER "table#rows" i 6 type
+                READ_2DA_ENTRY_FORMER "table#rows" i 7 proficiency
+                READ_2DA_ENTRY_FORMER "table#rows" i 8 flags
+                READ_2DA_ENTRY_FORMER "table#rows" i 9 inventory_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 ground_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 description_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 12 price
+                READ_2DA_ENTRY_FORMER "table#rows" i 13 stack
+                READ_2DA_ENTRY_FORMER "table#rows" i 14 lore
+                READ_2DA_ENTRY_FORMER "table#rows" i 15 weight
+                READ_2DA_ENTRY_FORMER "table#rows" i 16 enchantment
+                READ_2DA_ENTRY_FORMER "table#rows" i 17 exclusion
+                READ_2DA_ENTRY_FORMER "table#rows" i 18 patch
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Copy.
+                    INNER_ACTION BEGIN
+                        COPY_EXISTING ~%resource%.spl~ ~override~
+                            //Patch table data.
+                            LPF patch_item INT_VAR
+                                name = name
+                                descr = descr
+                                id_name = id_name
+                                id_descr = id_descr
+                                price = price
+                                stack = stack
+                                lore = lore
+                                weight = weight
+                                enchantment = enchantment
+                            STR_VAR
+                                type = "%type%"
+                                proficiency = "%proficiency%"
+                                flags = "%flags%"
+                                inventory_icon = "%inventory_icon%"
+                                ground_icon = "%ground_icon%"
+                                description_icon = "%description_icon%"
+                            END
+
+                            //Final patching.
+                            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                                LPF "%patch%" END
+                            END
+                        BUT_ONLY
+
+                        //Exclusion.
+                        ACTION_IF NOT (exclusion = 0) BEGIN
+                            LAF set_item_exclusion STR_VAR item = "%resource%" END
+                        END
+                    END
+                END
+            END
+    END
+END

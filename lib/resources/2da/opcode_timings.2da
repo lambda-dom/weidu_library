@@ -1,0 +1,6 @@
+limited             0
+instant             1
+equipped            2
+limited_delayed     3
+instant_delayed     4
+permanent           9

@@ -1,0 +1,136 @@
+//Libraries.
+INCLUDE "%library_dir%/arrays.tpa"
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Constants.
+//Opcode size.
+OUTER_SET opcode_size = 0x30
+
+//Arrays.
+LAF build_array_from_2da STR_VAR
+    table = "opcode_offsets"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    opcode_offsets = array
+END
+
+LAF build_array_from_2da STR_VAR
+    table = "opcode_targets"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    opcode_targets = array
+END
+
+LAF build_array_from_2da STR_VAR
+    table = "opcode_timings"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    opcode_timings = array
+END
+
+LAF build_array_from_2da STR_VAR
+    table = "opcode_dispel_resistance"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    opcode_dispel_resistance = array
+END
+
+
+//Patch functions.
+//Read functions.
+DEFINE_PATCH_FUNCTION get_opcode_field INT_VAR offset = 0 STR_VAR field = "" RET value BEGIN
+    field_offset = $opcode_offsets("%field%")
+
+    //Match on field to decide which read function to use.
+    PATCH_MATCH "%field%" WITH
+        "opcode" BEGIN
+            READ_SHORT (offset + field_offset) value
+        END
+        "resource" BEGIN
+            READ_ASCII (offset + field_offset) value (8) NULL
+        END
+        "target" "power" "timing" "resist_dispel" "probability1" "probability2" BEGIN
+            READ_BYTE (offset + field_offset) value
+        END
+        "parameter1" "parameter2" "duration" "dicenumber" "dicesize" "savingthrow" "savebonus" "special" BEGIN
+            READ_LONG (offset + field_offset) value
+        END
+        DEFAULT
+            PATCH_FAIL "get_opcode_field: field '%field%' is not a valid opcode field."
+    END
+END
+
+//Write functions.
+DEFINE_PATCH_FUNCTION set_opcode_field INT_VAR offset = 0 STR_VAR field = "" value = "" BEGIN
+    field_offset = $opcode_offsets("%field%")
+
+    //Match on field to decide which write function to use.
+    PATCH_MATCH "%field%" WITH
+        "opcode" BEGIN
+            WRITE_SHORT (offset + field_offset) value
+        END
+        "resource" BEGIN
+            WRITE_EVALUATED_ASCII (offset + field_offset) "%value%" #8
+        END
+        "target" "power" "timing" "resist_dispel" "probability1" "probability2" BEGIN
+            WRITE_BYTE (offset + field_offset) value
+        END
+        "parameter1" "parameter2" "duration" "dicenumber" "dicesize" "savingthrow" "savebonus" "special" BEGIN
+            WRITE_LONG (offset + field_offset) value
+        END
+        DEFAULT
+            PATCH_FAIL "set_opcode_field: field '%field%' is not a valid opcode field."
+    END
+END
+
+
+//Generic comparison.
+DEFINE_PATCH_FUNCTION match_opcode_against_array INT_VAR offset = 0 STR_VAR array = "" RET bool
+BEGIN
+    bool = 1
+    PATCH_TRY
+        //Loop through array.
+        PHP_EACH "%array%" AS field => lhs BEGIN
+            //Read value.
+            LPF get_opcode_field INT_VAR offset = offset STR_VAR field = "%field%" RET rhs = value END
+            //Compare values as strings.
+            PATCH_IF NOT ("%lhs%" STRING_EQUAL "%rhs%") BEGIN
+                bool = 0
+                //Leave loop early.
+                PATCH_SILENT
+                PATCH_FAIL "Match failed."
+            END
+        END
+    //Silence error signaling match.
+    WITH ~Failure("Match failed.")~ BEGIN PATCH_VERBOSE END
+    DEFAULT
+        PATCH_RERAISE
+    END
+END
+
+
+//Opcode field utilities.
+DEFINE_DIMORPHIC_FUNCTION get_opcode_target STR_VAR target = "" RET value BEGIN
+    LAF is_key_in_array STR_VAR array = "opcode_targets" key = "%target%" RET is_in_array = bool END
+    OUTER_SET value = 0 - 1
+    ACTION_IF NOT (is_in_array = 0) BEGIN
+        OUTER_SET value = $opcode_targets("%target%")
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_opcode_timing STR_VAR timing = "" RET value BEGIN
+    LAF is_key_in_array STR_VAR array = "opcode_timings" key = "%timing%" RET is_in_array = bool END
+    OUTER_SET value = 0 - 1
+    ACTION_IF NOT (is_in_array = 0) BEGIN
+        OUTER_SET value = $opcode_timings("%timing%")
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_opcode_dispel_resistance STR_VAR dispel_resistance = "" RET value BEGIN
+    LAF is_key_in_array STR_VAR array = "opcode_dispel_resistance" key = "%dispel_resistance%" RET is_in_array = bool END
+    OUTER_SET value = 0 - 1
+    ACTION_IF NOT (is_in_array = 0) BEGIN
+        OUTER_SET value = $opcode_dispel_resistance("%dispel_resistance%")
+    END
+END

@@ -1,0 +1,408 @@
+//Libraries.
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Constants.
+//Item size.
+OUTER_SET item_size = 0x72
+
+//Item header size.
+OUTER_SET item_header_size = 0x38
+
+
+//Arrays.
+LAF build_array_from_2da STR_VAR
+    table = "item_offsets"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    item_offsets = array
+END
+
+LAF build_array_from_2da STR_VAR
+    table = "item_header_offsets"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    item_header_offsets = array
+END
+
+LAF build_array_from_2da STR_VAR
+    table = "item_types"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    item_types = array
+END
+
+
+//Basic functions.
+DEFINE_PATCH_FUNCTION get_item_header_count RET count BEGIN
+    READ_SHORT 0x68 count
+END
+
+DEFINE_PATCH_FUNCTION get_item_headers_offset RET offset BEGIN
+    READ_LONG 0x64 offset
+END
+
+DEFINE_PATCH_FUNCTION get_item_opcodes_offset RET offset BEGIN
+    READ_LONG 0x6a offset
+END
+
+DEFINE_PATCH_FUNCTION get_equipped_opcode_count RET count BEGIN
+    READ_SHORT 0x70 count
+END
+
+
+//Read-write functions.
+DEFINE_PATCH_FUNCTION get_item_field STR_VAR field = "" RET value BEGIN
+    field_offset = $item_offsets("%field%")
+
+    //Match on field to decide which read function to use.
+    PATCH_MATCH "%field%" WITH
+        "id_name"
+        "name"
+        "id_descr"
+        "descr"
+        "usability"
+        "price"
+        "weight"
+        "enchantment" BEGIN
+            READ_LONG field_offset value
+        END
+        "strength_bonus"
+        "intelligence"
+        "constitution"
+        "dexterity"
+        "wisdom"
+        "proficiency"
+        "kit_usability1"
+        "kit_usability2"
+        "kit_usability3"
+        "kit_usability4" BEGIN
+            READ_BYTE field_offset value
+        END
+        "type"
+        "level"
+        "strength"
+        "charisma"
+        "stack"
+        "lore" BEGIN
+            READ_SHORT field_offset value
+        END
+        "animation" BEGIN
+            READ_ASCII field_offset value (2) NULL
+        END
+        "replacement"
+        "inventory_icon"
+        "ground_icon"
+        "description_icon" BEGIN
+            READ_ASCII field_offset value (8) NULL
+        END
+        DEFAULT
+            PATCH_FAIL "get_item_field: field '%field%' is not a valid item field."
+    END
+END
+
+DEFINE_PATCH_FUNCTION set_item_field STR_VAR field = "" RET value BEGIN
+    field_offset = $item_offsets("%field%")
+
+    //Match on field to decide which write function to use.
+    PATCH_MATCH "%field%" WITH
+        "id_name"
+        "name"
+        "id_descr"
+        "descr"
+        "usability"
+        "price"
+        "weight"
+        "enchantment" BEGIN
+            WRITE_LONG field_offset value
+        END
+        "strength_bonus"
+        "intelligence"
+        "constitution"
+        "dexterity"
+        "wisdom"
+        "proficiency"
+        "kit_usability1"
+        "kit_usability2"
+        "kit_usability3"
+        "kit_usability4" BEGIN
+            WRITE_BYTE field_offset value
+        END
+        "type"
+        "level"
+        "strength"
+        "charisma"
+        "stack"
+        "lore" BEGIN
+            WRITE_SHORT field_offset value
+        END
+        "animation" BEGIN
+            WRITE_EVALUATED_ASCII field_offset "%value%" (2)
+        END
+        "replacement"
+        "inventory_icon"
+        "ground_icon"
+        "description_icon" BEGIN
+            WRITE_EVALUATED_ASCII field_offset "%value%" (8)
+        END
+        DEFAULT
+            PATCH_FAIL "get_item_field: field '%field%' is not a valid item field."
+    END
+END
+
+
+//Item field utilities.
+DEFINE_DIMORPHIC_FUNCTION get_item_type STR_VAR type = "" RET value BEGIN
+    ACTION_TO_LOWER type
+    LAF is_key_in_array STR_VAR array = "item_types" key = "%type%" RET is_in_array = bool END
+    OUTER_SET value = 0 - 1
+    ACTION_IF NOT (is_in_array = 0) BEGIN
+        OUTER_SET value = $item_types("%type%")
+    END
+END
+
+
+//Item header functions.
+DEFINE_PATCH_FUNCTION get_item_header_offset INT_VAR header = 0 RET offset BEGIN
+    offset = 0 - 1
+    LPF get_item_header_count RET headers_count = count END
+    LPF get_item_headers_offset RET headers_offset = offset END
+    PATCH_IF (0 <= header ) AND (header < headers_count) BEGIN
+        offset = headers_offset + (header * item_header_size)
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_item_header_field INT_VAR header = 0 STR_VAR field = "" RET value BEGIN
+    //Get header and field offsets.
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+    field_offset = $item_header_offsets("%field%")
+
+    //Sanity check.
+    PATCH_IF header_offset < 0 BEGIN
+        PATCH_FAIL "get_item_header_field: header %header% out of bounds."
+    END
+    
+    //Match on field to select read function to use.
+    PATCH_MATCH "%field%" WITH
+        "type"
+        "identify"
+        "location"
+        "target"
+        "launcher"
+        "speed"
+        "dicesize"
+        "dicenumber"
+        "school"
+        "sectype" BEGIN
+            READ_BYTE (header_offset + field_offset) value
+        END
+        "range"
+        "thac0_bonus"
+        "damage_bonus"
+        "damage_type"
+        "charges"
+        "drained"
+        "projectile"
+        "arrow"
+        "bolt"
+        "bullet"
+        "animation_overhand"
+        "animation_backhand"
+        "animation_thrust" BEGIN
+            READ_SHORT (header_offset + field_offset) value
+        END
+        "flags" BEGIN
+            READ_LONG (header_offset + field_offset) value
+        END
+        "icon" BEGIN
+            READ_ASCII (header_offset + field_offset) value (8) NULL
+        END
+        DEFAULT
+            PATCH_FAIL "get_item_header_field: field '%field%' not a valid item header field."
+    END
+END
+
+DEFINE_PATCH_FUNCTION set_item_header_field INT_VAR header = 0 STR_VAR field = "" value = "" BEGIN
+    //Get header offset.
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+
+    //Sanity check.
+    PATCH_IF header_offset < 0 BEGIN
+        PATCH_FAIL "set_item_header_field: header %header% out of bounds."
+    END
+    
+    //Match on field to select write function to use.
+    field_offset = $item_header_offsets("%field%")
+    PATCH_MATCH "%field%" WITH
+        "type"
+        "identify"
+        "location"
+        "target"
+        "launcher"
+        "speed"
+        "dicesize"
+        "dicenumber"
+        "school"
+        "sectype" BEGIN
+            WRITE_BYTE (header_offset + field_offset) value
+        END
+        "range"
+        "thac0_bonus"
+        "damage_bonus"
+        "damage_type"
+        "charges"
+        "drained"
+        "projectile"
+        "arrow"
+        "bolt"
+        "bullet"
+        "animation_overhand"
+        "animation_backhand"
+        "animation_thrust" BEGIN
+            WRITE_SHORT (header_offset + field_offset) value
+        END
+        "flags" BEGIN
+            WRITE_LONG (header_offset + field_offset) value
+        END
+        "icon" BEGIN
+            WRITE_EVALUATED_ASCII (header_offset + field_offset) "%value%" (8)
+        END
+        DEFAULT
+            PATCH_FAIL "set_item_header_field: field '%field%' not a valid item header field."
+    END
+END
+
+
+//Equipped opcode functions.
+DEFINE_PATCH_FUNCTION get_equipped_opcode_offset INT_VAR index = 0 RET offset BEGIN
+    offset = 0 - 1
+    LPF get_equipped_opcode_count RET opcode_count = count END
+    PATCH_IF (0 <= index) AND (index < opcode_count) BEGIN
+        LPF get_item_opcodes_offset RET op_start = offset END
+        //Read index into equipped opcodes block: should be zero.
+        READ_SHORT 0x6e op_index
+        offset = op_start + (op_index + index) * opcode_size
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_equipped_opcodes_array RET_ARRAY offsets BEGIN
+    DEFINE_ASSOCIATIVE_ARRAY offsets BEGIN END
+    //Loop.
+    LPF get_equipped_opcode_count RET opcode_count = count END
+    FOR (i = 0; i < count; ++i) BEGIN
+        LPF get_equipped_opcode_offset INT_VAR index = i RET offset END
+        TEXT_SPRINT $offsets("%i%") "%offset%"
+    END
+END
+
+
+//Item header opcode functions.
+DEFINE_PATCH_FUNCTION get_item_header_opcode_count INT_VAR header = 0 RET count BEGIN
+    count = 0 - 1
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        READ_SHORT (header_offset + 0x1e) count
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_item_header_opcode_block_offset INT_VAR header = 0 RET offset BEGIN
+    offset = 0 - 1
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        LPF get_item_opcodes_offset RET op_start = offset END
+        //Read from opcode index field.
+        READ_SHORT (header_offset + 0x20) op_index
+        offset = op_start + op_index * opcode_size
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_item_header_opcode_offset INT_VAR header = 0 index = 0 RET offset BEGIN
+    offset = 0 - 1
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        LPF get_item_header_opcode_count INT_VAR header = header RET op_count = count END
+        PATCH_IF (0 <= index) AND (index < op_count) BEGIN
+            LPF get_item_opcodes_offset RET op_start = offset END
+            //Read from opcode index field.
+            READ_SHORT (header_offset + 0x20) op_index
+            offset = op_start + (op_index + index) * opcode_size
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_item_header_opcodes_array INT_VAR header = 0 RET_ARRAY offsets BEGIN
+    //Sanitize.
+    LPF get_item_header_count END
+    PATCH_IF NOT ((0 <= header) AND (header < count)) BEGIN
+        PATCH_FAIL "get_item_header_opcodes_array: header '%header%' out of bounds."
+    END
+
+    DEFINE_ASSOCIATIVE_ARRAY offsets BEGIN END
+    //Loop.
+    LPF get_item_header_opcode_count INT_VAR header = header RET header_count = count END
+    FOR (i = 0; i < header_count; ++i) BEGIN
+        LPF get_item_header_opcode_offset INT_VAR header = header index = i RET offset END
+        TEXT_SPRINT $offsets("%i%") "%offset%"
+    END
+END
+
+
+//Miscellaneous functions.
+DEFINE_DIMORPHIC_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item = "" BEGIN
+    //Existence check.
+    ACTION_IF NOT FILE_EXISTS_IN_GAME "%item%.itm" BEGIN
+        FAIL "set_item_exclusion: resource '%item%.itm' does not exist in game."
+    END
+
+    COPY_EXISTING ~itemexcl.2da~ ~override~
+        //Find itm in itemexcl.2da.
+        LPF find_row INT_VAR col = 0 STR_VAR key = "%item%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            //Set value.
+            SET_2DA_ENTRY row 1 2 exclusion
+        END ELSE BEGIN
+            //Insert row.
+            COUNT_2DA_ROWS 2 rows
+            INSERT_2DA_ROW rows 2 "%item% %exclusion%"
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 ability = 0 STR_VAR item = "" BEGIN
+    //Sanity existence check.
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%item%.itm") BEGIN
+        FAIL "set_ability_tooltip: item '%item%.itm' does not exist in game."
+    END
+
+    COPY_EXISTING ~tooltip.2da~ ~override~
+        COUNT_2DA_COLS cols
+
+        //Sanitize ability.
+        PATCH_IF NOT (0 <= ability) AND (ability < cols - 1) BEGIN
+            PATCH_FAIL "set_ability_tooltip: ability index '%ability%' out of bounds."
+        END
+        
+        //Find index of item.
+        LPF find_row STR_VAR key = "%item%" RET row = index END
+        
+        //Insert new row if not found.
+        PATCH_IF (row = 0 - 1) BEGIN
+            //Set index to last row.
+            COUNT_2DA_ROWS cols row
+
+            //Compose row.
+            LPF repeat_string INT_VAR times = (cols - 1) STR_VAR string = "-1" RET_ARRAY array = strings END
+            LPF join_strings STR_VAR strings = array RET string = string END
+            
+            //Append row.
+            INSERT_2DA_ROW row cols "%item% %string%"
+        END
+
+        //Resolove tra reference.
+        ref = RESOLVE_STR_REF ((AT tra_ref))
+        //Write ability tooltip.
+        SET_2DA_ENTRY row (ability + 1) cols "%ref%"
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END

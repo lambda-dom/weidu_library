@@ -1,0 +1,84 @@
+//Description strings.
+//Damage spells.
+//Poison damage.
+@10 = ~Poison~
+@11 = ~Inflicts %damage% point(s) of poison damage on any living creature.~
+
+//Vampiric.
+@20 = ~Vampiric~
+@21 = ~Living creatures are drained of %damage% point(s).~
+
+//Splash damage spells.
+//Poisoning.
+@100 = ~Poisoning~
+@101 = ~Every %amount% second(s) for %duration% round(s), living creatures suffer 1 point of poison damage. This effect is not dispellable.~
+
+//Bleeding.
+@110 = ~Bleeding~
+@111 = ~When hit and every round thereafter for %duration% round(s), living creatures suffer %amount% point(s) of piercing damage. The effect is not dispellable.~
+
+//Acid Splash.
+@120 = ~Acid Splash~
+@121 = ~When hit and every round thereafter for %duration% round(s), targets suffer %amount% point(s) of acid damage. The effect is not dispellable.~
+
+
+//Duration spells.
+//Unconsciousness.
+@200 = ~Unconsciousness~
+@201 = ~Victim is knocked down unconscious for %duration% round(s), awaking before the end of this period if it takes any damage. Incorporeal creatures like Elementals and non-living creatures are immune to the effect.~
+
+//Paralyze.
+@210 = ~Paralyze~
+@211 = ~Paralyzes the victim for %duration% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to paralyzation.~
+
+//Entangle.
+@220 = ~Entangle~
+@221 = ~Entangles the victim for %duration% round(s). Incorporeal creatures like Elementals, flying creatures like Wyverns and Giant creatures are immune to entangle.~
+
+//Panic.
+@230 = ~Panic~
+@231 = ~Victim panics for %duration% round(s). Undead and illusionary creatures are immune to fear.~
+
+//Confusion.
+@240 = ~Confusion~
+@241 = ~Victim is confused for %duration% round(s).~
+
+//Blind.
+@250 = ~Blind~
+@251 = ~Victim is blinded for %duration% round(s).~
+
+//Stun.
+@260 = ~Stun~
+@261 = ~Victim is stunned for %duration% round(s).~
+
+
+//Duration and amount spells.
+//Slow movement rate.
+@300 = ~Slower~
+@301 = ~Victim's movement rate is decreased by %amount% for %duration% round(s). Incorporeal creatures like Elementals and flying creatures like Wyverns and Dragons are immune to slowing.~
+
+//Crippled.
+@310 = ~Crippled~
+@311 = ~Victim's movement rate is decreased by %amount% per cent for %duration% round(s). Incorporeal creatures like Elementals and flying creatures like Wyverns and Dragons are immune to the effect.~
+
+//Level drain.
+@320 = ~Level drained~
+@321 = ~Victim loses %amount% level(s) for %duration% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to level drain. The effect is cumulative.~
+
+//Drain strength.
+@330 = ~Drain Strength~
+@331 = ~Victim is weakened, losing %amount% points of strenth for %duration% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to the effect. The effect is cumulative.~
+
+//Knockback.
+@340 = ~Knockback~
+@341 = ~Victim is knocked back with a strength of %amount%, suffering unconsciouness for %duration% round(s). Creatures like dragons and giants are immune.~
+
+
+//Argument-less spells.
+//Dispel magic.
+@400 = ~Dispel Magic~
+@401 = ~Dispels all magic effects. Does not bypass or remove protections such as Dispelling Screen.~
+
+//Kill target.
+@410 = ~Kill Target~
+@411 = ~Victim is instantly killed.~

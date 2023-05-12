@@ -1,0 +1,22 @@
+2DA V1.0
+*
+                    name    descr   patch               patch_description           arg1        arg2        arg3
+poison_damage       10      11      patch_damage        patch_damage_description    amount      dicenumber  dicesize
+vampiric_damage     20      21      patch_damage        patch_damage_description    amount      dicenumber  dicesize
+poisoning           100     101     poisoning           patch_expand_description    duration    amount      *
+bleeding            110     111     splash_damage       patch_expand_description    duration    amount      *
+acid_splash         120     121     splash_damage       patch_expand_description    duration    amount      *
+unconsciousness     200     201     patch_duration      patch_expand_description    duration    *           *
+paralyze            210     211     patch_duration      patch_expand_description    duration    *           *
+entangle            220     221     patch_duration      patch_expand_description    duration    *           *
+panic               230     231     patch_duration      patch_expand_description    duration    *           *
+confusion           240     241     patch_duration      patch_expand_description    duration    *           *
+blind               250     251     patch_duration      patch_expand_description    duration    *           *
+stun                260     261     patch_duration      patch_expand_description    duration    *           *
+slow_movement_rate  300     301     slow_movement_rate  patch_expand_description    duration    amount      *
+cripple             310     311     cripple             patch_expand_description    duration    amount      *
+level_drain         320     321     level_drain         patch_expand_description    duration    amount      *
+drain_strength      330     331     drain_strength      patch_expand_description    duration    amount      *
+knockback           340     341     knockback           patch_expand_description    duration    amount      *
+dispel_magic        400     401     *                   *                           *           *           *
+kill_target         410     411     *                   *                           *           *           *

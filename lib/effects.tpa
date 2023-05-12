@@ -1,0 +1,111 @@
+//Libraries.
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Constants.
+//Effect size: 272 bytes.
+OUTER_SET effect_size = 0x110
+
+//Array of effect offsets.
+LAF build_array_from_2da STR_VAR
+    table = "effect_offsets"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    effect_offsets = array
+END
+
+
+//Patch functions.
+DEFINE_PATCH_FUNCTION get_effect_field STR_VAR field = "" RET value BEGIN
+    field_offset = $effect_offsets("%field%")
+    //Match on field to decide which read function to use.
+    PATCH_MATCH "%field%" WITH
+        "opcode"
+        "target"
+        "power"
+        "parameter1"
+        "parameter2"
+        "duration"
+        "dicenumber"
+        "dicesize"
+        "savingthrow"
+        "savebonus"
+        "special"
+        "school"
+        "min_level"
+        "max_level"
+        "resist_dispel"
+        "parameter3"
+        "parameter4"
+        "projectile"
+        "sectype" BEGIN
+            READ_LONG field_offset value
+        END
+        "timing" "probability1" "probability2" BEGIN
+            READ_SHORT field_offset value
+        END
+        //Order is important: resource would shadow resource2 and resource3.
+        "resource2" "resource3" "resource" BEGIN
+            READ_ASCII field_offset value (8) NULL
+        END
+        DEFAULT
+            PATCH_FAIL "get_effect_field: field '%field%' is not a valid effect field."
+    END
+END
+
+DEFINE_PATCH_FUNCTION set_effect_field STR_VAR field = "" value = "" BEGIN
+    field_offset = $effect_offsets("%field%")
+    //Match on field to decide which write function to use.
+    PATCH_MATCH "%field%" WITH
+        "opcode"
+        "target"
+        "power"
+        "parameter1"
+        "parameter2"
+        "duration"
+        "dicenumber"
+        "dicesize"
+        "savingthrow"
+        "savebonus"
+        "special"
+        "school"
+        "min_level"
+        "max_level"
+        "resist_dispel"
+        "parameter3"
+        "parameter4"
+        "projectile"
+        "sectype" BEGIN
+            WRITE_LONG field_offset value
+        END
+        "timing" "probability1" "probability2" BEGIN
+            WRITE_SHORT field_offset value
+        END
+        //Order is important: resource will shadow resource2 and resource3.
+        "resource2" "resource3" "resource" BEGIN
+            WRITE_EVALUATED_ASCII field_offset "%value%" #8
+        END
+        DEFAULT
+            PATCH_FAIL "set_effect_field: field '%field%' is not a valid effect field."
+    END
+END
+
+
+//Builders.
+DEFINE_ACTION_FUNCTION create_effect_with_array INT_VAR opcode = 0 STR_VAR resource = "" arguments = "" BEGIN
+    ACTION_IF FILE_EXISTS_IN_GAME "%resource%.eff" BEGIN
+        FAIL "create_effect_with_array: effect '%resource%.eff' already exists in game."
+    END
+
+    CREATE EFF "%resource%"
+        //Dynamic scoping woes: have to bring array names into scope.
+        INNER_ACTION BEGIN
+            INCLUDE "%library_dir%/effects.tpa"
+        END
+
+        LPF set_effect_field STR_VAR field = "opcode" value = "%opcode%" END
+        LPF set_effect_field STR_VAR field = "probability1" value = "100" END
+        PHP_EACH "%arguments%" AS field => value BEGIN
+            LPF set_effect_field STR_VAR field = "%field%" value = "%value%" END
+        END
+END

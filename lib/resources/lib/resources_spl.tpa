@@ -1,0 +1,542 @@
+//Libraries.
+INCLUDE "%library_dir%/arrays.tpa"
+INCLUDE "%library_dir%/bits.tpa"
+INCLUDE "%library_dir%/components.tpa"
+INCLUDE "%library_dir%/spells.tpa"
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Arrays.
+LAF build_array_from_2da STR_VAR
+    table = "add_spell_types"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    add_spell_types = array
+END
+
+LAF build_array_from_2da STR_VAR
+    table = "spell_school_animations"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    spell_school_animations = array
+END
+
+
+//Patchers.
+DEFINE_PATCH_FUNCTION set_spell_flags STR_VAR flags = "" BEGIN
+    //Sanitize.
+    PATCH_IF NOT (("%flags%" STRING_MATCHES_REGEXP "^[01][01][01][01][01][01][01][01]$") = 0) THEN BEGIN
+        PATCH_FAIL "set_spell_flags: string '%flags%' does not have 8 '0' or '1' characters."
+    END
+
+    //Extract values via regexp matching.
+    INNER_PATCH "%flags%" BEGIN
+        REPLACE_EVALUATE CASE_INSENSITIVE "^\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)\([01]\)$" BEGIN
+            TEXT_SPRINT break_invis "%MATCH1%"
+            TEXT_SPRINT hostile "%MATCH2%"
+            TEXT_SPRINT outdoors "%MATCH3%"
+            TEXT_SPRINT ignore_dead "%MATCH4%"
+            TEXT_SPRINT ignore_wild "%MATCH5%"
+            TEXT_SPRINT non_combat "%MATCH6%"
+            TEXT_SPRINT target_invisible "%MATCH7%"
+            TEXT_SPRINT cast_silenced "%MATCH8%"
+        END ~~
+    END
+
+    base = $spell_offsets("flags")
+    //Set flags.
+    LPF set_bit INT_VAR
+        offset =  base + 1
+        bit = 1
+        value = break_invis
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 1
+        bit = 2
+        value = hostile
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 1
+        bit = 5
+        value = outdoors
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 1
+        bit = 6
+        value = ignore_dead
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 1
+        bit = 7
+        value = ignore_wild
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 2
+        bit = 0
+        value = non_combat
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 3
+        bit = 0
+        value = target_invisible
+    END
+
+    LPF set_bit INT_VAR
+        offset = base + 3
+        bit = 1
+        value = cast_silenced
+    END
+END
+
+
+DEFINE_PATCH_FUNCTION patch_spell INT_VAR
+    name = 0 - 1
+    descr = 0 - 1
+    level = 0 - 1
+STR_VAR
+    type = "*"
+    flags = "*"
+    school = "*"
+    sectype = "*"
+    sound = "*"
+    book_icon = "*"
+    abil_icon = "*"
+    projectile = "*"
+BEGIN
+    //Name and description.
+    PATCH_IF NOT (name = 0 - 1) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            name_ref = RESOLVE_STR_REF ((AT name))
+            LPF set_spell_field STR_VAR field = "name" value = "%name_ref%" END
+        END
+    END
+
+    PATCH_IF NOT (descr = 0 - 1) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            descr_ref = RESOLVE_STR_REF ((AT descr))
+            LPF set_spell_field STR_VAR field = "descr" value = "%descr_ref%" END
+        END
+    END
+
+    //Level.
+    PATCH_IF NOT (level = 0 - 1) BEGIN
+        PATCH_IF (level >= 1) BEGIN
+            LPF set_spell_field STR_VAR field = "level" value = "%level%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_spell: level '%level%' must be greater than '1'."
+        END
+    END
+
+    //Spell type.
+    PATCH_IF NOT ("%type%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            LPF get_spell_type STR_VAR type = "%type%" RET type_id = value END
+            PATCH_IF NOT (type_id = 0 - 1) BEGIN
+                LPF set_spell_field STR_VAR field = "type" value = "%type_id%" END
+            END ELSE BEGIN
+                PATCH_FAIL "patch_spell: type '%type%' is not valid."
+            END
+        END
+    END
+
+    //Flags.
+    PATCH_IF NOT ("%flags%" STRING_EQUAL_CASE "*") BEGIN
+        LPF set_spell_flags STR_VAR flags = "%flags%" END
+    END
+
+    //School and sectype.
+    PATCH_IF NOT ("%school%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            LPF get_school STR_VAR school = "%school%" RET school_id = id END
+            PATCH_IF NOT (school_id = 0 - 1) BEGIN
+                LPF set_spell_field STR_VAR field = "school" value = "%school_id%" END
+            END ELSE BEGIN
+                PATCH_FAIL "patch_spell: school '%school%' not found."
+            END
+
+            //Set animation if known school.
+            TO_LOWER school
+            LPF is_key_in_array STR_VAR key = "%school%" array = "spell_school_animations" RET is_known_school = bool END
+            PATCH_IF NOT (is_known_school = 0) BEGIN
+                animation = $spell_school_animations("%school%")
+                LPF set_spell_field STR_VAR field = "animation" value = "%animation%" END
+            END
+        END
+    END
+
+    PATCH_IF NOT ("%sectype%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            LPF get_sectype STR_VAR sectype = "%sectype%" RET sectype_id = id END
+            PATCH_IF NOT (sectype_id = 0 - 1) BEGIN
+                LPF set_spell_field STR_VAR field = "sectype" value = "%sectype_id%" END
+            END ELSE BEGIN
+                PATCH_FAIL "patch_spell: sectype '%sectype%' not found."
+            END
+        END
+    END
+
+    //Sound.
+    PATCH_IF NOT ("%sound%" STRING_EQUAL_CASE "*") BEGIN
+        //Check if mod provides it.
+        PATCH_IF FILE_EXISTS "%component_resources_dir%/wav/%sound%.wav" BEGIN
+            INNER_ACTION BEGIN
+                //Install icon.
+                LAF copy_resource INT_VAR 
+                    override = 0
+                STR_VAR
+                    resource = "%sound%"
+                    ext = "wav"
+                    dir = "%component_resources_dir%/wav"
+                END
+            END
+        END
+
+        //Check existence in game.
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%sound%.wav") BEGIN
+            PATCH_WARN "Warning: patch_spell: sound '%sound%.wav' does not exist in game."
+        END
+
+        //Set.
+        LPF set_spell_field STR_VAR field = "sound" value = "%sound%" END
+    END
+
+    //Icons.
+    PATCH_IF NOT ("%book_icon%" STRING_EQUAL_CASE "*") BEGIN
+        //Check if mod provides it.
+        PATCH_IF FILE_EXISTS "%component_resources_dir%/bam/%book_icon%.bam" BEGIN
+            INNER_ACTION BEGIN
+                //Install icon.
+                LAF copy_resource INT_VAR
+                    override = 0
+                STR_VAR
+                    resource = "%book_icon%"
+                    ext = "bam"
+                    dir = "%component_resources_dir%/bam"
+                END
+            END
+        END
+
+        //Check existence in game.
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%book_icon%.bam") BEGIN
+            PATCH_WARN "Warn: patch_spell: icon '%book_icon%.bam' does not exist in game."
+        END
+
+        //Set.
+        LPF set_spell_field STR_VAR field = "book_icon" value = "%book_icon%" END
+    END
+
+    PATCH_IF NOT ("%abil_icon%" STRING_EQUAL_CASE "*") BEGIN
+        //Check if mod provides it.
+        PATCH_IF FILE_EXISTS "%component_resources_dir%/bam/%abil_icon%.bam" BEGIN
+            INNER_ACTION BEGIN
+                //Install icon.
+                LAF copy_resource INT_VAR
+                    override = 0
+                STR_VAR
+                    resource = "%abil_icon%"
+                    ext = "bam"
+                    dir = "%component_resources_dir%/bam"
+                END
+            END
+        END
+
+        //Check existence in game.
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%abil_icon%.bam") BEGIN
+            PATCH_WARN "Warning: patch_spell: icon '%abil_icon%.bam' does not exist in game."
+        END
+
+        //Set field on all headers.
+        PATCH_WITH_SCOPE BEGIN
+            LPF get_spell_header_count RET headers_count = count END
+            FOR (i = 0; i < headers_count; ++i) BEGIN
+                LPF set_spell_header_field INT_VAR header = i STR_VAR field = "icon" value = "%abil_icon%" END
+            END
+        END
+    END
+
+    //Projectile.
+    PATCH_IF NOT ("%projectile%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            pro_number = IDS_OF_SYMBOL ("projectl" "%projectile%")
+            //Check if projectile exists.
+            PATCH_IF (pro_number = 0 - 1) BEGIN
+                PATCH_IF (FILE_EXISTS "%component_resources_dir%/pro/%projectile%.pro") BEGIN
+                    INNER_ACTION BEGIN
+                        //Add projectile.
+                        ADD_PROJECTILE "%component_resources_dir%/pro/%projectile%.pro"
+                    END
+
+                    //Grab new projectile number: double indirection.
+                    pro_number = EVAL "%projectile%"
+                END ELSE BEGIN
+                    PATCH_FAIL "patch_spell: projectile '%component_resources_dir%/pro/%projectile%.pro' not found."
+                END
+            END ELSE BEGIN
+                //Correct projectile number.
+                pro_number += 1
+            END
+
+            //Write out projectile numbers.
+            LPF get_spell_header_count RET headers_count = count END
+            FOR (i = 0; i < headers_count; ++i) BEGIN
+                LPF set_spell_header_field INT_VAR header = i STR_VAR field = "projectile" value = "%pro_number%" END
+            END
+        END
+    END
+END
+
+
+//Installers.
+DEFINE_ACTION_FUNCTION copy_spells_from_table STR_VAR table = "" patches = "*" tra = "*" BEGIN
+    //Existence check.
+    OUTER_TEXT_SPRINT table_file "%component_resources_dir%/2da/%table%.2da"
+    ACTION_IF NOT FILE_EXISTS "%table_file%" BEGIN
+        FAIL "copy_spells_from_table: table '%table_file%' does not exist."
+    END
+
+    //Set tra file.
+    ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+    END ELSE BEGIN
+        OUTER_TEXT_SPRINT tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
+    END
+
+    //Existence check.
+    ACTION_IF NOT FILE_EXISTS "%tra_file%" BEGIN
+        FAIL "copy_spells_from_table: tra file '%tra_file%' does not exist."
+    END
+
+    WITH_TRA "%tra_file%" BEGIN
+        //Load patches file if passed.
+        ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+            ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
+                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+            END ELSE BEGIN
+                FAIL "copy_spells_from_table: library file '%component_dir%/lib/%patches%' does not exist."
+            END
+        END
+
+
+        //Read table.
+        COPY - ~%table_file%~ ~override~
+            COUNT_2DA_COLS cols
+            //Number of columns check.
+            PATCH_IF NOT (cols = 17) BEGIN
+                PATCH_FAIL "copy_spells_from_table: number of columns '%cols%' in table '%table_file%' is not the required one."
+            END
+
+            //Set subdir where resource spell is located.
+            TEXT_SPRINT dir "%component_resources_dir%/spl"
+            PATCH_IF NOT ("%subdir%" STRING_EQUAL_CASE "*") BEGIN
+                TEXT_SPRINT dir "%subdir%"
+            END
+
+            //Loop.
+            READ_2DA_ENTRIES_NOW "table#rows" cols
+            FOR (i = 0; i < table#rows; ++i) BEGIN
+                //Collect data.
+                READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
+                READ_2DA_ENTRY_FORMER "table#rows" i 1 install
+                READ_2DA_ENTRY_FORMER "table#rows" i 2 name
+                READ_2DA_ENTRY_FORMER "table#rows" i 3 descr
+                READ_2DA_ENTRY_FORMER "table#rows" i 4 type
+                READ_2DA_ENTRY_FORMER "table#rows" i 5 level
+                READ_2DA_ENTRY_FORMER "table#rows" i 6 flags
+                READ_2DA_ENTRY_FORMER "table#rows" i 7 school
+                READ_2DA_ENTRY_FORMER "table#rows" i 8 sectype
+                READ_2DA_ENTRY_FORMER "table#rows" i 9 sound
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 book_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 abil_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 12 projectile
+                READ_2DA_ENTRY_FORMER "table#rows" i 13 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 14 override
+                READ_2DA_ENTRY_FORMER "table#rows" i 15 type_add
+                READ_2DA_ENTRY_FORMER "table#rows" i 16 id
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Install resource.
+                    PATCH_IF NOT ("%id%" STRING_EQUAL_CASE "*") BEGIN
+                        LPF get_spell_res STR_VAR spell = "%id%" RET dest = resource END
+                        //id does not exist; add spell.
+                        PATCH_IF ("%dest%" STRING_EQUAL_CASE "*") BEGIN
+                            //Sanity check.
+                            PATCH_IF (override = 1) BEGIN
+                                PATCH_WARN "Warning: copy_spells_from_table: resource '%resource%' with id '%id%' marked for adding but 'override' set to '1'."
+                            END
+
+                            //Sanitize addition type.
+                            TO_LOWER type_add
+                            PATCH_WITH_SCOPE BEGIN
+                                LPF is_key_in_array STR_VAR array = "add_spell_types" key = "%type_add%" RET bool END
+                                PATCH_IF bool = 0 BEGIN
+                                    PATCH_FAIL "copy_spells_from_table: type '%type_add%' not valid."
+                                END
+                            END
+
+                            //Adding new spell.
+                            INNER_ACTION BEGIN
+                                WITH_SCOPE BEGIN
+                                    OUTER_SET type_add_id = $add_spell_types("%type_add%")
+                                    ADD_SPELL "%dir%/%resource%.spl" type_add_id level "%id%"
+                                END
+                            END
+
+                            //Spell successfully added: grab its resource name.
+                            LPF get_spell_res STR_VAR spell = "%id%" RET dest = resource END
+                        //id exists; copy-override spell.
+                        END ELSE BEGIN
+                            //Sanity checks.
+                            PATCH_IF (override = 0) BEGIN
+                                PATCH_FAIL "copy_spells_from_table: resource '%resource%' with id '%id%' marked for override but 'override' is set to '0'."
+                            END
+                            
+                            PATCH_IF NOT ("%type_add%" STRING_EQUAL_CASE "*") BEGIN
+                                PATCH_WARN "Warning: copy_spells_from_table: resource '%resource%' with id '%id%' marked for override. Type to add should be '*'."
+                            END
+
+                            //Copy-override.
+                            INNER_ACTION BEGIN
+                                COPY ~%dir%/%resource%.spl~ ~override/%dest%.spl~
+                            END
+                        END
+                    END ELSE BEGIN
+                        //Existence check.
+                        TEXT_SPRINT dest "%resource%"
+                        PATCH_IF (override = 0) AND (FILE_EXISTS_IN_GAME "%dest%.spl") BEGIN
+                            PATCH_FAIL "copy_spells_from_table: resource '%dest%.spl' already exists in game."
+                        END
+
+                        //Copy.
+                        INNER_ACTION BEGIN
+                            COPY ~%dir%/%resource%.spl~ ~override/%dest%.spl~
+                        END
+                    END
+
+                    //Patch the copied spell.
+                    INNER_ACTION BEGIN
+                        COPY_EXISTING ~%dest%.spl~ ~override~
+                            //Correct resource self-references.
+                            PATCH_IF NOT ("%resource%" STRING_EQUAL_CASE "%dest%") BEGIN
+                                LPF ALTER_EFFECT STR_VAR
+                                    silent = 1
+                                    match_resource = "%resource%"
+                                    resource = "%dest%"
+                                END
+                            END
+
+                            //Patch table data.
+                            LPF patch_spell INT_VAR
+                                name = name
+                                descr = descr
+                                level = level
+                            STR_VAR
+                                type = "%type%"
+                                flags = "%flags%"
+                                school = "%school%"
+                                sectype = "%sectype%"
+                                sound = "%sound%"
+                                book_icon = "%book_icon%"
+                                abil_icon = "%abil_icon%"
+                                projectile = "%projectile%"
+                            END
+
+                            //Final patching.
+                            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                                LPF "%patch%" END
+                            END
+                        BUT_ONLY
+                    END
+                END
+            END
+    END
+END
+
+DEFINE_ACTION_FUNCTION patch_spells_from_table STR_VAR table = "" patches = "*" tra = "*" BEGIN
+    OUTER_TEXT_SPRINT table_file "%component_resources_dir%/2da/%table%.2da"
+    ACTION_IF NOT (FILE_EXISTS "%table_file%") BEGIN
+        FAIL "patch_spells_from_table: table '%table_file%' does not exist."
+    END
+
+    //Set tra file.
+    OUTER_TEXT_SPRINT tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
+    ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+    END
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS "%tra_file%") BEGIN
+        FAIL "patch_spells_from_table: tra file '%tra_file%' does not exist."
+    END
+
+    WITH_TRA "%tra_file%" BEGIN
+        //Load patches file if passed.
+        ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+            ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
+                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+            END ELSE BEGIN
+                FAIL "patch_spells_from_table: library file '%component_dir%/lib/%patches%' does not exist."
+            END
+        END
+
+        //Read table.
+        COPY - ~%table_file%~ ~override~
+            COUNT_2DA_COLS cols
+            //Number of columns check.
+            PATCH_IF NOT (cols = 14) BEGIN
+                PATCH_FAIL "patch_spells_from_table: number of columns '%cols%' in table '%table_file%' is not the required."
+            END
+
+            //Loop.
+            READ_2DA_ENTRIES_NOW "table#rows" cols
+            FOR (i = 0; i < table#rows; ++i) BEGIN
+                //Collect data.
+                READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
+                READ_2DA_ENTRY_FORMER "table#rows" i 1 install
+                READ_2DA_ENTRY_FORMER "table#rows" i 2 name
+                READ_2DA_ENTRY_FORMER "table#rows" i 3 descr
+                READ_2DA_ENTRY_FORMER "table#rows" i 4 type
+                READ_2DA_ENTRY_FORMER "table#rows" i 5 level
+                READ_2DA_ENTRY_FORMER "table#rows" i 6 flags
+                READ_2DA_ENTRY_FORMER "table#rows" i 7 school
+                READ_2DA_ENTRY_FORMER "table#rows" i 8 sectype
+                READ_2DA_ENTRY_FORMER "table#rows" i 9 sound
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 book_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 abil_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 12 projectile
+                READ_2DA_ENTRY_FORMER "table#rows" i 13 patch
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Copy.
+                    INNER_ACTION BEGIN
+                        COPY_EXISTING ~%resource%.spl~ ~override~
+                            //Patch table data.
+                            LPF patch_spell INT_VAR
+                                name = name
+                                descr = descr
+                                level = level
+                            STR_VAR
+                                type = "%type%"
+                                flags = "%flags%"
+                                school = "%school%"
+                                sectype = "%sectype%"
+                                sound = "%sound%"
+                                book_icon = "%book_icon%"
+                                abil_icon = "%abil_icon%"
+                                projectile = "%projectile%"
+                            END
+
+                            //Final patching.
+                            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                                LPF "%patch%" END
+                            END
+                    END
+                END
+            END
+    END
+END

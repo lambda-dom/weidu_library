@@ -1,0 +1,14 @@
+2DA V1.0
+*
+            offset  type
+name        0x08    long
+sound       0x10    ascii
+flags       0x18    long
+type        0x1c    short
+exclusion   0x1e    long
+animation   0x22    short
+school      0x25    byte
+sectype     0x27    byte
+level       0x34    long
+book_icon   0x3a    ascii
+descr       0x50    long

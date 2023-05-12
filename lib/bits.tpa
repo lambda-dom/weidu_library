@@ -1,0 +1,61 @@
+//Auxiliary functions.
+//Set ith bit to 1 (0-indexed, least-to-most significant order) of byte at offset to 1.
+DEFINE_PATCH_FUNCTION enable_bit INT_VAR offset = 0 bit = 0 BEGIN
+    PATCH_IF (0 <= bit) AND (bit <= 7) BEGIN
+        WRITE_BYTE offset (THIS BOR (1 << bit))
+    END ELSE BEGIN
+        PATCH_FAIL "enable_bit: bit '%bit%' not between 0 and 7."
+    END
+END
+
+//Set ith bit to 0 (0-indexed, least-to-most significant order) of byte at offset to 0.
+DEFINE_PATCH_FUNCTION disable_bit INT_VAR offset = 0 bit = 0 BEGIN
+    PATCH_IF (0 <= bit) AND (bit <= 7) BEGIN
+        WRITE_BYTE offset (THIS BAND (BNOT (1 << bit)))
+    END ELSE BEGIN
+        PATCH_FAIL "disable_bit: bit '%bit%' not between 0 and 7."
+    END
+END
+
+
+//Public functions.
+//Dispatch call functions on the value to set the bit with.
+DEFINE_PATCH_FUNCTION set_bit INT_VAR offset = 0 bit = 0 value = 1 BEGIN
+    PATCH_IF (value = 0) BEGIN
+        LPF disable_bit INT_VAR offset = offset bit = bit END
+    END ELSE BEGIN
+        PATCH_IF (value = 1) BEGIN
+            LPF enable_bit INT_VAR offset = offset bit = bit END
+        END ELSE BEGIN
+            PATCH_FAIL "set_bit: '%value%' must be 0 or 1."
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION set_bits_in_byte INT_VAR offset = 0 STR_VAR bits = "" BEGIN
+    //Sanitize.
+    PATCH_IF NOT (("%bits%" STRING_MATCHES_REGEXP "^[01\*][01\*][01\*][01\*][01\*][01\*][01\*][01\*]$") = 0) THEN BEGIN
+        PATCH_FAIL "set_spell_flags: string '%flags%' does not have 8 '0', '1' or '*' characters."
+    END
+
+    //Extract values via regexp matching.
+    DEFINE_ASSOCIATIVE_ARRAY matches BEGIN END
+    INNER_PATCH "%flags%" BEGIN
+        REPLACE_EVALUATE CASE_INSENSITIVE "^\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)$" BEGIN
+        END ~~
+        FOR (i = 1; i <= 8; ++i) BEGIN
+            TEXT_SPRINT match "MATCH%i%"
+            TEXT_SPRINT $matches("%i%") EVAL "%match%"
+        END
+    END
+
+    PHP_EACH matches AS bit => value BEGIN
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            LPF set_bit INT_VAR
+                offset = offset
+                bit = bit - 1
+                value = value
+            END
+        END
+    END
+END

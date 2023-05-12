@@ -1,0 +1,12 @@
+2DA V1.0
+*
+            offset  type
+type        0x00    byte
+flags       0x01    byte
+location    0x02    short
+icon        0x04    ascii
+target      0x0c    byte
+range       0x0e    short
+min_level   0x10    short
+speed       0x12    short
+projectile  0x26    short

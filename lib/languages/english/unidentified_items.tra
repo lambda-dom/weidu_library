@@ -1,0 +1,253 @@
+//Description strings.
+//Un-identified items.
+//Necklaces and amulets.
+@500 = ~Necklace~
+@501 = ~A necklace is a piece of ornamental metal jewelry usually made of silver, gold, platinum, or other precious metals, and adorned with gems. A necklace is always worn on the neck and can be of any length.~
+
+@502 = ~Amulet~
+@503 = ~Amulets are usually magical devices that are commonly worn around the neck, suspended from a chain. The type of chain that comes with an amulet generally increases the item's aesthetic value, not its magical properties. Only one amulet can be dangled from the neck at a time.~
+
+//Rings.
+//ring01
+@510 = ~Ring~
+@511 = ~A ring is a small band of precious metal that is used as jewelry. Some rare rings have had enchantments placed upon them that confer various magical abilities. These rings are highly sought after, especially by those of the adventuring profession.~
+
+//Girdles (and belts).
+//belt01
+@520 = ~Girdle~
+@521 = ~Girdles are generally similar to belts. Unlike belts, girdles are not used to hold up pants and dungarees, but to carry pouches, scabbards, and the like.~
+
+//Bracers and Gauntlets.
+@530 = ~Bracers~
+@531 = ~Bracers are thick bands of metal or leather that are strapped, belted, or tied to a character's forearm.~
+
+@535 = ~Gauntlets~
+@536 = ~Gauntlets are armored gloves. They can be made of leather, metal plates, or chain mail. Every suit of armor is assumed to include gauntlets of an appropriate type. Magical gauntlets tend to be finer, lighter, and more easily worn than normal varieties.~
+
+//Boots.
+@540 = ~Boots~
+@541 = ~Boots are normally hand-made by cobblers. Common boots are made by using a form, but good boots are designed for the foot of an individual.~
+
+//Cloaks.
+@550 = ~Cloak~
+@551 = ~The cloak can be made in every possible shape with just about every type of fabric. The most common forms are a circular piece of fabric with a hole in the center for the head, and fabric draped from neck, connected by a chain, brooch, cord, or pins.~
+
+//Robes.
+@560 = ~Mage Robe~
+@561 = ~Since the age of Netheril, mages have learned to bestow a wide variety of magical properties upon the everyday objects that surround them. A favorite item of such enchantment is the common robe. It is lightweight, affordable, and holds its enchantment well, thereby making it the ideal equipment for a mage. Due to their magical heritage, however, only mages may wear these enchanted robes.~
+
+//Armors.
+//Leather armors.
+//leat01
+@600 = ~Leather Armor~
+@601 = ~Basic armor made of thick, wax or water-hardened leather. It is sturdy protection, not supple like boots or a cloak. Soft garment leathers like that would offer no more protection than common clothing.~
+
+//leat04
+@602 = ~Studded Leather Armor~
+@603 = ~Studded leather armor has little in common with normal leather armor. Instead of a hardened shell, studded leather offers hundreds of metal rivets affixed to a supple backing. The numerous studs form a flexible coat of metal that helps to turn aside slashing and cutting attacks, while the leather is little more than a means of securing the rivets in place.~
+
+//leat10
+@604 = ~Hide Armor~
+@605 = ~Hide Armor is made from the thick skin of large animals (elephants, for example) or layers of thinner, more common leather. It is considered too cumbersome for use in advanced human cultures, but is common among more barbaric humanoids. It offers better protection than normal leather, but can be hard to maintain, often resulting in an offensive odor or shoddy appearance that prevents effective use. Thieves can wear this armor, but it has a negative effect on their abilities.~
+
+//Chain Mails.
+//chan01
+@610 = ~Chain Mail~
+@611 = ~Chain mail is made of interlocking metal rings. It is always worn over a layer of padded fabric or soft leather to prevent chafing and lessen the impact of blows.~
+
+//chan04
+@612 = ~Splint Mail~
+@613 = ~Splint Mail is a variant of banded mail in which the metal strips are applied vertically to the backing of chain, leather, or cloth rather than horizontally as in banded mail. Since the human body does not swivel in mid-torso as much as it flexes back to front, splint mail is more restrictive in battle.~
+
+//chan12
+@614 = ~Elven Chain Mail~
+@615 = ~The delicate yet sturdy craftsmanship of the Elven races allows them to design many beautiful yet utilitarian goods. Among these is Elven chain mail, which is so finely wrought that it can be worn under normal clothing without revealing its presence. This and its lightness allows it to be worn by thieves and fighter/mages with few restrictions.~
+
+//Plate Mails.
+//plat01
+@620 = ~Plate Mail~
+@621 = ~Plate mail is a combination of chain armor with metal plates covering the vital areas such as the chest, abdomen and groin. Similar in construction to bronze plate mail, true plate mail comprises of chain and leather.~
+
+//plat04
+@622 = ~Full Plate Mail~
+@623 = ~Full plate armor is the best armor a warrior can buy, both in appearance and protection. The perfectly fitted interlocking plates are specially angled to deflect arrows and blows, and the entire suit is carefully adorned with rich engraving and embossed detail.~
+
+//Shields.
+//shld08
+@650 = ~Buckler~
+@651 = ~A buckler, also known as a target shield, is a small shield of wood or metal that fastens to the forearm. Because of its size it is light and can be worn with very little restriction to movement.~
+
+//shld01
+@652 = ~Small Shield~
+@653 = ~A small shield is usually round and is carried on the forearm, gripped with the shield hand. Its light weight as compared to a medium shield permits the user to carry other items in that hand, although he cannot wield or carry another weapon.~
+
+//shld03
+@654 = ~Medium Shield~
+@655 = ~A medium shield is carried in the same manner as a small shield. Unlike the small shield, however, its weight prevents the character from using his shield hand for anything other than carrying the medium shield. Medium shields are usually made of metal, range from 3'-4' in diameter, and can be of any shape, from round to square to a spread dragon's wings.~
+
+//shld05
+@656 = ~Large Shield~
+@657 = ~The body shield, also known as the kite or tower shield, is a massive metal or wooden shield reaching nearly from the chin to the toe of the user. It must be firmly fastened to the forearm and the shield hand must firmly grip it at all times. Naturally, this precludes use of the shield hand for anything but holding the body shield in place.~
+
+//Helmets.
+//helm01, helm15
+@660 = ~Helmet~
+@661 = ~This class of open-faced helmet, made of reinforced leather or metal, covers most of the head, save the face and neck. These helmets commonly provide protection for the nose as well.~
+
+//helm09, helm11, helm12
+@664 = ~Helmet~
+@665 = ~This class of decorative helmet, made of reinforced leather or metal, covers the face and head. Eye slits and breathing holes come highly recommended.~
+
+//Ioun stones.
+@670 = ~Ioun Stone~
+@671 = ~This is a small stone that floats in an orbit around the owner's head. Simply equip the stone to set it in its orbit. These obviously magical stones have different properties depending on their color.~
+
+//Melee Weapons.
+//Axes.
+//ax1h01
+@700 = ~Battle Axe~
+@701 = ~The most common version of the battle axe is a stout pole about four feet in length with a single-edged, trumpet-shaped blade mounted on one end. Battle axes are also called broad axes.~
+
+//ax1h04
+@702 = ~Throwing Axe~
+@703 = ~The hand axe, or throwing axe, is also known as a hatchet. The axe's blade has a sharp steel tip, counterbalanced by a pointed fluke. The short handle has a point on the bottom, and the head may have a spike on the top.~
+
+//Blunt Weapons.
+//blun01
+@710 = ~Club~
+@711 = ~Most clubs are stout, hardwood sticks, narrow at the grip and wider at the end. This simple weapon has been used since mankind first began using tools. Anyone can find a good stout piece of wood and swing it; hence the club's widespread use.~
+
+//blun02
+@712 = ~Flail~
+@713 = ~A flail consists of a sturdy wooden handle attached to an iron rod, a wooden rod with spikes, or a spiked iron ball. Between the handle and its implement is either a hinge or a chain link. The flail was originally used as a tool for threshing grain.~
+
+//blun04
+@714 = ~Mace~
+@715 = ~The mace is a direct descendant of the basic club, being nothing more than a wooden shaft with a stone or iron head mounted on the end. The design of the head varies: some are spiked, others flanged, and still others have pyramidal knobs.~
+
+//blun06
+@716 = ~Morning Star~
+@717 = ~A morning star consists of a wooden shaft topped with a metal head made up of a spiked iron sheath. Morning stars have an overall length of about four feet. Such weapons have round, oval, or cylindrical shaped heads studded with spikes. Extending from most morning star heads, regardless of design, is a long point for thrusting.~
+
+//Daggers.
+//dagg01
+@720 = ~Dagger~
+@721 = ~The typical dagger has a pointed, double-edged blade, as opposed to a knife, which has a single edge and is a bit shorter.~
+
+//dagg05
+@722 = ~Throwing Dagger~
+@723 = ~The typical throwing dagger has a pointed, usually double-edged blade, as opposed to a knife, which has a single edge and is a bit shorter than the dagger. Unlike a dagger, this one has a smaller handle and is balanced differently.~
+
+//Halberds.
+//halb01
+@730 = ~Halberd~
+@731 = ~Consisting of a cleaver-like axe blade mounted on a staff averaging six feet in length, the halberd is the oldest and most often used polearm. The axe blade is balanced at the rear with a fluke, and surmounted by a sharp spike, usually of quadrangular design. The fluke is sometimes replaced by a hook used to dismount cavalry. A halberd is best described as a cross between a spear and an axe.~
+
+//Hammers.
+//hamm01
+@740 = ~War Hammer~
+@741 = ~Mounted knights cannot effectively use long pole weapons while on horseback, and as a result, many weapons have been fitted with shorter shafts so they may be wielded with just one hand. Maces and flails are two previous examples of this -- the war hammer is another. The horseman's war hammer is a descendant of the Lucerne hammer. It is made entirely of steel, with rondels protecting and strengthening the grip. Rondels are small disks of metal, often shaped into decorative designs. The shaft is about 18 inches long.~
+
+//Spears.
+//sper01
+@750 = ~Spear~
+@751 = ~Among mankind's earliest weapons, dating back to the most primitive of times, the first spears were simply wooden poles or sticks that had been sharpened at one end. Upon mastering the use of metals, weaponsmiths forged spear heads from iron and steel, and began experimenting with different types of spear heads, thus leading to the development of certain types of polearms.~
+
+//Staves.
+//staf01
+@760 = ~Quarterstaff~
+@761 = ~The simplest and humblest of staff weapons, the quarterstaff is a length of wood ranging six to nine feet in length. High quality quarterstaves are made of stout oak and are shod with metal at both ends. The quarterstaff must be wielded with both hands.~
+
+//One-handed swords.
+//sw1h01
+@770 = ~Bastard Sword~
+@771 = ~Also known as the hand-and-a-half sword, the bastard sword derives its name from the fact that it is halfway between the two-handed sword and the long sword. The bastard sword has a double-edged blade and a long grip, which can accommodate both hands if preferred. The overall length of the bastard sword ranges between four feet and four feet ten inches.~
+
+//sw1h04
+@772 = ~Long Sword~
+@773 = ~These swords are usually referred to as doubled-edged swords, war swords, or military swords. In many cases, the long sword has a single-edged blade. There is no single version of the long sword; the design and length vary from culture to culture, and may vary within the same culture depending on the era. Among the most common characteristics of all long swords is their length, which ranges from 35 to 47 inches. In the latter case, the blade is known to take up 40 inches of the total length. Most long swords have a double-edged blade and a sharp point at the tip. Despite the tip, the long sword is designed for slashing, not thrusting.~
+
+//sw1h07
+@774 = ~Short Sword~
+@775 = ~The short sword is the first type of sword to come into existence. In the simplest of terms, a short sword can be considered a dagger with a blade so long that it can no longer be called a dagger. The term 'short sword' does not exist in sword classifications. However, it has come to be used to describe a double-edged blade about two feet in length. The sword tip is usually pointed, ideal for thrusting.~
+
+//sw1h20
+@776 = ~Scimitar~
+@777 = ~The long, curved, single-edged blade is characteristic of both the sabre and the scimitar, even though their origins lie in different parts of Faerun. Whereas the sabre was intended mainly for horsemen due to its versatility, the scimitar has a heavier oriental influence. The "shamshir," as it was originally called, is larger, has a greater curve to it, and is tapered to an elongated, sharp point. Thus, it is slightly slower, but tends to be more effective and deadly in combat.~
+
+//sw1h43
+@778 = ~Katana~
+@779 = ~The katana is a single-edged, slightly curved sword which ends in a chisel point. The katana is perhaps one of the finest swords ever made, the steps to its creation both complex and secret, and more an art form than anything else. This blade is an important facet of Kara-Tur culture. To touch or wield a samurai's katana is to insult the samurai and to incite his wrath. For a gaijin, or foreigner, to own such a blade is rare. Either the gaijin is a greatly honored friend of an important minister, or the gaijin has murdered a samurai.~
+
+//sw1h46
+@780 = ~Wakizashi~
+@781 = ~The wakizashi, or companion sword, is extremely important to samurai. It is worn at all times, even indoors, and is near the samurai when he sleeps at night. As finely made as the katana, the wakizashi is a shorter sword with a length between 12 and 24 inches, and is a dangerous weapon in the hands of a skilled user.~
+
+//sw1h48
+@782 = ~Ninja-To~
+@783 = ~The sword of the ninja, the ninja-to, is of lower quality than other Kara-Tur blades such as the katana. The ninja-to is short with a straight blade, making it ideal for the subterfuge of the ninja. The ninja-to is also more suited to fighting in closed places, sometimes giving the ninja an advantage over those using longer blades such as the samurai used.~
+
+//Two-handed swords.
+//sw2h01
+@790 = ~Two-Handed Sword~
+@791 = ~The two-handed sword is a derivative of the long sword. Weaponsmiths have always looked for ways to improve existing weapons. In an effort to improve the long sword, the blade was lengthened. Eventually, the handle had to be extended and two hands became necessary to properly swing the sword. The primary function of two-handed swords is cleaving mounted knights and breaking up pike formations.~
+
+//Ranged Weapons.
+//Bows.
+//bow01
+@800 = ~Composite Long Bow~
+@801 = ~Composite bows are long bows or short bows whose staves are made from more than one type of material. This gives greater flexibility, and makes arrows fired from such bows deliver more damage. Wielding such a powerful bow requires great strength.~
+
+//bow03
+@802 = ~Long Bow~
+@803 = ~The long bow is similar to the short bow, except that the staff is about as high as the archer is, usually 6 to 6.5 feet. Though the long bow is slightly slower than the short bow, it has better range and is more damaging.~
+
+//bow05
+@804 = ~Short Bow~
+@805 = ~Short bows were the first bows to be developed, although they were not called such. 'Short bow' is more of a default term that refers to anything which is not a long bow. Short bow staves are about 5 feet long on average. As the years passed, attempts were made to increase bow ranges, either by giving them longer staves or by increasing flexibility with no change to the length. The former resulted in what is now called the long bow.~
+
+//Slings.
+//slng01
+@810 = ~Sling~
+@811 = ~Slings have existed since the beginning of recorded history. The basic sling consists of a leather or fabric strap with a pouch for holding the missile. The weapon is held by both ends of the strap and twirled around the wielder's head. When top speed is attained, the missile is launched by releasing one of the strap's ends.~
+
+//Crossbows.
+//xbow01
+@820 = ~Heavy Crossbow~
+@821 = ~A crossbow is a bow mounted crosswise on a wooden or metal shaft called a tiller. The bow is usually made of ash or yew. The crossbow fires a type of projectile known as a quarrel or bolt.~
+
+//xbow04
+@822 = ~Light Crossbow~
+@823 = ~A crossbow is a bow mounted crosswise on a wooden or metal shaft called a tiller. The bow is usually made of ash or yew. The crossbow fires a type of projectile known as a quarrel or bolt. Light crossbows not only weigh less than their heavier counterparts, but they fire faster as well.~
+
+//Launcher ammunition.
+//arow01
+@850 = ~Arrows~
+@851 = ~The flight arrow, as its name implies, is built for distance. These lightweight arrows are often used for hunting. Most such arrows are made of ash or birch and are 30 to 40 inches long.~
+
+//bull01
+@852 = ~Bullets~
+@853 = ~A bullet is simply a rounded, well-balanced stone.~
+
+//bolt01
+@854 = ~Bolts~
+@855 = ~Quarrels, or bolts, are the ammunition fired by crossbows, regardless of the weapon's size.~
+
+//dart01
+@856 = ~Dart~
+@857 = ~The dart is a small, easily concealable missile weapon that is thrown rather than fired from a launcher.~
+
+//Miscellaneous
+//Wands
+@870 = ~Wand~
+@871 = ~Wands are 1 1/4 feet long and slender. They are made of ivory, bone, or wood and are usually tipped with something - metal, crystal, stone, etc. They are fragile and tend to break easily. Because of this, they are often kept in cases.
+
+Wands are powered by charges, each use costing one or more charges depending on the item. When a wand runs out of charges, it is consumed and destroyed.~
+
+//Rods
+@872 = ~Rod~
+@873 = ~Rods are about three feet long and as thick as your thumb. They are normally found in cases or similar storage places. Rods can be fashioned from metal, wood, ivory, or bone. They can be plain or decorated and carved, tipped, or not. Rods are powered by charges and each time the rod is used, one or more charges are expended.~
+
+//Potions
+@880 = ~Potion~
+@881 = ~Potions are typically found in ceramic, crystal, glass, or metal flasks or vials. Flasks or other containers generally contain enough fluid to provide one person with one complete dose to achieve the effects of the potion.~

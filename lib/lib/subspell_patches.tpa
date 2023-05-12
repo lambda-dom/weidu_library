@@ -1,0 +1,260 @@
+//Libraries.
+INCLUDE "%library_dir%/arrays.tpa"
+INCLUDE "%library_dir%/spells.tpa"
+
+
+//Auxiliary functions.
+DEFINE_PATCH_FUNCTION compose_damage_string INT_VAR amount = 0 dicenumber = 0 dicesize = 0 RET string BEGIN
+    //Sanitize arguments.
+    PATCH_IF (dicenumber = 0) AND (amount = 0) BEGIN
+        PATCH_FAIL "compose_damage_string: both dice number and amount are zero."
+    END
+
+    //Compose dice part of string.
+    TEXT_SPRINT dice ""
+    PATCH_IF NOT (dicenumber = 0) BEGIN
+        PATCH_IF NOT (dicesize = 0) BEGIN
+            TEXT_SPRINT dice "%dicenumber%d%dicesize%"
+        END ELSE BEGIN
+            PATCH_FAIL "compose_damage_string: dice number is non-zero but dice size is."
+        END
+    END
+
+    PATCH_IF (amount = 0) BEGIN
+        TEXT_SPRINT string "%dice%"
+    END ELSE BEGIN
+        PATCH_IF (STRING_LENGTH "%dice%") = 0 BEGIN
+            TEXT_SPRINT string "%amount%"
+        END ELSE BEGIN
+            TEXT_SPRINT string "%amount% + %dice%"
+        END
+    END
+END
+
+
+//Description patches.
+DEFINE_PATCH_FUNCTION patch_expand_description INT_VAR descr = 0 STR_VAR arguments = "" BEGIN
+    PATCH_IF NOT (descr = 0) BEGIN
+        //Inject variables in local scope.
+        PHP_EACH "%arguments%" AS field => value BEGIN
+            TEXT_SPRINT "%field%" "%value%"
+        END
+
+        //Implicit variable expansion: no way to get at text of tra ref without RESOLVE_STR_REF.
+        SAY $spell_offsets("descr") (AT descr)
+    END
+END
+
+DEFINE_PATCH_FUNCTION patch_damage_description INT_VAR descr = 0 STR_VAR arguments = "" BEGIN
+    //Grab arguments.
+    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "dicenumber" RET dicenumber = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "dicesize" RET dicesize = value END
+
+    //Compose damage string.
+    LPF compose_damage_string INT_VAR
+        amount = amount
+        dicenumber = dicenumber
+        dicesize = dicesize
+    RET
+        damage = string
+    END
+
+    //Re-define arguments.
+    DEFINE_ASSOCIATIVE_ARRAY new_arguments BEGIN
+        "damage" => "%damage%"
+    END
+
+    LPF patch_expand_description INT_VAR descr = descr STR_VAR arguments = "new_arguments" END
+END
+
+
+//Spell patches.
+DEFINE_PATCH_FUNCTION patch_damage STR_VAR arguments = "" BEGIN
+    dicenumber = $"%arguments%"("dicenumber")
+    dicesize = $"%arguments%"("dicesize")
+    amount = $"%arguments%"("amount")
+    //Sanitize arguments.
+    PATCH_IF (dicenumber < 0) OR (dicesize < 0) OR (amount < 0) BEGIN
+        PATCH_FAIL "patch_damage: all arguments must be positive."
+    END
+
+    //Damage.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        match_opcode = 12                   //Damage.
+        parameter1 = amount
+        dicenumber = dicenumber
+        dicesize = dicesize
+    END
+END
+
+DEFINE_PATCH_FUNCTION patch_duration STR_VAR arguments = "" BEGIN
+    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    //Sanitize arguments.
+    PATCH_IF (duration <= 0) BEGIN
+        PATCH_FAIL "patch_duration: argument duration is '%duration%' but must be strictly positive."
+    END
+ 
+    //Patch duration.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        duration_high = duration * 6
+    END
+END
+
+//Specific patchers.
+DEFINE_PATCH_FUNCTION poisoning STR_VAR arguments = "" BEGIN
+    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    //Sanitize arguments.
+    PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
+        PATCH_FAIL "poisoning: amount and duration must be strictly positive."
+    END
+
+    //Patch duration.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        duration_high = duration * 6
+    END
+
+    //Patch amount.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        match_opcode = 25                   //Poison.
+        parameter1 = amount
+    END
+END
+
+DEFINE_PATCH_FUNCTION slow_movement_rate STR_VAR arguments = "" BEGIN
+    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    //Sanitize arguments.
+    PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
+        PATCH_FAIL "slow_movement_rate: amount and duration must be strictly positive."
+    END
+
+    //Patch duration.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        duration_high = duration * 6
+    END
+
+    //Patch amount.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        match_opcode = 126                  //Movement rate.
+        parameter1 = 0 - amount
+    END
+END
+
+DEFINE_PATCH_FUNCTION cripple STR_VAR arguments = "" BEGIN
+    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    //Sanitize arguments.
+    PATCH_IF (duration <= 0) BEGIN
+        PATCH_FAIL "cripple: duration must be strictly positive."
+    END
+    PATCH_IF NOT ((1 <= amount) AND (amount <= 100)) BEGIN
+        PATCH_FAIL "cripple: percentage argument must be between 1 and 100, is: %amount%."
+    END
+
+    //Patch duration.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        duration_high = duration * 6
+    END
+
+    //Patch amount.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        match_opcode = 126                  //Movement rate.
+        parameter1 = amount
+    END
+END
+
+DEFINE_PATCH_FUNCTION splash_damage STR_VAR arguments = "" BEGIN
+    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    //sanitize arguments.
+    PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
+        PATCH_FAIL "bleeding: both amount and duration arguments must be strictly positive."
+    END
+
+    //Patch amount.
+    LPF ALTER_EFFECT INT_VAR
+        match_opcode = 12                   //Damage.
+        parameter1 = amount
+    END
+
+    //Patch duration.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        duration_high = duration * 6
+    END
+
+    //Add remaining delayed damage opcodes.
+    PATCH_IF (duration >= 2) BEGIN
+        FOR (i = 1 ; i < duration ; ++i) BEGIN
+            LPF CLONE_EFFECT INT_VAR
+                match_opcode = 12           //Damage.
+                match_timing = 4            //Delayed.
+                //(duration - i) to get ordered opcodes.
+                duration = 3 + (duration - i) * 6
+            STR_VAR
+                insert = "below"
+            END
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION level_drain STR_VAR arguments = "" BEGIN
+    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    //Sanitize arguments.
+    PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
+        PATCH_FAIL "level_drain: amount and duration must be strictly positive."
+    END
+   
+    //Patch duration.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        duration_high = duration * 6
+    END
+
+    //Patch opcode with amount.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        match_opcode = 216                  //Level drain.
+        parameter1 = amount
+    END
+END
+
+DEFINE_PATCH_FUNCTION drain_strength STR_VAR arguments = "" BEGIN
+    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    //Sanitize arguments.
+    PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
+        PATCH_FAIL "drain_strength: amount and duration must be strictly positive."
+    END
+   
+    //Patch duration.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        duration_high = duration * 6
+    END
+
+    //Patch opcode with amount.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        match_opcode = 44                   //Strength penalty.
+        parameter1 = 0 - amount
+    END
+END
+
+DEFINE_PATCH_FUNCTION knockback STR_VAR arguments = "" BEGIN
+    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    //Sanitize arguments.
+    PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
+        PATCH_FAIL "knockback: amount and duration must be strictly positive."
+    END
+   
+    //Patch duration.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        duration_high = duration * 6
+    END
+
+    //Patch opcode with amount.
+    LPF ALTER_SPELL_EFFECT INT_VAR
+        match_opcode = 235                  //Wing buffet.
+        parameter1 = amount
+    END
+END

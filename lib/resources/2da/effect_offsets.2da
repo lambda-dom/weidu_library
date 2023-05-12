@@ -1,0 +1,26 @@
+2DA V1.0
+*
+                offset  type
+opcode          0x10    long
+target          0x14    long
+power           0x18    long
+parameter1      0x1c    long
+parameter2      0x20    long
+timing          0x24    short
+duration        0x28    long
+probability1    0x2c    short
+probability2    0x2e    short
+resource        0x30    ascii
+dicenumber      0x38    long
+dicesize        0x3c    long
+savingthrow     0x40    long
+savebonus       0x44    long
+special         0x48    long
+school          0x4c    long
+resist_dispel   0x5c    long
+parameter3      0x60    long
+parameter4      0x64    long
+resource2       0x70    ascii
+resource3       0x78    ascii
+projectile      0xa0    long
+sectype         0xd0    long

@@ -1,0 +1,125 @@
+//Action functions.
+DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" BEGIN
+    //Clear on entry.
+    CLEAR_ARRAYS
+    CLEAR_CODES
+    CLEAR_INLINED
+    CLEAR_IDS_MAP
+
+    //Check name validity.
+    ACTION_IF NOT (("%component%" STRING_MATCHES_REGEXP "[a-z][a-z0-9_-]+") = 0) THEN BEGIN
+        FAIL "load_component: string '%component%' is not a valid component name: cannot have spaces, must be lower-cased, etc."
+    END
+
+    //Set variables.
+    OUTER_TEXT_SPRINT component_dir "%MOD_FOLDER%/components/%component%"
+    OUTER_TEXT_SPRINT component_resources_dir "%component_dir%/resources"
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS "%component_dir%/main.tpa") BEGIN
+        FAIL "load_component: file '%component_dir%/main.tpa' does not exist."
+    END
+    
+    //Set tra file.
+    ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT component_tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+    END ELSE BEGIN
+        ACTION_IF (VARIABLE_IS_SET "library_dir") BEGIN
+            OUTER_TEXT_SPRINT component_tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
+        END ELSE BEGIN
+            FAIL "load_component: cannot resolve library dir, variable 'library_dir' not set."
+        END        
+    END
+
+    //Existence check.
+    ACTION_IF NOT FILE_EXISTS "%component_tra_file%" BEGIN
+        FAIL "load_file: tra file '%component_tra_file%' does not exist."
+    END
+
+    //Load tra file.
+    WITH_TRA "%component_tra_file%" BEGIN
+        //Load component's main tpa file.
+        INCLUDE "%component_dir%/main.tpa"
+    END
+END
+
+//Library functions.
+DEFINE_ACTION_FUNCTION load_file STR_VAR file = "" dir = "*" tra = "*" BEGIN
+    //Standardize dir.
+    ACTION_IF "%dir%" STRING_EQUAL_CASE "*" BEGIN
+        ACTION_IF VARIABLE_IS_SET "component_dir" BEGIN
+            OUTER_TEXT_SPRINT dir "%component_dir%/lib"
+        END ELSE BEGIN
+            FAIL "load_file: cannot resolve directory from which to fetch '%file%', variable 'component_dir' not set."
+        END
+    END
+
+    //Set tra file.
+    ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF (VARIABLE_IS_SET "component") BEGIN
+            OUTER_TEXT_SPRINT tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+        END ELSE BEGIN
+            FAIL "load_file: cannot resolve component's tra dir, variable 'component' not set."
+        END
+    END ELSE BEGIN
+        ACTION_IF (VARIABLE_IS_SET "library_dir") BEGIN
+            OUTER_TEXT_SPRINT tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
+        END ELSE BEGIN
+            FAIL "load_file: cannot resolve library dir, variable 'library_dir' not set."
+        END        
+    END
+
+    //Existence check.
+    ACTION_IF NOT FILE_EXISTS "%tra_file%" BEGIN
+        FAIL "load_file: tra file '%tra_file%' does not exist."
+    END
+
+    WITH_TRA "%tra_file%" BEGIN
+        //Includes.
+        INCLUDE "%dir%/%file%"
+    END
+END
+
+
+//General resource install functions.
+DEFINE_ACTION_FUNCTION copy_resource INT_VAR override = 1 STR_VAR resource = "" ext = "" dest = "*" dir = "*" patch = "*" BEGIN
+    //Standardize destination.
+    ACTION_IF ("%dest%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT dest "%resource%"
+    END
+
+    //Existence check.
+    ACTION_IF (override = 0) AND (FILE_EXISTS_IN_GAME "%dest%.%ext%") BEGIN
+        FAIL "copy_resource: file '%dest%.%ext%' already exists in game."
+    END
+
+    //Standardize dir.
+    ACTION_IF ("%dir%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF VARIABLE_IS_SET "component_resources_dir" BEGIN
+            //Set to component resources dir.
+            OUTER_TEXT_SPRINT dir "%component_resources_dir%/%ext%"
+        END ELSE BEGIN
+            FAIL "copy_resource: cannot resolve directory from which to fetch resource."
+        END
+    END
+
+    COPY ~%dir%/%resource%.%ext%~ ~override/%dest%.%ext%~
+        //Call patch function if any.
+        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+            LPF "%patch%" END
+        END
+END
+
+DEFINE_ACTION_FUNCTION clone_resource STR_VAR resource = "" ext = "" dest = "" patch = "*" BEGIN
+    //Existence check.
+    ACTION_IF (FILE_EXISTS_IN_GAME "%dest%.%ext%") BEGIN
+        FAIL "clone_resource: file '%dest%.%ext%' already exists in game."
+    END
+
+    //Copy.
+    COPY_EXISTING ~%resource%.%ext%~ ~override/%dest%.%ext%~
+        //Call patch function if any.
+        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+            LPF "%patch%" END
+        END
+END

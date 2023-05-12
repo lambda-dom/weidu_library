@@ -1,0 +1,149 @@
+//Libraries.
+INCLUDE "%library_dir%/strings.tpa"
+
+
+//Searchers.
+DEFINE_PATCH_FUNCTION find_column_index STR_VAR key = "" RET index BEGIN
+    COUNT_2DA_COLS cols
+
+    //Avoid trivial cases to simplify code.
+    PATCH_IF (cols <= 2) BEGIN
+        PATCH_FAIL "find_column_index: table with two columns or less."
+    END
+
+    row = 0
+    //Correct row to search, as signature row has 2 columns.
+    PATCH_IF (cols = 3) BEGIN
+        row = 1
+    END
+
+    index = 0 - 1
+    //Loop through row of names to search for key.
+    FOR (i = 0; (i < cols - 1) AND (index < 0); ++i) BEGIN
+        READ_2DA_ENTRY row i (cols - 1) value
+        PATCH_IF ("%key%" STRING_EQUAL_CASE "%value%") BEGIN
+            //Correct index to account that we searched through names row.
+            index = i + 1
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION find_first_row INT_VAR col = 0 start = 0 STR_VAR key = "" RET index BEGIN
+    //Sanity bounds check.
+    COUNT_2DA_COLS cols
+    PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
+        PATCH_FAIL "find_first_row: column index '%col%' out of bounds."
+    END
+
+    COUNT_2DA_ROWS cols rows
+    //Sanitize start.
+    PATCH_IF NOT ((0 <= start) AND (start < rows)) BEGIN
+        PATCH_FAIL "find_first_row: argument start: '%start%' out of bounds."
+    END
+
+    //Read table.
+    index = 0 - 1
+    FOR (i = start ; (i < rows) AND (index < 0) ; ++i) BEGIN
+        READ_2DA_ENTRY i col cols value
+        PATCH_IF ("%key%" STRING_EQUAL_CASE "%value%") BEGIN
+            //Set index => break out of the loop.
+            index = i
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION find_first_row_from_end INT_VAR col = 0 start = 0 - 1 STR_VAR key = "" RET index BEGIN
+    //Sanity bounds check.
+    COUNT_2DA_COLS cols
+    PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
+        PATCH_FAIL "find_first_row_from_end: column index '%col%' out of bounds."
+    END
+
+    COUNT_2DA_ROWS cols rows
+    //Normalize end.
+    PATCH_IF (start = 0 - 1) BEGIN
+        start = rows - 1
+    END
+
+    //Sanitize start.
+    PATCH_IF NOT ((0 <= start) AND (start < rows)) BEGIN
+        PATCH_FAIL "find_first_row_from_end: argument start '%start%' out of bounds."
+    END
+
+    //Loop.
+    index = 0 - 1
+    FOR (i = start ; (i >= 0) AND (index < 0) ; --i) BEGIN
+        READ_2DA_ENTRY i col cols value
+        PATCH_IF ("%key%" STRING_EQUAL_CASE "%value%") BEGIN
+            //Set index => break out of the loop.
+            index = i
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION find_all_rows INT_VAR col = 0 STR_VAR key = "" RET_ARRAY indexes BEGIN
+    //Sanity bounds check.
+    COUNT_2DA_COLS cols
+    PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
+        PATCH_FAIL "find_first_row_from_end: column index '%col%' out of bounds."
+    END
+
+    DEFINE_ASSOCIATIVE_ARRAY indexes BEGIN END
+    j = 0
+    //Loop.
+    COUNT_2DA_ROWS cols rows
+    FOR (i = 0; i < rows; ++i) BEGIN
+        READ_2DA_ENTRY i col cols value
+        PATCH_IF ("%key%" STRING_EQUAL_CASE "%value%") BEGIN
+            TEXT_SPRINT $indexes("%j%") "%i%"
+            j += 1
+        END
+    END
+END
+
+
+//Builders.
+DEFINE_DIMORPHIC_FUNCTION build_array_from_2da INT_VAR col = 1 STR_VAR table = "" dir = "*" RET_ARRAY array BEGIN
+    //Standardize dir.
+    ACTION_IF "%dir%" STRING_EQUAL_CASE "*" BEGIN
+        ACTION_IF VARIABLE_IS_SET "component_resources_dir" BEGIN
+            OUTER_TEXT_SPRINT dir "%component_resources_dir%/2da"
+        END ELSE BEGIN
+            FAIL "build_array_from_2da: cannot resolve dir from which to read table, variable 'component_resources_dir' not."
+        END
+    END
+
+    ACTION_IF FILE_EXISTS "%dir%/%table%.2da" BEGIN
+        COPY - ~%dir%/%table%.2da~ ~override/%table%-gr#temp-no-copy.2da~
+            //Sanity bounds check.
+            COUNT_2DA_COLS cols
+            PATCH_IF NOT ((1 <= col) AND (col < cols)) BEGIN
+                PATCH_FAIL "build_array_from_2da: column index '%col%' out of bounds."
+            END
+
+            //Initialize variables.
+            DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+            READ_2DA_ENTRIES_NOW "table#rows" cols
+            //Read table.
+            FOR (i = 0 ; i < table#rows ; ++ i) BEGIN
+                //Collect data.
+                READ_2DA_ENTRY_FORMER "table#rows" i 0 key
+                READ_2DA_ENTRY_FORMER "table#rows" i col value
+                TEXT_SPRINT $array("%key%") "%value%"
+            END
+    END ELSE BEGIN
+        FAIL "build_array_from_2da: table file '%dir%/%table%.2da' does not exist."
+    END
+END
+
+
+//Writers.
+DEFINE_PATCH_FUNCTION append_blank_row STR_VAR key = "" default = "*" BEGIN
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+
+    //Compose row.
+    LPF repeat_string INT_VAR times = cols - 1 STR_VAR string = "%default%" RET_ARRAY strings END
+    LPF join_strings STR_VAR strings = "strings" RET new_row = string END
+    INSERT_2DA_ROW rows cols "%key% %new_row%"
+END

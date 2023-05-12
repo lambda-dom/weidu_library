@@ -1,0 +1,203 @@
+//Libraries.
+INCLUDE "%library_dir%/tables.tpa"
+
+//Constants.
+//Cre size: 723 bytes.
+OUTER_SET creature_size = 0x2d3
+
+//Arrays.
+//Creature offsets.
+LAF build_array_from_2da STR_VAR
+    table = "creature_offsets"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    creature_offsets = array
+END
+
+//Generic read and write functions.
+DEFINE_PATCH_FUNCTION get_cre_field STR_VAR field = "" RET value BEGIN
+    field_offset = $creature_offsets("%field%")
+
+    //Match on field to decide which read function to use.
+    PATCH_MATCH "%field%" WITH
+        "name"
+        "tooltip"
+        "flags"
+        "xp"
+        "power"
+        "gold"
+        "status"
+        "animation"
+        "kit" BEGIN
+            READ_LONG field_offset value
+        END
+        "hps"
+        "max_hps"
+        "ac_effective"
+        "ac_crushing"
+        "ac_missile"
+        "ac_piercing"
+        "ac_slashing"
+        "ac"
+        "morale_recovery" BEGIN
+            READ_SHORT field_offset value
+        END
+        "portrait_small"
+        "portrait_large"
+        "dialog" BEGIN
+            READ_ASCII field_offset value (8) NULL
+        END
+        "reputation" BEGIN
+            READ_SBYTE field_offset value
+        END
+        "hide_shadows"
+        "thac0"
+        "apr"
+        "saves_death"
+        "saves_wands"
+        "saves_polymorph"
+        "saves_breath"
+        "saves_spells"
+        "resist_fire"
+        "resist_cold"
+        "resist_electricity"
+        "resist_acid"
+        "resist_magic"
+        "resist_slashing"
+        "resist_crushing"
+        "resist_piercing"
+        "resist_missile"
+        "detect_illusion"
+        "set_traps"
+        "lore"
+        "lockpicking"
+        "move_silently"
+        "find_traps"
+        "pick_pockets"
+        "fatigue"
+        "intoxication"
+        "luck"
+        "turn_undead"
+        "first_class"
+        "second_class"
+        "third_class"
+        "sex"
+        "str_bonus"
+        "str"
+        "int"
+        "wis"
+        "dex"
+        "con"
+        "chr"
+        "morale"
+        "morale_break"
+        "racial_enemy"
+        "ea"
+        "general"
+        "race"
+        "class"
+        "specific"
+        "gender"
+        "alignment" BEGIN
+            READ_BYTE field_offset value
+        END
+        "death_variable" BEGIN
+            READ_ASCII field_offset value (32) NULL
+        END
+        DEFAULT
+            PATCH_FAIL "get_cre_field: field '%field%' not a valid creature field."
+    END
+END
+
+DEFINE_PATCH_FUNCTION set_cre_field STR_VAR field = "" value = "" BEGIN
+    field_offset = $creature_offsets("%field%")
+
+    //Match on field to decide which write function to use.
+    PATCH_MATCH "%field%" WITH
+        "name"
+        "tooltip"
+        "flags"
+        "xp"
+        "power"
+        "gold"
+        "status"
+        "animation"
+        "kit" BEGIN
+            WRITE_LONG field_offset value
+        END
+        "hps"
+        "max_hps"
+        "ac_effective"
+        "ac_crushing"
+        "ac_missile"
+        "ac_piercing"
+        "ac_slashing"
+        "ac"
+        "morale_recovery" BEGIN
+            WRITE_SHORT field_offset value
+        END
+        "portrait_small" "portrait_large" "dialog" BEGIN
+            WRITE_EVALUATED_ASCII field_offset "%value%" #8
+        END
+        "reputation" BEGIN
+            //write_byte serves for signed and unsigned bytes.
+            WRITE_BYTE field_offset value
+        END
+        "hide_shadows"
+        "thac0"
+        "apr"
+        "saves_death"
+        "saves_wands"
+        "saves_polymorph"
+        "saves_breath"
+        "saves_spells"
+        "resist_fire"
+        "resist_cold"
+        "resist_electricity"
+        "resist_acid"
+        "resist_magic"
+        "resist_slashing"
+        "resist_crushing"
+        "resist_piercing"
+        "resist_missile"
+        "detect_illusion"
+        "set_traps"
+        "lore"
+        "lockpicking"
+        "move_silently"
+        "find_traps"
+        "pick_pockets"
+        "fatigue"
+        "intoxication"
+        "luck"
+        "turn_undead"
+        "first_class"
+        "second_class"
+        "third_class"
+        "sex"
+        "str_bonus"
+        "str"
+        "int"
+        "wis"
+        "dex"
+        "con"
+        "chr"
+        "morale"
+        "morale_break"
+        "racial_enemy"
+        "ea"
+        "general"
+        "race"
+        "class"
+        "specific"
+        "gender"
+        "alignment" BEGIN
+            WRITE_BYTE field_offset value
+        END
+        "death_variable" BEGIN
+            WRITE_EVALUATED_ASCII field_offset "%value%" #32
+        END
+        DEFAULT
+            PATCH_FAIL "set_cre_field: field '%field%' not a valid creature field."
+    END
+END

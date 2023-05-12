@@ -1,0 +1,19 @@
+2DA V1.0
+*
+                offset  type
+opcode          0x00    short
+target          0x02    byte
+power           0x03    byte
+parameter1      0x04    long
+parameter2      0x08    long
+timing          0x0c    byte
+resist_dispel   0x0d    byte
+duration        0x0e    long
+probability1    0x12    byte
+probability2    0x13    byte
+resource        0x14    ascii
+dicenumber      0x1c    long
+dicesize        0x20    long
+savingthrow     0x24    long
+savebonus       0x28    long
+special         0x2c    long

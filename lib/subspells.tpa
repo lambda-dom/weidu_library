@@ -1,0 +1,94 @@
+//Libraries.
+INCLUDE "%library_dir%/arrays.tpa"
+INCLUDE "%library_dir%/spells.tpa"
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Main function.
+DEFINE_DIMORPHIC_FUNCTION clone_subspell_from_table STR_VAR spell = "" dest = "" arguments = "" BEGIN
+    //Existence check.
+    ACTION_IF NOT (VARIABLE_IS_SET "library_dir") BEGIN
+        FAIL "clone_subspell_from_table: cannot resolve library dir, variable 'library_dir' not set."
+    END
+
+    OUTER_TEXT_SPRINT tra_file "%library_dir%/languages/%LANGUAGE%/subspells.tra"
+    ACTION_IF (FILE_EXISTS "%tra_file%") BEGIN
+        //Include patches.
+        WITH_SCOPE  BEGIN
+            OUTER_TEXT_SPRINT patches_file "%library_dir%/lib/subspell_patches.tpa"
+            ACTION_IF FILE_EXISTS "%patches_file%" BEGIN
+                INCLUDE "%patches_file%"
+            END ELSE BEGIN
+                FAIL "clone_subspell_from_table: cannot find library '%patches_file%'."
+            END
+        END
+
+        //Open tra scope.
+        WITH_TRA "%tra_file%" BEGIN
+            OUTER_TEXT_SPRINT table_file "%library_dir%/resources/2da/subspells.2da"
+            ACTION_IF (FILE_EXISTS "%table_file%") BEGIN
+                //Open table file.
+                COPY - "%table_file%" "override"
+                    //Find row.
+                    LPF find_first_row STR_VAR key = "%spell%" RET row = index END
+                    PATCH_IF (row = 0 - 1) BEGIN
+                        PATCH_FAIL "clone_subspell_from_table: spell '%spell%' does not exist."
+                    END
+
+                    //Collect data.
+                    COUNT_2DA_COLS cols
+                    READ_2DA_ENTRIES_NOW "table#rows" cols
+                    READ_2DA_ENTRY_FORMER "table#rows" row 1 name
+                    READ_2DA_ENTRY_FORMER "table#rows" row 2 descr
+                    READ_2DA_ENTRY_FORMER "table#rows" row 3 patch
+                    READ_2DA_ENTRY_FORMER "table#rows" row 4 patch_description
+                    READ_2DA_ENTRY_FORMER "table#rows" row 5 arg1
+                    READ_2DA_ENTRY_FORMER "table#rows" row 6 arg2
+                    READ_2DA_ENTRY_FORMER "table#rows" row 7 arg3
+            END ELSE BEGIN
+                FAIL "clone_subspell_from_table: table '%table_file%' does not exist."
+            END
+
+            //Extract arguments from array argument to only forward arguments needed by patch.
+            ACTION_DEFINE_ASSOCIATIVE_ARRAY patch_arguments BEGIN END
+            ACTION_FOR_EACH arg IN "%arg1%" "%arg2%" "%arg3%" BEGIN
+                ACTION_IF NOT ("%arg%" STRING_EQUAL_CASE "*") BEGIN
+                    LAF is_key_in_array STR_VAR key = "%arg%" array = "%arguments%" RET is_arg = bool END
+                    ACTION_IF (is_arg = 0) BEGIN
+                        FAIL "clone_subspell_from_table: argument '%arg%' not in the arguments array."
+                    END
+                    OUTER_TEXT_SPRINT $patch_arguments("%arg%") $"%arguments%"("%arg%")
+                END
+            END
+
+            //Copy resource.
+            OUTER_TEXT_SPRINT resource "%library_dir%/resources/subspells/%spell%.spl"
+            ACTION_IF FILE_EXISTS "%resource%" BEGIN
+                COPY "%resource%" "override/%dest%.spl"
+                    tlk_ref = RESOLVE_STR_REF ((AT name))
+                    LPF set_spell_field STR_VAR field = "name" value = "%tlk_ref%" END
+
+                    //Patch description.
+                    PATCH_IF NOT ("%patch_description%" STRING_EQUAL_CASE "*") BEGIN
+                        LPF "%patch_description%" INT_VAR descr = descr STR_VAR arguments = "patch_arguments" END
+                    END
+
+                    //Correct self-references.
+                    LPF ALTER_EFFECT STR_VAR
+                        silent = 1
+                        match_resource = "self#res"
+                        resource = "%dest%"
+                    END
+
+                    //Call patch.
+                    PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                        LPF "%patch%" STR_VAR arguments = "patch_arguments" END
+                    END
+            END ELSE BEGIN
+                FAIL "clone_subspell_from_table: resource '%resource%' not found."
+            END
+        END
+    END ELSE BEGIN
+        FAIL "clone_subspell_from_table: tra file '%tra_file%' not found."
+    END
+END

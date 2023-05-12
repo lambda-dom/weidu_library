@@ -1,0 +1,28 @@
+2DA V1.0
+*
+                    offset  type
+type                0x00    byte
+identify            0x01    byte
+location            0x02    byte
+icon                0x04    ascii
+target              0x0c    byte
+range               0x0e    short
+launcher            0x10    byte
+speed               0x12    byte
+thac0_bonus         0x14    short
+dicesize            0x16    byte
+school              0x17    byte
+dicenumber          0x18    byte
+sectype             0x19    byte
+damage_bonus        0x1a    short
+damage_type         0x1c    short
+charges             0x22    short
+drained             0x24    short
+flags               0x26    long
+projectile          0x2a    short
+animation_overhand  0x2c    short
+animation_backhand  0x2e    short
+animation_thrust    0x30    short
+arrow               0x32    short
+bolt                0x34    short
+bullet              0x36    short
