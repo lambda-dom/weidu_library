@@ -6,12 +6,76 @@ INCLUDE "%library_dir%/creatures.tpa"
 //Patchers.
 DEFINE_PATCH_FUNCTION patch_cre INT_VAR
     name = 0 - 1
+    str = 0 -1
+    str_ex = 0 - 1
+    dex = 0 - 1
+    con = 0 - 1
+    int = 0 - 1
+    wis = 0 - 1
+    chr = 0 - 1
 BEGIN
     PATCH_IF NOT (name = 0 - 1) BEGIN
         PATCH_WITH_SCOPE BEGIN
             name_ref = RESOLVE_STR_REF ((AT name))
             LPF set_cre_field STR_VAR field = "name" value = "%name_ref%" END
             LPF set_cre_field STR_VAR field = "tooltip" value = "%name_ref%" END
+        END
+    END
+
+    //Main stats.
+    PATCH_IF NOT (str = 0 - 1) BEGIN
+        PATCH_IF (3 <= str) AND (str <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "str" value = "%str%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: str '%str%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (dex = 0 - 1) BEGIN
+        PATCH_IF (3 <= dex) AND (dex <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "dex" value = "%dex%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: dex '%dex%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (con = 0 - 1) BEGIN
+        PATCH_IF (3 <= con) AND (con <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "con" value = "%con%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: con '%con%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (int = 0 - 1) BEGIN
+        PATCH_IF (3 <= int) AND (int <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "int" value = "%int%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: int '%int%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (wis = 0 - 1) BEGIN
+        PATCH_IF (3 <= wis) AND (wis <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "wis" value = "%wis%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: wis '%wis%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (chr = 0 - 1) BEGIN
+        PATCH_IF (3 <= chr) AND (chr <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "chr" value = "%chr%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: chr '%chr%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (str_ex = 0 - 1) BEGIN
+        PATCH_IF (0 <= str_ex) AND (str_ex <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "str_bonus" value = "%str_ex%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: exceptional str '%str_ex%' out of bounds."
         END
     END
 END
@@ -51,7 +115,7 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
         COPY - ~%table_file%~ ~override~
             COUNT_2DA_COLS cols
             //Number of columns check.
-            PATCH_IF NOT (cols = 5) BEGIN
+            PATCH_IF NOT (cols = 12) BEGIN
                 PATCH_FAIL "copy_cres_from_table: number of columns '%cols%' in table '%table_file%' is not the required one."
             END
 
@@ -68,8 +132,15 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                 READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
                 READ_2DA_ENTRY_FORMER "table#rows" i 1 install
                 READ_2DA_ENTRY_FORMER "table#rows" i 2 name
-                READ_2DA_ENTRY_FORMER "table#rows" i 3 patch
-                READ_2DA_ENTRY_FORMER "table#rows" i 4 override
+                READ_2DA_ENTRY_FORMER "table#rows" i 3 str
+                READ_2DA_ENTRY_FORMER "table#rows" i 4 str_ex
+                READ_2DA_ENTRY_FORMER "table#rows" i 5 dex
+                READ_2DA_ENTRY_FORMER "table#rows" i 6 con
+                READ_2DA_ENTRY_FORMER "table#rows" i 7 int
+                READ_2DA_ENTRY_FORMER "table#rows" i 8 wis
+                READ_2DA_ENTRY_FORMER "table#rows" i 9 chr
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 override
 
                 PATCH_IF NOT (install = 0) BEGIN
                     //Existence check.
@@ -83,6 +154,13 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                             //Patch table data.
                             LPF patch_item INT_VAR
                                 name = name
+                                str = str
+                                str_ex = str_ex
+                                dex = dex
+                                con = con
+                                int = int
+                                wis = wis
+                                chr = chr
                             END
 
                             //Final patching.

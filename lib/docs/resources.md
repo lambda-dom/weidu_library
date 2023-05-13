@@ -187,9 +187,9 @@ The 2da table file must have the structure of the [Template Copy Creatures Table
 ```
 2DA V1.0
 *
-            install name    override    patch
+            install name    str str_bonus   dex con int wis chr override    patch
 
-resource    1       -1      0           *
+resource    1       -1      -1  -1          -1  -1  -1  -1  -1  0           *
 ```
 
 All columns have a more or less evident meaning. The field `install` is a flag to selectively enable or disable installation of a specific spell. The `override` field is a flag used mostly for debugging purposes. It controls whether before copying, a sanity check is made for the existence of an equally named item already exists in game. The `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patches` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
@@ -204,6 +204,13 @@ note(s):
 ```
 DEFINE_PATCH_FUNCTION patch_cre INT_VAR
     name = 0 - 1
+    str = 0 -1
+    str_ex = 0 - 1
+    dex = 0 - 1
+    con = 0 - 1
+    int = 0 - 1
+    wis = 0 - 1
+    chr = 0 - 1
 ```
 
 A creature patcher used by `copy_cres_from_table` but that is useful all by itself.
