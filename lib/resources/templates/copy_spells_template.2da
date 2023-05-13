@@ -1,4 +1,4 @@
 2DA V1.0
 *
-            install subdir  name    descr   type    level   flags   school  sectype sound   book_icon   abil_icon   projectile  patch   override    type    id
-resource    1       *       -1      -1      *       -1      *       *       *       *       *           *           *           *       0           0       *
+            install name    descr   type    level   flags   school  sectype sound   book_icon   abil_icon   projectile  patch   override    type    id
+resource    1       -1      -1      *       -1      *       *       *       *       *           *           *           *       0           0       *
