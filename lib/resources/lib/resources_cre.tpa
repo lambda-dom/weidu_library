@@ -13,6 +13,11 @@ DEFINE_PATCH_FUNCTION patch_cre INT_VAR
     int = 0 - 1
     wis = 0 - 1
     chr = 0 - 1
+    saves_spell = 0 - 1
+    saves_breath = 0 - 1
+    saves_death = 0 - 1
+    saves_wand = 0 - 1
+    saves_polymorph = 0 - 1
 BEGIN
     PATCH_IF NOT (name = 0 - 1) BEGIN
         PATCH_WITH_SCOPE BEGIN
@@ -78,6 +83,47 @@ BEGIN
             PATCH_FAIL "patch_cre: exceptional str '%str_ex%' out of bounds."
         END
     END
+
+    //Saves.
+    PATCH_IF NOT (saves_spell = 0 - 1) BEGIN
+        PATCH_IF (0 - 20 <= saves_spell) AND (saves_spell <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_spells" value = "%saves_spell%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: saves vs. spell '%saves_spell%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (saves_breath = 0 - 1) BEGIN
+        PATCH_IF (0 - 20 <= saves_breath) AND (saves_breath <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_breath" value = "%saves_breath%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: saves vs. breath '%saves_breath%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (saves_death = 0 - 1) BEGIN
+        PATCH_IF (0 - 20 <= saves_death) AND (saves_death <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_death" value = "%saves_death%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: saves vs. death '%saves_death%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (saves_wand = 0 - 1) BEGIN
+        PATCH_IF (0 - 20 <= saves_wand) AND (saves_wand <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_wands" value = "%saves_wand%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: savs vs. wand '%saves_wand%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (saves_polymorph = 0 - 1) BEGIN
+        PATCH_IF (0 - 20 <= saves_polymorph) AND (saves_polymorph <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_polymorph" value = "%saves_polymorph%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: saves vs. polymorph '%saves_polymorph%' out of bounds."
+        END
+    END
 END
 
 
@@ -115,7 +161,7 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
         COPY - ~%table_file%~ ~override~
             COUNT_2DA_COLS cols
             //Number of columns check.
-            PATCH_IF NOT (cols = 12) BEGIN
+            PATCH_IF NOT (cols = 17) BEGIN
                 PATCH_FAIL "copy_cres_from_table: number of columns '%cols%' in table '%table_file%' is not the required one."
             END
 
@@ -132,6 +178,7 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                 READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
                 READ_2DA_ENTRY_FORMER "table#rows" i 1 install
                 READ_2DA_ENTRY_FORMER "table#rows" i 2 name
+                //Main stats.
                 READ_2DA_ENTRY_FORMER "table#rows" i 3 str
                 READ_2DA_ENTRY_FORMER "table#rows" i 4 str_ex
                 READ_2DA_ENTRY_FORMER "table#rows" i 5 dex
@@ -139,8 +186,15 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                 READ_2DA_ENTRY_FORMER "table#rows" i 7 int
                 READ_2DA_ENTRY_FORMER "table#rows" i 8 wis
                 READ_2DA_ENTRY_FORMER "table#rows" i 9 chr
-                READ_2DA_ENTRY_FORMER "table#rows" i 10 patch
-                READ_2DA_ENTRY_FORMER "table#rows" i 11 override
+                //Saves.
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 saves_spell
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 saves_breath
+                READ_2DA_ENTRY_FORMER "table#rows" i 12 saves_death
+                READ_2DA_ENTRY_FORMER "table#rows" i 13 saves_wand
+                READ_2DA_ENTRY_FORMER "table#rows" i 14 saves_polymorph
+                //Final.
+                READ_2DA_ENTRY_FORMER "table#rows" i 15 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 16 override
 
                 PATCH_IF NOT (install = 0) BEGIN
                     //Existence check.
@@ -161,6 +215,11 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                                 int = int
                                 wis = wis
                                 chr = chr
+                                saves_spell = saves_spell
+                                saves_breath = saves_breath
+                                saves_death = saves_death
+                                saves_wand = saves_wand
+                                saves_polymorph = saves_polymorph
                             END
 
                             //Final patching.

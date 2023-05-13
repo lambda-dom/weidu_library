@@ -1,4 +1,4 @@
 2DA V1.0
 *
-            install name    str str_ex  dex con int wis chr patch   override
-resource    1       -1      -1  -1      -1  -1  -1  -1  -1  *       0
+            install name    str str_ex  dex con int wis chr saves_spell saves_breath    saves_death saves_wand  saves_polymorph patch   override
+resource    1       -1      -1  -1      -1  -1  -1  -1  -1  -1          -1              -1          -1          -1              *       0
