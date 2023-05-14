@@ -135,6 +135,17 @@ Return offset of `index` opcode of `header`. If any of `index` or `header` are o
 
 Return the array of the header's opcode offsets. Returns the empty array if header has no casting opcodes. The function PATCH_FAIL's if `header` out of bounds.
 
+### B. 6. Addition and removal of headers.
+
+The next batch of functions, adds and removes item headers. They should not be needed, but either WeiDU lacks some of such basic functionality or it does not work quite the way we need.
+
+`insert_item_header INT_VAR index = 0 type = 1 location = 1 target = 1`
+
+Inserts a new, blank item header at `index` with `type` (default 1 = melee), `location` (default 1 = weapon) and `target` (default 1 = living actor). Function PATCH_FAIL's if `index` not in the range 0:count where count is the number of existing headers.
+
+note(s):
+* any other header fields must be set via existing functions such as ALTER_ITEM_HEADER or the functions in this library.
+
 ## C. Miscellaneous utilities.
 
 note(s):
