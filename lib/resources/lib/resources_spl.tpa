@@ -293,7 +293,7 @@ END
 
 
 //Installers.
-DEFINE_ACTION_FUNCTION copy_spells_from_table STR_VAR table = "" patches = "*" tra = "*" BEGIN
+DEFINE_ACTION_FUNCTION copy_spells_from_table STR_VAR table = "" patches = "*" tra = "*" subdir = "*" BEGIN
     //Existence check.
     OUTER_TEXT_SPRINT table_file "%component_resources_dir%/2da/%table%.2da"
     ACTION_IF NOT FILE_EXISTS "%table_file%" BEGIN
