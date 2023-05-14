@@ -189,9 +189,9 @@ DEFINE_DIMORPHIC_FUNCTION get_hla_table STR_VAR kit = "" RET table BEGIN
 	    COUNT_2DA_COLS cols
         COUNT_2DA_ROWS cols rows
 
-        TEXT_SPRINT table "*"
         //Loop through rows.
-        FOR (i = 0; (i < rows) AND (NOT ("%table%" STRING_EQUAL_CASE "*")); ++i) BEGIN
+        TEXT_SPRINT table "*"
+        FOR (i = 0; (i < rows) AND ("%table%" STRING_EQUAL_CASE "*"); ++i) BEGIN
             READ_2DA_ENTRY i 0 cols name
             READ_2DA_ENTRY i 1 cols tbl
             PATCH_IF ("%name%" STRING_EQUAL_CASE "%kit%") BEGIN
@@ -239,7 +239,7 @@ END
 
 //Table normalization.
 DEFINE_ACTION_FUNCTION normalize_hla_table STR_VAR kit = "" BEGIN
-    LAF get_hla_table STR_VAR kit = "%kit%" RET table END
+    LAF get_hla_table STR_VAR kit = "%kit%" RET table = table END
 
     //Sanitize.
     ACTION_IF ("%table%" STRING_EQUAL_CASE "*") BEGIN
@@ -256,18 +256,22 @@ DEFINE_ACTION_FUNCTION normalize_hla_table STR_VAR kit = "" BEGIN
         END ELSE BEGIN
             PATCH_IF (cols = 10) BEGIN
                 PATCH_LOG "Log: normalize_hla_table: table '%table%.2da' already normalized."
+                rows = 0 - 1
             END ELSE BEGIN
                 COUNT_2DA_ROWS cols rows
             END
         END
+    BUT_ONLY
     
-    //Construct column text.
-    LAF repeat_string INT_VAR times = rows - 1 STR_VAR string = "*" RET_ARRAY values = strings END
-    LAF join_strings STR_VAR strings = "strings" RET s_values END
-    OUTER_TEXT_SPRINT column_text "ALIGNMENT_RESTRICT %s_values%"
+    ACTION_IF NOT (rows = 0 - 1) BEGIN
+        //Construct column text.
+        LAF repeat_string INT_VAR times = rows - 1 STR_VAR string = "*" RET_ARRAY values = strings END
+        LAF join_strings STR_VAR strings = "strings" RET s_values END
+        OUTER_TEXT_SPRINT column_text "ALIGNMENT_RESTRICT %s_values%"
 
-    //Append column.
-    APPEND_COL "%table%.2da" "%column_text%"
+        //Append column.
+        APPEND_COL "%table%.2da" "%column_text%"
+    END
 END
 
 //HLA table manipulation.
