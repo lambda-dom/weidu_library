@@ -133,12 +133,12 @@ note(s):
 
 `normalize_hla_table STR_VAR kit`
 
-Some hla tables (e.g. ranger tables) miss the alignment column. This function normalizes them. The function FAIL's if the `kit` does not exist.
+Some hla tables miss the alignment column. This function normalizes them. The function FAIL's if the `kit` does not exist.
 
 ## E. 3. HLA table manipulation.
 
 note(s):
-* some hla tables are malformed in that they do not have the alignment column (e.g. ranger tables), so it is best to normalize them first using `normalize_hla_table`. 
+* some hla tables are malformed in that they do not have the alignment column, so it is best to normalize them first using `normalize_hla_table`. 
 
 The functions in this section manipulate HLA table files. All functions are patch functions, so the workflow is similar to that for clab files.
 
