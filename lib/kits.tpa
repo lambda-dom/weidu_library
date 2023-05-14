@@ -194,6 +194,7 @@ DEFINE_DIMORPHIC_FUNCTION get_hla_table STR_VAR kit = "" RET table BEGIN
         FOR (i = 0; (i < rows) AND (NOT ("%table%" STRING_EQUAL_CASE "*")); ++i) BEGIN
             READ_2DA_ENTRY i 0 cols name
             READ_2DA_ENTRY i 1 cols tbl
+            PATCH_PRINT "get_hla_table: testing against %name%."
             PATCH_IF ("%name%" STRING_EQUAL_CASE "%kit%") BEGIN
                 //Found matching kit.
                 TEXT_SPRINT table "lu%tbl%"
@@ -242,6 +243,7 @@ DEFINE_ACTION_FUNCTION normalize_hla_table STR_VAR kit = "" BEGIN
     LAF get_hla_table STR_VAR kit = "%kit%" RET table END
 
     //Sanitize.
+    PRINT "normalize_hla_table:got table '%table%'."
     ACTION_IF ("%table%" STRING_EQUAL_CASE "*") BEGIN
         FAIL "normalize_hla_table: kit '%kit%' not found in 'luabbr.2da'."
     END
