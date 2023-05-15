@@ -173,7 +173,7 @@ DEFINE_DIMORPHIC_FUNCTION get_item_proficiency STR_VAR proficiency = "" RET valu
     LAF is_key_in_array STR_VAR array = "item_proficiencies" key = "%proficiency%" RET is_in_array = bool END
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
-        OUTER_SET value = $item_proficiencies("%type%")
+        OUTER_SET value = $item_proficiencies("%proficiency%")
     END
 END
 
