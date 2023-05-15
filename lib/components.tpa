@@ -48,10 +48,17 @@ DEFINE_ACTION_FUNCTION load_file STR_VAR file = "" dir = "*" tra = "*" tra_dir =
     //Standardize dir.
     ACTION_IF "%dir%" STRING_EQUAL_CASE "*" BEGIN
         ACTION_IF VARIABLE_IS_SET "component_dir" BEGIN
-            OUTER_TEXT_SPRINT dir "%component_dir%/lib"
+            OUTER_TEXT_SPRINT file_to_load "%component_dir%/lib/%file%"
         END ELSE BEGIN
             FAIL "load_file: cannot resolve directory from which to fetch '%file%', variable 'component_dir' not set."
         END
+    END ELSE BEGIN
+        OUTER_TEXT_SPRINT file_to_load "%dir%/%file%"
+    END
+
+    //Existence check.
+    ACTION_IF NOT FILE_EXISTS "%file_to_load%" BEGIN
+        FAIL "load_file: file '%file_to_load%' does not exist."
     END
 
     //Set tra file.
@@ -76,7 +83,7 @@ DEFINE_ACTION_FUNCTION load_file STR_VAR file = "" dir = "*" tra = "*" tra_dir =
 
     WITH_TRA "%tra_file%" BEGIN
         //Includes.
-        INCLUDE "%dir%/%file%"
+        INCLUDE "%file_to_load%"
     END
 END
 
