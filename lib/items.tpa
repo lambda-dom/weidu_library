@@ -409,7 +409,7 @@ DEFINE_DIMORPHIC_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item 
 
     COPY_EXISTING ~itemexcl.2da~ ~override~
         //Find itm in itemexcl.2da.
-        LPF find_row INT_VAR col = 0 STR_VAR key = "%item%" RET row = index END
+        LPF find_first_row INT_VAR col = 0 STR_VAR key = "%item%" RET row = index END
         PATCH_IF NOT (row = 0 - 1) BEGIN
             //Set value.
             SET_2DA_ENTRY row 1 2 exclusion
@@ -437,7 +437,7 @@ DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 ability = 0 ST
         END
         
         //Find index of item.
-        LPF find_row STR_VAR key = "%item%" RET row = index END
+        LPF find_first_row STR_VAR key = "%item%" RET row = index END
         
         //Insert new row if not found.
         PATCH_IF (row = 0 - 1) BEGIN
