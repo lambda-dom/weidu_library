@@ -158,10 +158,12 @@ Sets the `item` exclusion flag in the `itemexcl.2da` table. Function FAIL's if `
 note(s):
 * this function opens `itemexcl.2da`, changes a few entries, pretty-prints, etc. If chaining several calls it can incur a performance penalty.
 
-`set_ability_tooltip INT_VAR tra_ref ability = 0 STR_VAR item`
+`set_ability_tooltip INT_VAR tra_ref tlk_ref = 0 ability = 0 STR_VAR item`
 
-Sets the tooltip of item `item` for ability `ability` to (the tlk reference of) the text of `tra_ref`, a tra reference. Function FAIL's if `item` does not exist in-game.
+Sets the tooltip of item `item` for ability `ability` to (the tlk reference of) the text of `tra_ref`, a tra reference. If `tra_ref` is not passed (or is `0`) then it uses the tlk_ref directly.
+
+Function FAIL's if `item` does not exist in-game.
 
 note(s):
-* this function has the side-effect of (potentially) adding text to the tlk file.
+* this function has the side-effect of (potentially) adding text to the tlk file, if it is passed a tra reference.
 * this function opens `tooltip.2da`, changes a few entries, pretty-prints, etc. If chaining several calls it can incur a performance penalty.

@@ -422,7 +422,7 @@ DEFINE_DIMORPHIC_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item 
     BUT_ONLY
 END
 
-DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 ability = 0 STR_VAR item = "" BEGIN
+DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 tlk_ref = 0 ability = 0 STR_VAR item = "" BEGIN
     //Sanity existence check.
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%item%.itm") BEGIN
         FAIL "set_ability_tooltip: item '%item%.itm' does not exist in game."
@@ -452,8 +452,16 @@ DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 ability = 0 ST
             INSERT_2DA_ROW row cols "%item% %string%"
         END
 
-        //Resolove tra reference.
-        ref = RESOLVE_STR_REF ((AT tra_ref))
+        //Resolve tra reference.
+        PATCH_IF NOT (tra_ref = 0) BEGIN
+            ref = RESOLVE_STR_REF ((AT tra_ref))
+        END ELSE BEGIN
+            PATCH_IF (tlk_ref > 0) BEGIN
+                ref = tlk_ref
+            END ELSE BEGIN
+                PATCH_PRINT "set_ability_tooltip: tlk_ref '%tlk_ref%' is not strictly positive."
+            END
+        END
         //Write ability tooltip.
         SET_2DA_ENTRY row (ability + 1) cols "%ref%"
     PRETTY_PRINT_2DA
