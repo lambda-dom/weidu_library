@@ -168,6 +168,17 @@ DEFINE_PATCH_FUNCTION set_spell_header_field INT_VAR header = 0 STR_VAR field = 
     END
 END
 
+DEFINE_PATCH_FUNCTION get_spell_header_array INT_VAR header = 0 RET_ARRAY array BEGIN
+    DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+
+    //Loop.
+    PHP_EACH spell_header_offsets AS field => _ BEGIN
+        //Read value.
+        LPF get_spell_header_field INT_VAR header = header STR_VAR field = "%field%" RET value END
+        TEXT_SPRINT $array("%field%") "%value%"
+    END
+END
+
 DEFINE_PATCH_FUNCTION match_spell_header_against_array INT_VAR header = 0 STR_VAR array = "" RET bool BEGIN
     bool = 1
     PATCH_TRY
