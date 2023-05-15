@@ -146,6 +146,12 @@ Inserts a new, blank item header at `index` with `type` (default 1 = melee), `lo
 note(s):
 * any other header fields must be set via existing functions such as ALTER_ITEM_HEADER or the functions in this library.
 
+### B. 7. Addition and removal of opcodes.
+
+`insert_item_header_opcode INT_VAR header = 0 index = -1 ...`
+
+Inserts an opcode in `header` at `index`. The default `index` is -1 which corresponds to inserting at the end. Rest of the arguments are to patch the opcode and fields and follow the same rules as in the standard WeiDU function `ADD_ITEM_EFFECT`. If any of `header` or `index` are out of bounds, function PATCH_FAILS.
+
 ## C. Miscellaneous utilities.
 
 note(s):
