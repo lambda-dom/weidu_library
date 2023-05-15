@@ -311,7 +311,7 @@ DEFINE_ACTION_FUNCTION copy_items_from_table STR_VAR table = "" patches = "*" tr
             END
 
             //Set subdir where resource spell is located.
-            TEXT_SPRINT dir "%component_resources_dir%/spl"
+            TEXT_SPRINT dir "%component_resources_dir%/itm"
             PATCH_IF NOT ("%subdir%" STRING_EQUAL_CASE "*") BEGIN
                 TEXT_SPRINT dir "%subdir%"
             END
