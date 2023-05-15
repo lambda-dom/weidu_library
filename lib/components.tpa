@@ -23,7 +23,7 @@ DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" tra_dir =
     //Set tra file.
     ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT ("%tra_dir%" STRING_EQUAL_CASE "*") BEGIN
-            OUTER_TEXT_SPRINT component_tra_file "%dir%/%tra%.tra"
+            OUTER_TEXT_SPRINT component_tra_file "%tra_dir%/%tra%.tra"
         END ELSE BEGIN
             OUTER_TEXT_SPRINT component_tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
         END
