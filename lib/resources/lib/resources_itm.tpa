@@ -448,7 +448,7 @@ DEFINE_ACTION_FUNCTION patch_items_from_table STR_VAR table = "" patches = "*" t
                 PATCH_IF NOT (install = 0) BEGIN
                     //Copy.
                     INNER_ACTION BEGIN
-                        COPY_EXISTING ~%resource%.spl~ ~override~
+                        COPY_EXISTING ~%resource%.itm~ ~override~
                             //Patch table data.
                             LPF patch_item INT_VAR
                                 name = name
