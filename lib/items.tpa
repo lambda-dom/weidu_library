@@ -32,6 +32,13 @@ RET_ARRAY
     item_types = array
 END
 
+LAF build_array_from_2da STR_VAR
+    table = "item_proficiencies"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    item_proficiencies = array
+END
+
 
 //Basic functions.
 DEFINE_PATCH_FUNCTION get_item_header_count RET count BEGIN
@@ -158,6 +165,15 @@ DEFINE_DIMORPHIC_FUNCTION get_item_type STR_VAR type = "" RET value BEGIN
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
         OUTER_SET value = $item_types("%type%")
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_item_proficiency STR_VAR proficiency = "" RET value BEGIN
+    ACTION_TO_LOWER proficiency
+    LAF is_key_in_array STR_VAR array = "item_proficiencies" key = "%proficiency%" RET is_in_array = bool END
+    OUTER_SET value = 0 - 1
+    ACTION_IF NOT (is_in_array = 0) BEGIN
+        OUTER_SET value = $item_proficiencies("%type%")
     END
 END
 
