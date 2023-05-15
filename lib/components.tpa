@@ -1,5 +1,5 @@
 //Action functions.
-DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" BEGIN
+DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" tra_dir = "*" BEGIN
     //Clear on entry.
     CLEAR_ARRAYS
     CLEAR_CODES
@@ -22,7 +22,11 @@ DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" BEGIN
     
     //Set tra file.
     ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
-        OUTER_TEXT_SPRINT component_tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+        ACTION_IF NOT ("%tra_dir%" STRING_EQUAL_CASE "*") BEGIN
+            OUTER_TEXT_SPRINT component_tra_file "%dir%/%tra%.tra"
+        END ELSE BEGIN
+            OUTER_TEXT_SPRINT component_tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+        END
     END ELSE BEGIN
         ACTION_IF (VARIABLE_IS_SET "library_dir") BEGIN
             OUTER_TEXT_SPRINT component_tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"

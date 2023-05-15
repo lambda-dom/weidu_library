@@ -7,13 +7,13 @@ This library streamlines installation of mod components.
 note(s):
 * all the functions in this section are action functions.
 
-`load_component STR_VAR component tra = "*"`
+`load_component STR_VAR component tra = "*" tra_dir = "*"`
 
 Installs a component. First it clears up arrays, unloads included and inlined files, etc. so as to start from a clean slate. Then it starts the real work by doing some minimal checking: the component's name must be well-formed (no spaces, lower-cased to play well with linux, etc.) and the component's main file `main.tpa` must exist. Then it sets some variables:
 * `component`: component's name.
 * `component_dir`: component's root directory.
 * `component_resources_dir`: the component's root resources dir, defaulting to `%component_dir%/resources`.
-* `component_tra_file`: the component's tra file, an empty stub file if one is not provided in `tra`. This file (*no* .tra extension) is looked up in `%MOD_FOLDER%/languages/%LANGUAGE%/%component%`.
+* `component_tra_file`: the component's tra file, an empty stub file if one is not provided in `tra`. This file (*no* .tra extension) is looked up in `dir` if provided, defaulting to `%MOD_FOLDER%/languages/%LANGUAGE%/%component%`.
 
 The function then loads the component's tra file and inside this tra scope, it `INCLUDE`'s the component's main file `main.tpa`.
 
