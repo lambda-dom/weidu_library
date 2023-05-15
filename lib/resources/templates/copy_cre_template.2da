@@ -1,4 +1,4 @@
 2DA V1.0
 *
-            install name    str str_ex  dex con int wis chr hps ac  thac0   apr saves_spell saves_breath    saves_death saves_wand  saves_polymorph patch   override
-resource    1       -1      -1  -1      -1  -1  -1  -1  -1  -1  *   -1      -1  *           *               *           *           *               *       0
+            install name    str str_ex  dex con int wis chr hps ac  thac0   apr sv_spl  sv_brt  sv_dth  sv_wand sv_ptf  res_fir res_col res_elc res_acd res_mag res_sls res_crs res_prc res_mis patch   override
+resource    1       -1      -1  -1      -1  -1  -1  -1  -1  -1  *   -1      -1  *       *       *       *       *       -1      -1      -1      -1      -1      -1      -1      -1      -1      *       0

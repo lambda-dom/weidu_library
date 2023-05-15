@@ -187,9 +187,8 @@ The 2da table file must have the structure of the [Template Copy Creatures Table
 ```
 2DA V1.0
 *
-            install name    override    patch
-
-resource    1       -1      0           *
+            install name    str str_ex  dex con int wis chr hps ac  thac0   apr sv_spl  sv_brt  sv_dth  sv_wand sv_ptf  res_fir res_col res_elc res_acd res_mag res_sls res_crs res_prc res_mis patch   override
+resource    1       -1      -1  -1      -1  -1  -1  -1  -1  -1  *   -1      -1  *       *       *       *       *       -1      -1      -1      -1      -1      -1      -1      -1      -1      *       0
 ```
 
 All columns have a more or less evident meaning. The field `install` is a flag to selectively enable or disable installation of a specific spell. The `override` field is a flag used mostly for debugging purposes. It controls whether before copying, a sanity check is made for the existence of an equally named item already exists in game. The `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patches` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
@@ -204,6 +203,32 @@ note(s):
 ```
 DEFINE_PATCH_FUNCTION patch_cre INT_VAR
     name = 0 - 1
+    str = 0 -1
+    str_ex = 0 - 1
+    dex = 0 - 1
+    con = 0 - 1
+    int = 0 - 1
+    wis = 0 - 1
+    chr = 0 - 1
+    hps = 0 - 1
+    thac0 = 0 - 1
+    apr = 0 - 1
+    resist_fire = 0 - 1
+    resist_cold = 0 - 1
+    resist_electricity = 0 - 1
+    resist_acid = 0 - 1
+    resist_magic = 0 - 1
+    resist_slash = 0 - 1
+    resist_crush = 0 - 1
+    resist_pierce = 0 - 1
+    resist_missile = 0 - 1
+STR_VAR
+    ac = "*"
+    saves_spell = "*"
+    saves_breath = "*"
+    saves_death = "*"
+    saves_wand = "*"
+    saves_polymorph = "*"
 ```
 
 A creature patcher used by `copy_cres_from_table` but that is useful all by itself.

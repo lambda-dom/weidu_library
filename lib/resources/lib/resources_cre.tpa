@@ -16,6 +16,15 @@ DEFINE_PATCH_FUNCTION patch_cre INT_VAR
     hps = 0 - 1
     thac0 = 0 - 1
     apr = 0 - 1
+    resist_fire = 0 - 1
+    resist_cold = 0 - 1
+    resist_electricity = 0 - 1
+    resist_acid = 0 - 1
+    resist_magic = 0 - 1
+    resist_slash = 0 - 1
+    resist_crush = 0 - 1
+    resist_pierce = 0 - 1
+    resist_missile = 0 - 1
 STR_VAR
     ac = "*"
     saves_spell = "*"
@@ -166,6 +175,79 @@ BEGIN
             PATCH_FAIL "patch_cre: saves vs. polymorph '%saves_polymorph%' out of bounds."
         END
     END
+
+    //Resistances.
+    PATCH_IF NOT (resist_fire = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_fire) AND (resist_fire <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_fire" value = "%resist_fire%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_fire '%resist_fire%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_cold = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_cold) AND (resist_cold <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_cold" value = "%resist_cold%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_cold '%resist_cold%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_electricity = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_electricity) AND (resist_electricity <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_electricity" value = "%resist_electricity%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_electricity '%resist_electricity%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_acid = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_acid) AND (resist_acid <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_acid" value = "%resist_acid%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_acid '%resist_acid%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_magic = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_magic) AND (resist_magic <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_magic" value = "%resist_magic%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_magic '%resist_magic%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_slash = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_slash) AND (resist_slash <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_slash" value = "%resist_slash%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_slash '%resist_slash%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_crush = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_crush) AND (resist_crush <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_crush" value = "%resist_crush%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_crush '%resist_crush%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_pierce = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_pierce) AND (resist_pierce <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_pierce" value = "%resist_pierce%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_pierce '%resist_pierce%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_missile = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_missile) AND (resist_missile <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_missile" value = "%resist_missile%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_missile '%resist_missile%' out of bounds."
+        END
+    END
 END
 
 
@@ -203,7 +285,7 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
         COPY - ~%table_file%~ ~override~
             COUNT_2DA_COLS cols
             //Number of columns check.
-            PATCH_IF NOT (cols = 21) BEGIN
+            PATCH_IF NOT (cols = 30) BEGIN
                 PATCH_FAIL "copy_cres_from_table: number of columns '%cols%' in table '%table_file%' is not the required one."
             END
 
@@ -239,9 +321,20 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                 READ_2DA_ENTRY_FORMER "table#rows" i 16 saves_death
                 READ_2DA_ENTRY_FORMER "table#rows" i 17 saves_wand
                 READ_2DA_ENTRY_FORMER "table#rows" i 18 saves_polymorph
+                //Resistances.
+                READ_2DA_ENTRY_FORMER "table#rows" i 19 resist_fire
+                READ_2DA_ENTRY_FORMER "table#rows" i 20 resist_cold
+                READ_2DA_ENTRY_FORMER "table#rows" i 21 resist_electricity
+                READ_2DA_ENTRY_FORMER "table#rows" i 22 resist_acid
+                READ_2DA_ENTRY_FORMER "table#rows" i 23 resist_magic
+                READ_2DA_ENTRY_FORMER "table#rows" i 24 resist_slash
+                READ_2DA_ENTRY_FORMER "table#rows" i 25 resist_crush
+                READ_2DA_ENTRY_FORMER "table#rows" i 26 resist_pierce
+                READ_2DA_ENTRY_FORMER "table#rows" i 27 resist_missile
+
                 //Final.
-                READ_2DA_ENTRY_FORMER "table#rows" i 19 patch
-                READ_2DA_ENTRY_FORMER "table#rows" i 20 override
+                READ_2DA_ENTRY_FORMER "table#rows" i 28 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 29 override
 
                 PATCH_IF NOT (install = 0) BEGIN
                     //Existence check.
@@ -265,6 +358,15 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                                 hps = hps
                                 thac0 = thac0
                                 apr = apr
+                                resist_fire = resist_fire
+                                resist_cold = resist_cold
+                                resist_electricity = resist_electricity
+                                resist_acid = resist_acid
+                                resist_magic = resist_magic
+                                resist_slash = resist_slash
+                                resist_crush = resist_crush
+                                resist_pierce = resist_pierce
+                                resist_missile = resist_missile
                             STR_VAR
                                 ac = "%ac%"
                                 saves_spell = "%saves_spell%"
