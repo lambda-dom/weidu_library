@@ -536,7 +536,7 @@ DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 tlk_ref = 0 ab
             PATCH_IF (tlk_ref > 0) BEGIN
                 ref = tlk_ref
             END ELSE BEGIN
-                PATCH_PRINT "set_ability_tooltip: tlk_ref '%tlk_ref%' is not strictly positive."
+                PATCH_FAIL "set_ability_tooltip: tlk_ref '%tlk_ref%' is not strictly positive."
             END
         END
         //Write ability tooltip.
