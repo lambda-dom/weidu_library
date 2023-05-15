@@ -6,12 +6,246 @@ INCLUDE "%library_dir%/creatures.tpa"
 //Patchers.
 DEFINE_PATCH_FUNCTION patch_cre INT_VAR
     name = 0 - 1
+    str = 0 -1
+    str_ex = 0 - 1
+    dex = 0 - 1
+    con = 0 - 1
+    int = 0 - 1
+    wis = 0 - 1
+    chr = 0 - 1
+    hps = 0 - 1
+    thac0 = 0 - 1
+    apr = 0 - 1
+    resist_fire = 0 - 1
+    resist_cold = 0 - 1
+    resist_electricity = 0 - 1
+    resist_acid = 0 - 1
+    resist_magic = 0 - 1
+    resist_slash = 0 - 1
+    resist_crush = 0 - 1
+    resist_pierce = 0 - 1
+    resist_missile = 0 - 1
+STR_VAR
+    ac = "*"
+    saves_spell = "*"
+    saves_breath = "*"
+    saves_death = "*"
+    saves_wand = "*"
+    saves_polymorph = "*"
 BEGIN
     PATCH_IF NOT (name = 0 - 1) BEGIN
         PATCH_WITH_SCOPE BEGIN
             name_ref = RESOLVE_STR_REF ((AT name))
             LPF set_cre_field STR_VAR field = "name" value = "%name_ref%" END
             LPF set_cre_field STR_VAR field = "tooltip" value = "%name_ref%" END
+        END
+    END
+
+    //Main stats.
+    PATCH_IF NOT (str = 0 - 1) BEGIN
+        PATCH_IF (3 <= str) AND (str <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "str" value = "%str%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: str '%str%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (dex = 0 - 1) BEGIN
+        PATCH_IF (3 <= dex) AND (dex <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "dex" value = "%dex%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: dex '%dex%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (con = 0 - 1) BEGIN
+        PATCH_IF (3 <= con) AND (con <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "con" value = "%con%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: con '%con%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (int = 0 - 1) BEGIN
+        PATCH_IF (3 <= int) AND (int <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "int" value = "%int%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: int '%int%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (wis = 0 - 1) BEGIN
+        PATCH_IF (3 <= wis) AND (wis <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "wis" value = "%wis%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: wis '%wis%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (chr = 0 - 1) BEGIN
+        PATCH_IF (3 <= chr) AND (chr <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "chr" value = "%chr%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: chr '%chr%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (str_ex = 0 - 1) BEGIN
+        PATCH_IF (0 <= str_ex) AND (str_ex <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "str_bonus" value = "%str_ex%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: exceptional str '%str_ex%' out of bounds."
+        END
+    END
+
+    //Hps, ac, thac0 and apr.
+    PATCH_IF NOT (hps = 0 - 1) BEGIN
+        PATCH_IF (hps > 0) BEGIN
+            PATCH_FOR_EACH field IN "max_hps" "hps" BEGIN
+                LPF set_cre_field STR_VAR field = "%field%" value = "%hps%" END
+            END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: hps '%hps%' must be strictly positive."
+        END
+    END
+
+    PATCH_IF NOT ("%ac%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF (0 - 20 <= ac) AND (ac <= 20) BEGIN
+            PATCH_FOR_EACH field IN "ac" "effective_ac" BEGIN
+                LPF set_cre_field STR_VAR field = "%field%" value = "%ac%" END
+            END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: ac '%ac%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT (thac0 = 0 - 1) BEGIN
+        PATCH_IF (0 <= thac0) AND (thac0 <= 25) BEGIN
+            LPF set_cre_field STR_VAR field = "thac0" value = "%thac0%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: thac0 '%thac0%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (apr = 0 - 1) BEGIN
+        PATCH_IF (1 <= apr) AND (apr <= 10) BEGIN
+            LPF set_cre_field STR_VAR field = "apr" value = "%apr%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: apr '%apr%' out of bounds."
+        END
+    END
+    
+    //Saves.
+    PATCH_IF NOT ("%saves_spell%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF (0 - 20 <= saves_spell) AND (saves_spell <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_spells" value = "%saves_spell%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: saves vs. spell '%saves_spell%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT ("%saves_breath%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF (0 - 20 <= saves_breath) AND (saves_breath <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_breath" value = "%saves_breath%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: saves vs. breath '%saves_breath%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT ("%saves_death%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF (0 - 20 <= saves_death) AND (saves_death <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_death" value = "%saves_death%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: saves vs. death '%saves_death%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT ("%saves_wand%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF (0 - 20 <= saves_wand) AND (saves_wand <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_wands" value = "%saves_wand%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: savs vs. wand '%saves_wand%' out of bounds."
+        END
+    END
+
+    PATCH_IF NOT ("%saves_polymorph%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF (0 - 20 <= saves_polymorph) AND (saves_polymorph <= 20) BEGIN
+            LPF set_cre_field STR_VAR field = "saves_polymorph" value = "%saves_polymorph%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: saves vs. polymorph '%saves_polymorph%' out of bounds."
+        END
+    END
+
+    //Resistances.
+    PATCH_IF NOT (resist_fire = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_fire) AND (resist_fire <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_fire" value = "%resist_fire%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_fire '%resist_fire%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_cold = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_cold) AND (resist_cold <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_cold" value = "%resist_cold%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_cold '%resist_cold%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_electricity = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_electricity) AND (resist_electricity <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_electricity" value = "%resist_electricity%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_electricity '%resist_electricity%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_acid = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_acid) AND (resist_acid <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_acid" value = "%resist_acid%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_acid '%resist_acid%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_magic = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_magic) AND (resist_magic <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_magic" value = "%resist_magic%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_magic '%resist_magic%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_slash = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_slash) AND (resist_slash <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_slash" value = "%resist_slash%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_slash '%resist_slash%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_crush = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_crush) AND (resist_crush <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_crush" value = "%resist_crush%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_crush '%resist_crush%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_pierce = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_pierce) AND (resist_pierce <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_pierce" value = "%resist_pierce%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_pierce '%resist_pierce%' out of bounds."
+        END
+    END
+    
+    PATCH_IF NOT (resist_missile = 0 - 1) BEGIN
+        PATCH_IF (0 <= resist_missile) AND (resist_missile <= 100) BEGIN
+            LPF set_cre_field STR_VAR field = "resist_missile" value = "%resist_missile%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: resist_missile '%resist_missile%' out of bounds."
         END
     END
 END
@@ -51,7 +285,7 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
         COPY - ~%table_file%~ ~override~
             COUNT_2DA_COLS cols
             //Number of columns check.
-            PATCH_IF NOT (cols = 5) BEGIN
+            PATCH_IF NOT (cols = 30) BEGIN
                 PATCH_FAIL "copy_cres_from_table: number of columns '%cols%' in table '%table_file%' is not the required one."
             END
 
@@ -68,8 +302,39 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                 READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
                 READ_2DA_ENTRY_FORMER "table#rows" i 1 install
                 READ_2DA_ENTRY_FORMER "table#rows" i 2 name
-                READ_2DA_ENTRY_FORMER "table#rows" i 3 patch
-                READ_2DA_ENTRY_FORMER "table#rows" i 4 override
+                //Main stats.
+                READ_2DA_ENTRY_FORMER "table#rows" i 3 str
+                READ_2DA_ENTRY_FORMER "table#rows" i 4 str_ex
+                READ_2DA_ENTRY_FORMER "table#rows" i 5 dex
+                READ_2DA_ENTRY_FORMER "table#rows" i 6 con
+                READ_2DA_ENTRY_FORMER "table#rows" i 7 int
+                READ_2DA_ENTRY_FORMER "table#rows" i 8 wis
+                READ_2DA_ENTRY_FORMER "table#rows" i 9 chr
+                //Derived stats.
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 hps
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 ac
+                READ_2DA_ENTRY_FORMER "table#rows" i 12 thac0
+                READ_2DA_ENTRY_FORMER "table#rows" i 13 apr
+                //Saves.
+                READ_2DA_ENTRY_FORMER "table#rows" i 14 saves_spell
+                READ_2DA_ENTRY_FORMER "table#rows" i 15 saves_breath
+                READ_2DA_ENTRY_FORMER "table#rows" i 16 saves_death
+                READ_2DA_ENTRY_FORMER "table#rows" i 17 saves_wand
+                READ_2DA_ENTRY_FORMER "table#rows" i 18 saves_polymorph
+                //Resistances.
+                READ_2DA_ENTRY_FORMER "table#rows" i 19 resist_fire
+                READ_2DA_ENTRY_FORMER "table#rows" i 20 resist_cold
+                READ_2DA_ENTRY_FORMER "table#rows" i 21 resist_electricity
+                READ_2DA_ENTRY_FORMER "table#rows" i 22 resist_acid
+                READ_2DA_ENTRY_FORMER "table#rows" i 23 resist_magic
+                READ_2DA_ENTRY_FORMER "table#rows" i 24 resist_slash
+                READ_2DA_ENTRY_FORMER "table#rows" i 25 resist_crush
+                READ_2DA_ENTRY_FORMER "table#rows" i 26 resist_pierce
+                READ_2DA_ENTRY_FORMER "table#rows" i 27 resist_missile
+
+                //Final.
+                READ_2DA_ENTRY_FORMER "table#rows" i 28 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 29 override
 
                 PATCH_IF NOT (install = 0) BEGIN
                     //Existence check.
@@ -83,6 +348,32 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                             //Patch table data.
                             LPF patch_item INT_VAR
                                 name = name
+                                str = str
+                                str_ex = str_ex
+                                dex = dex
+                                con = con
+                                int = int
+                                wis = wis
+                                chr = chr
+                                hps = hps
+                                thac0 = thac0
+                                apr = apr
+                                resist_fire = resist_fire
+                                resist_cold = resist_cold
+                                resist_electricity = resist_electricity
+                                resist_acid = resist_acid
+                                resist_magic = resist_magic
+                                resist_slash = resist_slash
+                                resist_crush = resist_crush
+                                resist_pierce = resist_pierce
+                                resist_missile = resist_missile
+                            STR_VAR
+                                ac = "%ac%"
+                                saves_spell = "%saves_spell%"
+                                saves_breath = "%saves_breath%"
+                                saves_death = "%saves_death%"
+                                saves_wand = "%saves_wand%"
+                                saves_polymorph = "%saves_polymorph%"
                             END
 
                             //Final patching.
