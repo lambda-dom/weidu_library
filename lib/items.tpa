@@ -1,4 +1,5 @@
 //Libraries.
+INCLUDE "%library_dir%/opcodes.tpa"
 INCLUDE "%library_dir%/tables.tpa"
 
 
@@ -30,6 +31,13 @@ LAF build_array_from_2da STR_VAR
     dir = "%library_dir%/resources/2da"
 RET_ARRAY
     item_types = array
+END
+
+LAF build_array_from_2da STR_VAR
+    table = "item_proficiencies"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    item_proficiencies = array
 END
 
 
@@ -158,6 +166,15 @@ DEFINE_DIMORPHIC_FUNCTION get_item_type STR_VAR type = "" RET value BEGIN
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
         OUTER_SET value = $item_types("%type%")
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_item_proficiency STR_VAR proficiency = "" RET value BEGIN
+    ACTION_TO_LOWER proficiency
+    LAF is_key_in_array STR_VAR array = "item_proficiencies" key = "%proficiency%" RET is_in_array = bool END
+    OUTER_SET value = 0 - 1
+    ACTION_IF NOT (is_in_array = 0) BEGIN
+        OUTER_SET value = $item_proficiencies("%proficiency%")
     END
 END
 
@@ -383,6 +400,82 @@ DEFINE_PATCH_FUNCTION insert_item_header INT_VAR index = 0 type = 1 location = 1
     WRITE_LONG 0x6a (THIS + item_header_size)
 END
 
+DEFINE_PATCH_FUNCTION insert_item_header_opcode INT_VAR
+    header = 0
+    index = 0 - 1
+    opcode = 0
+    target = 0
+    timing = 0
+    parameter1 = 0
+    parameter2 = 0
+    power = 0
+    resist_dispel = 0
+    duration = 0
+    probability1 = 100
+    probability2 = 0
+    dicenumber = 0
+    dicesize = 0
+    savingthrow = 0
+    savebonus = 0
+    special = 0
+STR_VAR
+    resource = ""
+BEGIN
+    //Sanitize argument.
+    LPF get_item_header_count RET headers_count = count END
+    PATCH_IF NOT ((0 <= header) AND (header < headers_count)) BEGIN
+        PATCH_FAIL "insert_item_header_opcode: header %header% out of bounds."
+    END
+    
+    LPF get_item_header_opcode_count INT_VAR header = header RET op_count = count END
+    //Normalize index.
+    PATCH_IF (index = 0 - 1) BEGIN
+        index = op_count
+    END
+
+    //Sanitize argument.
+    PATCH_IF NOT ((0 <= index) AND (index <= op_count)) BEGIN
+        PATCH_FAIL "insert_item_header_opcode: index %index% out of bounds."
+    END
+
+    //Opcode insertion offset.
+    PATCH_IF (index = 0) BEGIN
+        LPF get_item_header_opcode_block_offset INT_VAR header = header RET insertion_offset = offset END
+    END ELSE BEGIN
+        //index can be equal to count.
+        LPF get_item_header_opcode_offset INT_VAR header = header index = (index - 1) RET insertion_offset = offset END
+        insertion_offset += opcode_size
+    END
+
+    //Insert byte block.
+    INSERT_BYTES insertion_offset opcode_size
+
+    //Adjust opcode count and opcode indices.
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+    WRITE_SHORT (header_offset + 0x1e) (THIS + 1)
+    FOR (i = header + 1; i < headers_count; ++i) BEGIN
+        header_offset += item_header_size
+        WRITE_SHORT (header_offset + 0x20) (THIS + 1)
+    END
+
+    //Write fields.
+    WRITE_SHORT insertion_offset opcode
+    WRITE_BYTE (insertion_offset + $opcode_offsets("target")) target
+    WRITE_BYTE (insertion_offset + $opcode_offsets("timing")) timing
+    WRITE_LONG (insertion_offset + $opcode_offsets("parameter1")) parameter1
+    WRITE_LONG (insertion_offset + $opcode_offsets("parameter2")) parameter2
+    WRITE_BYTE (insertion_offset + $opcode_offsets("power")) power
+    WRITE_BYTE (insertion_offset + $opcode_offsets("resist_dispel")) resist_dispel
+    WRITE_LONG (insertion_offset + $opcode_offsets("duration")) duration
+    WRITE_BYTE (insertion_offset + $opcode_offsets("probability1")) probability1
+    WRITE_BYTE (insertion_offset + $opcode_offsets("probability2")) probability2
+    WRITE_LONG (insertion_offset + $opcode_offsets("dicenumber")) dicenumber
+    WRITE_LONG (insertion_offset + $opcode_offsets("dicesize")) dicesize
+    WRITE_LONG (insertion_offset + $opcode_offsets("savingthrow")) savingthrow
+    WRITE_LONG (insertion_offset + $opcode_offsets("savebonus")) savebonus
+    WRITE_LONG (insertion_offset + $opcode_offsets("special")) special
+    WRITE_EVALUATED_ASCII (insertion_offset + $opcode_offsets("resource")) "%resource%" #8
+END
 
 //Miscellaneous functions.
 DEFINE_DIMORPHIC_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item = "" BEGIN
@@ -393,7 +486,7 @@ DEFINE_DIMORPHIC_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item 
 
     COPY_EXISTING ~itemexcl.2da~ ~override~
         //Find itm in itemexcl.2da.
-        LPF find_row INT_VAR col = 0 STR_VAR key = "%item%" RET row = index END
+        LPF find_first_row INT_VAR col = 0 STR_VAR key = "%item%" RET row = index END
         PATCH_IF NOT (row = 0 - 1) BEGIN
             //Set value.
             SET_2DA_ENTRY row 1 2 exclusion
@@ -406,7 +499,7 @@ DEFINE_DIMORPHIC_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item 
     BUT_ONLY
 END
 
-DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 ability = 0 STR_VAR item = "" BEGIN
+DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 tlk_ref = 0 ability = 0 STR_VAR item = "" BEGIN
     //Sanity existence check.
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%item%.itm") BEGIN
         FAIL "set_ability_tooltip: item '%item%.itm' does not exist in game."
@@ -421,7 +514,7 @@ DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 ability = 0 ST
         END
         
         //Find index of item.
-        LPF find_row STR_VAR key = "%item%" RET row = index END
+        LPF find_first_row STR_VAR key = "%item%" RET row = index END
         
         //Insert new row if not found.
         PATCH_IF (row = 0 - 1) BEGIN
@@ -436,8 +529,16 @@ DEFINE_DIMORPHIC_FUNCTION set_ability_tooltip INT_VAR tra_ref = 0 ability = 0 ST
             INSERT_2DA_ROW row cols "%item% %string%"
         END
 
-        //Resolove tra reference.
-        ref = RESOLVE_STR_REF ((AT tra_ref))
+        //Resolve tra reference.
+        PATCH_IF NOT (tra_ref = 0) BEGIN
+            ref = RESOLVE_STR_REF ((AT tra_ref))
+        END ELSE BEGIN
+            PATCH_IF (tlk_ref > 0) BEGIN
+                ref = tlk_ref
+            END ELSE BEGIN
+                PATCH_FAIL "set_ability_tooltip: tlk_ref '%tlk_ref%' is not strictly positive."
+            END
+        END
         //Write ability tooltip.
         SET_2DA_ENTRY row (ability + 1) cols "%ref%"
     PRETTY_PRINT_2DA

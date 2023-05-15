@@ -146,6 +146,12 @@ Inserts a new, blank item header at `index` with `type` (default 1 = melee), `lo
 note(s):
 * any other header fields must be set via existing functions such as ALTER_ITEM_HEADER or the functions in this library.
 
+### B. 7. Addition and removal of opcodes.
+
+`insert_item_header_opcode INT_VAR header = 0 index = -1 ...`
+
+Inserts an opcode in `header` at `index`. The default `index` is -1 which corresponds to inserting at the end. Rest of the arguments are to patch the opcode and fields and follow the same rules as in the standard WeiDU function `ADD_ITEM_EFFECT`. If any of `header` or `index` are out of bounds, function PATCH_FAILS.
+
 ## C. Miscellaneous utilities.
 
 note(s):
@@ -158,10 +164,12 @@ Sets the `item` exclusion flag in the `itemexcl.2da` table. Function FAIL's if `
 note(s):
 * this function opens `itemexcl.2da`, changes a few entries, pretty-prints, etc. If chaining several calls it can incur a performance penalty.
 
-`set_ability_tooltip INT_VAR tra_ref ability = 0 STR_VAR item`
+`set_ability_tooltip INT_VAR tra_ref tlk_ref = 0 ability = 0 STR_VAR item`
 
-Sets the tooltip of item `item` for ability `ability` to (the tlk reference of) the text of `tra_ref`, a tra reference. Function FAIL's if `item` does not exist in-game.
+Sets the tooltip of item `item` for ability `ability` to (the tlk reference of) the text of `tra_ref`, a tra reference. If `tra_ref` is not passed (or is `0`) then it uses the tlk_ref directly.
+
+Function FAIL's if `item` does not exist in-game.
 
 note(s):
-* this function has the side-effect of (potentially) adding text to the tlk file.
+* this function has the side-effect of (potentially) adding text to the tlk file, if it is passed a tra reference.
 * this function opens `tooltip.2da`, changes a few entries, pretty-prints, etc. If chaining several calls it can incur a performance penalty.

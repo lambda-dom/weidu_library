@@ -173,7 +173,7 @@ BEGIN
     //Item proficiency.
     PATCH_IF NOT ("%proficiency%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_WITH_SCOPE BEGIN
-            LPF get_proficiency_type STR_VAR proficiency = "%proficiency%" RET proficiency_id = value END
+            LPF get_item_proficiency STR_VAR proficiency = "%proficiency%" RET proficiency_id = value END
             PATCH_IF NOT (proficiency_id = 0 - 1) BEGIN
                 LPF set_item_field STR_VAR field = "proficiency" value = "%proficiency_id%" END
             END ELSE BEGIN

@@ -22,9 +22,9 @@ The function then loads the component's tra file and inside this tra scope, it `
 note(s):
 * unless said otherwise, all functions in this section are action functions.
 
-`load_file STR_VAR file dir = "*" tra = "*"`
+`load_file STR_VAR file dir = "*" tra = "*" tra_dir = "*" `
 
-`INCLUDE` the `file` located at `dir` in its own scope. If dir (relative to the `%MOD_FOLDER%`) not provided then it searches for file in the `lib` dir of the current component. If `tra` (no .tra extension) is provided, it is a tra file that is loaded before loading the file. It is then automatically unloaded after execution. This file is looked up in `%MOD_FOLDER%/languages/%LANGUAGE%/components/%component%`.
+`INCLUDE` the `file` located at `dir` in its own scope. If dir (relative to the `%MOD_FOLDER%`) not provided then it searches for file in the `lib` dir of the current component. If `tra` (no .tra extension) is provided, it is a tra file that is loaded before loading the file. It is then automatically unloaded after execution. This file is looked up in `%tra_dir%` if provided, defaulting to `%MOD_FOLDER%/languages/%LANGUAGE%/components/%component%`.
 
 ## C. Basic resource install functions.
 
