@@ -1,5 +1,5 @@
 //Action functions.
-DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" tra_dir = "*" BEGIN
+DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" BEGIN
     //Clear on entry.
     CLEAR_ARRAYS
     CLEAR_CODES
@@ -22,11 +22,7 @@ DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" tra_dir =
     
     //Set tra file.
     ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
-        ACTION_IF NOT ("%tra_dir%" STRING_EQUAL_CASE "*") BEGIN
-            OUTER_TEXT_SPRINT component_tra_file "%tra_dir%/%tra%.tra"
-        END ELSE BEGIN
-            OUTER_TEXT_SPRINT component_tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
-        END
+        OUTER_TEXT_SPRINT component_tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
     END ELSE BEGIN
         ACTION_IF (VARIABLE_IS_SET "library_dir") BEGIN
             OUTER_TEXT_SPRINT component_tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
@@ -48,7 +44,7 @@ DEFINE_ACTION_FUNCTION load_component STR_VAR component = "" tra = "*" tra_dir =
 END
 
 //Library functions.
-DEFINE_ACTION_FUNCTION load_file STR_VAR file = "" dir = "*" tra = "*" BEGIN
+DEFINE_ACTION_FUNCTION load_file STR_VAR file = "" dir = "*" tra = "*" tra_dir = "*" BEGIN
     //Standardize dir.
     ACTION_IF "%dir%" STRING_EQUAL_CASE "*" BEGIN
         ACTION_IF VARIABLE_IS_SET "component_dir" BEGIN
@@ -60,16 +56,16 @@ DEFINE_ACTION_FUNCTION load_file STR_VAR file = "" dir = "*" tra = "*" BEGIN
 
     //Set tra file.
     ACTION_IF NOT ("%tra%" STRING_EQUAL_CASE "*") BEGIN
-        ACTION_IF (VARIABLE_IS_SET "component") BEGIN
-            OUTER_TEXT_SPRINT tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
+        ACTION_IF NOT ("%tra_dir%" STRING_EQUAL_CASE "*") BEGIN
+            OUTER_TEXT_SPRINT component_tra_file "%tra_dir%/%tra%.tra"
         END ELSE BEGIN
-            FAIL "load_file: cannot resolve component's tra dir, variable 'component' not set."
+            OUTER_TEXT_SPRINT component_tra_file "%MOD_FOLDER%/languages/%LANGUAGE%/%component%/%tra%.tra"
         END
     END ELSE BEGIN
         ACTION_IF (VARIABLE_IS_SET "library_dir") BEGIN
-            OUTER_TEXT_SPRINT tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
+            OUTER_TEXT_SPRINT component_tra_file "%library_dir%/languages/%LANGUAGE%/empty.tra"
         END ELSE BEGIN
-            FAIL "load_file: cannot resolve library dir, variable 'library_dir' not set."
+            FAIL "load_component: cannot resolve library dir, variable 'library_dir' not set."
         END        
     END
 
