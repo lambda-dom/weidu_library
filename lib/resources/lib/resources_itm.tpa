@@ -349,7 +349,7 @@ DEFINE_ACTION_FUNCTION copy_items_from_table STR_VAR table = "" patches = "*" tr
 
                     //Copy.
                     INNER_ACTION BEGIN
-                        COPY ~%dir%/%resource%.itm~ ~override/%dest%.itm~
+                        COPY "%dir%/%resource%.itm" "override/%dest%.itm"
                             //Patch table data.
                             LPF patch_item INT_VAR
                                 name = name
@@ -370,10 +370,12 @@ DEFINE_ACTION_FUNCTION copy_items_from_table STR_VAR table = "" patches = "*" tr
                                 description_icon = "%description_icon%"
                             END
 
+                        COPY_EXISTING "%dest%.itm" "override"
                             //Final patching.
                             PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                                 LPF "%patch%" END
                             END
+                        BUT_ONLY
 
                         //Exclusion.
                         ACTION_IF NOT (exclusion = 0) BEGIN
