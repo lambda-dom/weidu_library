@@ -375,11 +375,15 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                                 saves_wand = "%saves_wand%"
                                 saves_polymorph = "%saves_polymorph%"
                             END
+                    END
 
-                            //Final patching.
-                            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                    INNER_ACTION BEGIN
+                        //Final patching.
+                        ACTION_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                            COPY_EXISTING "%dest%.cre" "override"
                                 LPF "%patch%" END
-                            END
+                            BUT_ONLY
+                        END
                     END
                 END
             END
