@@ -6,6 +6,7 @@
 * Same change for `copy_cres_from_table`.
 * Add `biography` to `creature_offsets.2da`.
 * Add ids entries to `copy_cres_from_table` and `patch_cre`.
+* Fix defaulting on exclusion flags.
 
 ## version v1.0rc2.
 

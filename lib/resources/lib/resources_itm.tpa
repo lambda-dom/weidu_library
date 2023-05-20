@@ -378,7 +378,7 @@ DEFINE_ACTION_FUNCTION copy_items_from_table STR_VAR table = "" patches = "*" tr
                         BUT_ONLY
 
                         //Exclusion.
-                        ACTION_IF NOT (exclusion = 0) BEGIN
+                        ACTION_IF NOT (exclusion = 0 - 1) BEGIN
                             LAF set_item_exclusion STR_VAR item = "%resource%" END
                         END
                     END
@@ -478,7 +478,7 @@ DEFINE_ACTION_FUNCTION patch_items_from_table STR_VAR table = "" patches = "*" t
                         BUT_ONLY
 
                         //Exclusion.
-                        ACTION_IF NOT (exclusion = 0) BEGIN
+                        ACTION_IF NOT (exclusion = 0 - 1) BEGIN
                             LAF set_item_exclusion STR_VAR item = "%resource%" END
                         END
                     END
