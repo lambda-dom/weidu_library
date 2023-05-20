@@ -32,6 +32,13 @@ STR_VAR
     saves_death = "*"
     saves_wand = "*"
     saves_polymorph = "*"
+    ea = "*"
+    general = "*"
+    race = "*"
+    class = "*" 
+    specific = "*" 
+    gender = "*"
+    alignment = "*"
 BEGIN
     PATCH_IF NOT (name = 0 - 1) BEGIN
         PATCH_WITH_SCOPE BEGIN
@@ -248,6 +255,77 @@ BEGIN
             PATCH_FAIL "patch_cre: resist_missile '%resist_missile%' out of bounds."
         END
     END
+
+    //Ids entries.
+    PATCH_IF NOT ("%ea%" STRING_EQUAL_CASE "*") BEGIN
+        TO_UPPER ea
+        cre_ea = IDS_OF_SYMBOL ("ea" "%ea%")
+        PATCH_IF NOT (cre_ea = 0 - 1) BEGIN
+            LPF set_cre_field STR_VAR field = "ea"  value = "%cre_ea%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: ea id '%ea%' not found."
+        END
+    END
+
+    PATCH_IF NOT ("%general%" STRING_EQUAL_CASE "*") BEGIN
+        TO_UPPER general
+        cre_general = IDS_OF_SYMBOL ("general" "%general%")
+        PATCH_IF NOT (cre_general = 0 - 1) BEGIN
+            LPF set_cre_field STR_VAR field = "general"  value = "%cre_general%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: general id '%general%' not found."
+        END
+    END
+
+    PATCH_IF NOT ("%race%" STRING_EQUAL_CASE "*") BEGIN
+        TO_UPPER race
+        cre_race = IDS_OF_SYMBOL ("race" "%race%")
+        PATCH_IF NOT (cre_race = 0 - 1) BEGIN
+            LPF set_cre_field STR_VAR field = "race"  value = "%cre_race%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: race id '%race%' not found."
+        END
+    END
+
+    PATCH_IF NOT ("%class%" STRING_EQUAL_CASE "*") BEGIN
+        TO_UPPER class
+        cre_class = IDS_OF_SYMBOL ("class" "%class%")
+        PATCH_IF NOT (cre_class = 0 - 1) BEGIN
+            LPF set_cre_field STR_VAR field = "class"  value = "%cre_class%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: class id '%class%' not found."
+        END
+    END
+
+    PATCH_IF NOT ("%specific%" STRING_EQUAL_CASE "*") BEGIN
+        TO_UPPER specific
+        cre_specific = IDS_OF_SYMBOL ("specific" "%specific%")
+        PATCH_IF NOT (cre_specific = 0 - 1) BEGIN
+            LPF set_cre_field STR_VAR field = "specific"  value = "%cre_specific%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: specific id '%specific%' not found."
+        END
+    END
+
+    PATCH_IF NOT ("%gender%" STRING_EQUAL_CASE "*") BEGIN
+        TO_UPPER gender
+        cre_gender = IDS_OF_SYMBOL ("gender" "%gender%")
+        PATCH_IF NOT (cre_gender = 0 - 1) BEGIN
+            LPF set_cre_field STR_VAR field = "gender"  value = "%cre_gender%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: gender id '%gender%' not found."
+        END
+    END
+
+    PATCH_IF NOT ("%alignment%" STRING_EQUAL_CASE "*") BEGIN
+        TO_UPPER alignment
+        cre_alignment = IDS_OF_SYMBOL ("alignment" "%alignment%")
+        PATCH_IF NOT (cre_alignment = 0 - 1) BEGIN
+            LPF set_cre_field STR_VAR field = "alignment"  value = "%cre_alignment%" END
+        END ELSE BEGIN
+            PATCH_FAIL "patch_cre: alignment id '%alignment%' not found."
+        END
+    END
 END
 
 
@@ -285,7 +363,7 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
         COPY - ~%table_file%~ ~override~
             COUNT_2DA_COLS cols
             //Number of columns check.
-            PATCH_IF NOT (cols = 30) BEGIN
+            PATCH_IF NOT (cols = 37) BEGIN
                 PATCH_FAIL "copy_cres_from_table: number of columns '%cols%' in table '%table_file%' is not the required one."
             END
 
@@ -332,9 +410,18 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                 READ_2DA_ENTRY_FORMER "table#rows" i 26 resist_pierce
                 READ_2DA_ENTRY_FORMER "table#rows" i 27 resist_missile
 
+                //Ids entries.
+                READ_2DA_ENTRY_FORMER "table#rows" i 28 ea
+                READ_2DA_ENTRY_FORMER "table#rows" i 29 general
+                READ_2DA_ENTRY_FORMER "table#rows" i 30 race
+                READ_2DA_ENTRY_FORMER "table#rows" i 31 class
+                READ_2DA_ENTRY_FORMER "table#rows" i 32 specific
+                READ_2DA_ENTRY_FORMER "table#rows" i 33 gender
+                READ_2DA_ENTRY_FORMER "table#rows" i 34 alignment
+
                 //Final.
-                READ_2DA_ENTRY_FORMER "table#rows" i 28 patch
-                READ_2DA_ENTRY_FORMER "table#rows" i 29 override
+                READ_2DA_ENTRY_FORMER "table#rows" i 35 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 36 override
 
                 PATCH_IF NOT (install = 0) BEGIN
                     //Existence check.
@@ -374,6 +461,13 @@ DEFINE_ACTION_FUNCTION copy_cres_from_table STR_VAR table = "" patches = "*" tra
                                 saves_death = "%saves_death%"
                                 saves_wand = "%saves_wand%"
                                 saves_polymorph = "%saves_polymorph%"
+                                ea = "%ea%"
+                                general = "%general%"
+                                race = "%race%"
+                                class = "%class%" 
+                                specific = "%specific%" 
+                                gender = "%gender%"
+                                alignment = "%alignment%"
                             END
                     END
 
