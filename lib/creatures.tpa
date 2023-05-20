@@ -28,6 +28,7 @@ DEFINE_PATCH_FUNCTION get_cre_field STR_VAR field = "" RET value BEGIN
         "gold"
         "status"
         "animation"
+        "biography"
         "kit" BEGIN
             READ_LONG field_offset value
         END
@@ -122,6 +123,7 @@ DEFINE_PATCH_FUNCTION set_cre_field STR_VAR field = "" value = "" BEGIN
         "gold"
         "status"
         "animation"
+        "biography"
         "kit" BEGIN
             WRITE_LONG field_offset value
         END
