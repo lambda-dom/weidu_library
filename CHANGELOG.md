@@ -1,5 +1,9 @@
 # Changelog for `weidu_library`
 
+## version v1.0rc4 -- unreleased.
+
+* Small readme corrections.
+
 ## version v1.0rc3.
 
 * Move final patching in `copy_items_from_table` to its own `COPY_EXISTING` block to ensure that calls to `set_ability_tooltip` and similar functions do not barf on new items as the documentation states.
