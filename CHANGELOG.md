@@ -4,6 +4,7 @@
 
 * Small readme corrections.
 * Add `load_2da_table`.
+* Delete spurious `copy_items_template.2da`.
 
 ## version v1.0rc3.
 
