@@ -16,7 +16,11 @@ note(s):
 
 `load_2da_table STR_VAR table dir = "*" RET rows cols RET_ARRAY array`
 
-Sometimes, the builder `build_array_from_2da` is not enough and one really needs to load the whole table into memory. Since WeiDU has no data abstraction facilities, we have to make do with what is available, namely associative arrays, and encode the table entries in it. Every entry in a table is unique determine by its row, a positive integer, and the column, another positive integer, so the return value `array` is an associative array indexed by pairs `row col` of positive integers. The values `cols` and `rows` give the upper bounds of, respectively, the columns and rows indices.
+Sometimes, the builder `build_array_from_2da` is not enough and one really needs to load the whole table into memory. Since WeiDU has no data abstraction facilities, we have to make do with what is available, namely associative arrays, and encode the table entries in it. Every entry in a table is unique determine by its row, a positive integer, and the column, another positive integer, so the return value `array` is an associative array indexed by pairs `row col` of positive integers. The values `cols` and `rows` give the upper bounds of, respectively, the columns and rows indices. Once you have the arrar, use the usual array indexing, e.g. assuming `array` is the array's name:
+
+```
+TEXT_SPRINT entry $array(row col)
+```
 
 As per usual, if `dir` is not provided, the table file is looked up in component's resources 2da dir.
 
