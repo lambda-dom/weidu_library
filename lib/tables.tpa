@@ -155,7 +155,7 @@ DEFINE_DIMORPHIC_FUNCTION load_2da_table STR_VAR table = "" dir = "*" RET rows c
             //Read table.
             READ_2DA_ENTRIES_NOW "table#rows" cols
             //Gather data.
-            FOR (i = 0; i < rows; ++ i) BEGIN
+            FOR (i = 0; i < table#rows; ++ i) BEGIN
                 FOR (j = 0; j < cols; ++j) BEGIN
                     READ_2DA_ENTRY_FORMER "table#rows" i j value
                     TEXT_SPRINT $array(i j) "%value%"
