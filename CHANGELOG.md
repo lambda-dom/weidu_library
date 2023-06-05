@@ -3,6 +3,7 @@
 ## version v1.0rc4 -- unreleased.
 
 * Small readme corrections.
+* Add `load_2da_table`.
 
 ## version v1.0rc3.
 
