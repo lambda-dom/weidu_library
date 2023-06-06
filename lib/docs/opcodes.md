@@ -24,6 +24,13 @@ Array with keys the timing symbolic names and values the corresponding values.
 
 Array with keys the dispellable/mr-affected symbolic names and values the corresponding values.
 
+`opcode_types`
+
+Array of pairs `type => number`. The map is bidirectional, but no advantage is taken of this (yet).
+
+note(s):
+* only opcodes for BG(2)EE are in the table.
+
 ## B. Opcode functions.
 
 note(s):
@@ -84,4 +91,11 @@ note(s):
 Return the integer `value` corresponding to the symbolic name of opcode's `dispel_resistance`. The function returns -1 if `dispel_resistance` is not valid.
 
 note(s):
-* the symbolic names can be found in the [opcode_dispel_resistance.2da table](../resources/2da/dispel_resistance.2da).
+* the symbolic names can be found in the [opcode_dispel_resistance.2da table](../resources/2da/opcode_dispel_resistance.2da).
+
+`get_opcode_type STR_VAR type RET value`
+
+Return the integer `value` corresponding to the symbolic name of the opcode's `type`. The function returns -1 if `type` is not valid.
+
+note(s):
+* the symbolic names of the opcode types can be found in the [opcode_types.2da table](../resources/2da/opcode_types.2da).

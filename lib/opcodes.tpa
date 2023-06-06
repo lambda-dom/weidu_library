@@ -36,6 +36,13 @@ RET_ARRAY
     opcode_dispel_resistance = array
 END
 
+LAF build_array_from_2da STR_VAR
+    table = "opcode_types"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    opcode_types = array
+END
+
 
 //Patch functions.
 //Read functions.
@@ -132,5 +139,13 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_dispel_resistance STR_VAR dispel_resistance
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
         OUTER_SET value = $opcode_dispel_resistance("%dispel_resistance%")
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_opcode_type STR_VAR type = "" RET value BEGIN
+    LAF is_key_in_array STR_VAR array = "opcode_types" key = "%type%" RET is_in_array = bool END
+    OUTER_SET value = 0 - 1
+    ACTION_IF NOT (is_in_array = 0) BEGIN
+        OUTER_SET value = $opcode_types("%type%")
     END
 END
