@@ -24,6 +24,10 @@ Array with keys the timing symbolic names and values the corresponding values.
 
 Array with keys the dispellable/mr-affected symbolic names and values the corresponding values.
 
+`opcode_types`
+
+Array of pairs `type => number`. The map is bidirectional, but no advantage is taken of this (yet).
+
 ## B. Opcode functions.
 
 note(s):

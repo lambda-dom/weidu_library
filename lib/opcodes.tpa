@@ -36,6 +36,13 @@ RET_ARRAY
     opcode_dispel_resistance = array
 END
 
+LAF build_array_from_2da STR_VAR
+    table = "opcode_types"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    opcode_types = array
+END
+
 
 //Patch functions.
 //Read functions.
