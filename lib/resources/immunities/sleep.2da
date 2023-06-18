@@ -1,0 +1,9 @@
+2DA V1.0
+*
+                            parameter1  parameter2      resource
+ImmunityOpcode              0           Unconscious     *
+ImmunityOpcode              0           Unconscious20   *
+ImmunityIcon                0           14              *
+ImmunityIcon                0           130             *
+ImmunityDisplayString       12047       0               *
+ImmunityDisplayString       20438       0               *
