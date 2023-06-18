@@ -1,0 +1,91 @@
+//Libraries.
+INCLUDE "%library_dir%/arrays.tpa"
+INCLUDE "%library_dir%/opcodes.tpa"
+INCLUDE "%library_dir%/spells.tpa"
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Arrays to opcode => functions to convert values.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY opcodes_parameter1_functions BEGIN
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY opcodes_parameter2_functions BEGIN
+    "ImmunityOpcode" => "get_opcode"
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY opcodes_resource_functions BEGIN
+    "ImmunitySpell" => "get_resource"
+END
+
+
+//Conversion functions.
+DEFINE_PATCH_FUNCTION get_opcode STR_VAR input = "" RET output BEGIN
+    LPF get_opcode_type STR_VAR type = "%input%" RET output = value END
+    PATCH_IF (output = 0 - 1) BEGIN
+        PATCH_FAIL "get_opcode: opcode '%input%' unknown."
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_resource STR_VAR input = "" RET output BEGIN
+    LPF get_spell_res STR_VAR spell = "%input%" RET output = resource END
+    //Default to input if not found.
+    PATCH_IF ("%output%" STRING_EQUAL_CASE "*") BEGIN
+        TEXT_SPRINT output "%input%"
+    END
+END
+
+
+//Public functions.
+DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGIN
+    PATCH_IF NOT (FILE_EXISTS "%library_dir%/resources/immunities/%immunity%.2da") BEGIN
+        PATCH_FAIL "add_immunity: table file '%immunity%.2da' not found."
+    END
+
+    //Load table.
+    LPF load_2da_table STR_VAR
+        table = "%immunity%"
+        dir = "%library_dir%/resources/immunities"
+    RET rows cols RET_ARRAY immunity_opcodes = array END
+
+    FOR (i = 0; i < rows; ++i) BEGIN
+        //Gather data.
+        TEXT_SPRINT opcode_sym $immunity_opcodes(i 0)
+        TEXT_SPRINT param1_sym $immunity_opcodes(i 1)
+        TEXT_SPRINT param2_sym $immunity_opcodes(i 2)
+        TEXT_SPRINT resource_s $immunity_opcodes(i 3)
+
+        //Conversion functions.
+        //Opcode.
+        LPF get_opcode_type STR_VAR type = "%opcode_sym%" RET opcode = value END
+        PATCH_IF (opcode = 0 - 1) BEGIN
+            PATCH_FAIL "add_immunity: opcode '%opcode_sym%' unknown."
+        END
+
+        //Parameters.
+        TEXT_SPRINT parameter1 "%param1_sym%"
+        LPF is_key_in_array STR_VAR array = "opcodes_parameter1_functions" key = "%opcode_sym%" RET is_in = bool END
+        PATCH_IF (is_in = 1) BEGIN
+            TEXT_SPRINT func $opcodes_parameter1_functions("%opcode_sym%")
+            LPF "%func%" STR_VAR input = "%param1_sym%" RET parameter1 = output END
+        END
+
+        TEXT_SPRINT parameter2 "%param2_sym%"
+        LPF is_key_in_array STR_VAR array = "opcodes_parameter2_functions" key = "%opcode_sym%" RET is_in = bool END
+        PATCH_IF (is_in = 1) BEGIN
+            TEXT_SPRINT func $opcodes_parameter2_functions("%opcode_sym%")
+            LPF "%func%" STR_VAR input = "%param2_sym%" RET parameter2 = output END
+        END
+
+        //Resource.
+        TEXT_SPRINT resource "%resource_s%"
+        LPF is_key_in_array STR_VAR array = "opcodes_resource_functions" key = "%opcode_sym%" RET is_in = bool END
+        PATCH_IF (is_in = 1) BEGIN
+            TEXT_SPRINT func $opcodes_resource_functions("%opcode_sym%")
+            LPF "%func%" STR_VAR input = "%resource_s%" RET resource = output END
+        END
+
+        //Patching.
+        //Debugging for now.
+        PATCH_PRINT "add_immunity: row '%i%': opcode '%opcode%', parameter1 '%parameter1%', parameter2 '%parameter2%', resource '%resource%'."
+    END
+END
