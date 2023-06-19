@@ -15,7 +15,7 @@ DEFINE_DIMORPHIC_FUNCTION clone_subspell_from_table STR_VAR spell = "" dest = ""
     ACTION_IF (FILE_EXISTS "%tra_file%") BEGIN
         //Include patches.
         WITH_SCOPE  BEGIN
-            OUTER_TEXT_SPRINT patches_file "%library_dir%/lib/subspell_patches.tpa"
+            OUTER_TEXT_SPRINT patches_file "%library_dir%/resources/lib/subspell_patches.tpa"
             ACTION_IF FILE_EXISTS "%patches_file%" BEGIN
                 INCLUDE "%patches_file%"
             END ELSE BEGIN
