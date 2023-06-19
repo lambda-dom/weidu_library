@@ -6,6 +6,7 @@
 * Add `load_2da_table`.
 * Delete spurious `copy_items_template.2da`.
 * Added `opcode_types` array and `get_opcode_type` function.
+* Change `get_array_element`.
 
 ## version v1.0rc3.
 
