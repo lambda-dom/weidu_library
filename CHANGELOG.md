@@ -1,6 +1,8 @@
 # Changelog for `weidu_library`
 
-## version v1.0rc5 -- unreleased.
+## version v1.0rc6 -- unreleased.
+
+## version v1.0rc5.
 
 * Add `dir` argument to `patch_opcode_block`.
 * General pass to enforce case-insensivity almost everywhere.
