@@ -30,7 +30,7 @@ END
 
 
 //Constructing arrays of opcode values.
-DEFINE_PATCH_FUNCTION construct_matching_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
+DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
     DEFINE_ASSOCIATIVE_ARRAY opcode_array BEGIN
         "opcode"        => "-1"
         "target"        => "-1"
@@ -156,19 +156,6 @@ DEFINE_PATCH_FUNCTION construct_matching_opcode_array STR_VAR opcode = "" array 
     END
 END
 
-DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
-    LPF construct_matching_opcode_array STR_VAR
-        opcode = "%opcode%"
-        array = "%array%"
-    RET_ARRAY opcode_array END
-
-    //Fix resource.
-    TEXT_SPRINT resource $opcode_array("resource")
-    PATCH_IF ("%resource%" STRING_EQUAL_CASE "SAME") BEGIN
-        TEXT_SPRINT $opcode_array("resource") ""
-    END
-END
-
 
 //Public functions.
 DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGIN
@@ -194,7 +181,7 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
     TEXT_SPRINT $matching_array("parameter2") $opcodes("0" "2")
     TEXT_SPRINT $matching_array("resource") $opcodes("0" "3")
 
-    LPF construct_matching_opcode_array STR_VAR
+    LPF construct_opcode_array STR_VAR
         opcode = "%match_opcode%"
         array = "matching_array"
     RET_ARRAY matching_opcode_array = opcode_array END
@@ -223,9 +210,36 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
                 array = "array"
             RET_ARRAY opcode_array END
 
-            PHP_EACH opcode_array AS field => value BEGIN
-                PATCH_PRINT "add_immunity: row '%i%': '%field%' => '%value%'."
+            TEXT_SPRINT resource $opcode_array("resource")
+
+            //Delete matching opcodes.
+            LPF DELETE_EFFECT INT_VAR
+                check_globals = check_globals
+                check_headers = check_headers
+                verbose = 1
+                match_opcode = $opcode_array("opcode")
+                match_parameter1 = $opcode_array("parameter1")
+                match_parameter2 = $opcode_array("parameter2")
+                match_target = $opcode_array("target")
+                match_power = $opcode_array("power")
+                match_timing = $opcode_array("timing")
+                match_resist_dispel = $opcode_array("resist_dispel")
+                match_duration = $opcode_array("duration")
+                match_probability1 = $opcode_array("probability1")
+                match_probability2 = $opcode_array("probability2")
+                match_dicenumber = $opcode_array("dicenumber")
+                match_dicesize = $opcode_array("dicesize")
+                match_savingthrow = $opcode_array("savingthrow")
+                match_savebonus = $opcode_array("savebonus")
+                match_special = $opcode_array("special")
+            STR_VAR
+                match_resource = "%resource%"
             END
+
+            PATCH_IF ("%resource%" STRING_EQUAL_CASE "SAME") BEGIN
+                TEXT_SPRINT resource ""
+            END
+
         END
     END
 END
