@@ -33,119 +33,103 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
     END
 
     //Opcode.
-    PATCH_WITH_SCOPE BEGIN
-        LPF get_opcode_type STR_VAR type = "%opcode%" RET value END
-        PATCH_IF NOT (value = 0 - 1) BEGIN
-            TEXT_SPRINT $opcode_array("opcode") "%value%"
-        END ELSE BEGIN
-            PATCH_FAIL "construct_opcode_array: opcode '%opcode%' unknown."
-        END
+    LPF get_opcode_type STR_VAR type = "%opcode%" RET value END
+    PATCH_IF NOT (value = 0 - 1) BEGIN
+        TEXT_SPRINT $opcode_array("opcode") "%value%"
+    END ELSE BEGIN
+        PATCH_FAIL "construct_opcode_array: opcode '%opcode%' unknown."
     END
 
     //Parameters.
-    PATCH_WITH_SCOPE BEGIN
-        LPF is_key_in_array STR_VAR array = "%array%" key = "parameter1" RET is_in1 = bool END
-        LPF is_key_in_array STR_VAR array = "%array%" key = "parameter2" RET is_in2 = bool END
-        PATCH_IF (is_in1 = 1) AND (is_in2 = 1) BEGIN
-            TEXT_SPRINT input1 $"%array%"("parameter1")
-            TEXT_SPRINT input2 $"%array%"("parameter2")
+    LPF is_key_in_array STR_VAR array = "%array%" key = "parameter1" RET is_in1 = bool END
+    LPF is_key_in_array STR_VAR array = "%array%" key = "parameter2" RET is_in2 = bool END
+    PATCH_IF (is_in1 = 1) AND (is_in2 = 1) BEGIN
+        TEXT_SPRINT input1 $"%array%"("parameter1")
+        TEXT_SPRINT input2 $"%array%"("parameter2")
 
-            LPF is_key_in_array STR_VAR array = "opcode_parameter_functions" key = "%opcode%" RET is_in = bool END
-            PATCH_IF (is_in = 1) BEGIN
-                TEXT_SPRINT func $opcode_parameter_functions("%opcode%")
-                LPF "%func%" STR_VAR input1 = "%input1%" input2 = "%input2%" RET value1 = output1 value2 = output2 END
-                TEXT_SPRINT $opcode_array("parameter1") "%value1%"
-                TEXT_SPRINT $opcode_array("parameter2") "%value2%"
-            END ELSE BEGIN
-                TEXT_SPRINT $opcode_array("parameter1") "%input1%"
-                TEXT_SPRINT $opcode_array("parameter2") "%input2%"
-            END
+        LPF is_key_in_array STR_VAR array = "opcode_parameter_functions" key = "%opcode%" RET is_in = bool END
+        PATCH_IF (is_in = 1) BEGIN
+            TEXT_SPRINT func $opcode_parameter_functions("%opcode%")
+            LPF "%func%" STR_VAR input1 = "%input1%" input2 = "%input2%" RET value1 = output1 value2 = output2 END
+            TEXT_SPRINT $opcode_array("parameter1") "%value1%"
+            TEXT_SPRINT $opcode_array("parameter2") "%value2%"
+        END ELSE BEGIN
+            TEXT_SPRINT $opcode_array("parameter1") "%input1%"
+            TEXT_SPRINT $opcode_array("parameter2") "%input2%"
         END
     END
 
-
     //Target.
-    PATCH_WITH_SCOPE BEGIN
-        LPF is_key_in_array STR_VAR array = "%array%" key = "target" RET is_in = bool END
-        PATCH_IF is_in = 1 BEGIN
-            TEXT_SPRINT input $"%array%"("target")
-            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
-                LPF get_opcode_target STR_VAR target = "%input%" RET value END
-                PATCH_IF NOT (value = 0 - 1) BEGIN
-                    TEXT_SPRINT $opcode_array("target") "%value%"
-                END ELSE BEGIN
-                    PATCH_FAIL "construct_opcode_array: target '%input%' unknown."
-                END
+    LPF is_key_in_array STR_VAR array = "%array%" key = "target" RET is_in = bool END
+    PATCH_IF is_in = 1 BEGIN
+        TEXT_SPRINT input $"%array%"("target")
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            LPF get_opcode_target STR_VAR target = "%input%" RET value END
+            PATCH_IF NOT (value = 0 - 1) BEGIN
+                TEXT_SPRINT $opcode_array("target") "%value%"
+            END ELSE BEGIN
+                PATCH_FAIL "construct_opcode_array: target '%input%' unknown."
             END
         END
     END
 
     //Timing.
-    PATCH_WITH_SCOPE BEGIN
-        LPF is_key_in_array STR_VAR array = "%array%" key = "timing" RET is_in = bool END
-        PATCH_IF is_in = 1 BEGIN
-            TEXT_SPRINT input $"%array%"("timing")
-            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
-                LPF get_opcode_target STR_VAR target = "%input%" RET value END
-                PATCH_IF NOT (value = 0 - 1) BEGIN
-                    TEXT_SPRINT $opcode_array("timing") "%value%"
-                END ELSE BEGIN
-                    PATCH_FAIL "construct_opcode_array: timing '%input%' unknown."
-                END
+    LPF is_key_in_array STR_VAR array = "%array%" key = "timing" RET is_in = bool END
+    PATCH_IF is_in = 1 BEGIN
+        TEXT_SPRINT input $"%array%"("timing")
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            LPF get_opcode_target STR_VAR target = "%input%" RET value END
+            PATCH_IF NOT (value = 0 - 1) BEGIN
+                TEXT_SPRINT $opcode_array("timing") "%value%"
+            END ELSE BEGIN
+                PATCH_FAIL "construct_opcode_array: timing '%input%' unknown."
             END
         END
     END
 
     //Resist-dispel.
-    PATCH_WITH_SCOPE BEGIN
-        LPF is_key_in_array STR_VAR array = "%array%" key = "resist_dispel" RET is_in = bool END
-        PATCH_IF is_in = 1 BEGIN
-            TEXT_SPRINT input $"%array%"("resist_dispel")
-            LPF get_opcode_resist_dispel STR_VAR resist_dispel = "%input%" RET value END
-            PATCH_IF NOT (value = 0 - 1) BEGIN
-                TEXT_SPRINT $opcode_array("resist_dispel") "%value%"
-            END ELSE BEGIN
-                PATCH_FAIL "construct_opcode_array: resist_dispel '%input%' unknown."
-            END
+    LPF is_key_in_array STR_VAR array = "%array%" key = "resist_dispel" RET is_in = bool END
+    PATCH_IF is_in = 1 BEGIN
+        TEXT_SPRINT input $"%array%"("resist_dispel")
+        LPF get_opcode_resist_dispel STR_VAR resist_dispel = "%input%" RET value END
+        PATCH_IF NOT (value = 0 - 1) BEGIN
+            TEXT_SPRINT $opcode_array("resist_dispel") "%value%"
+        END ELSE BEGIN
+            PATCH_FAIL "construct_opcode_array: resist_dispel '%input%' unknown."
         END
     END
 
     //Resource.
-    PATCH_WITH_SCOPE BEGIN
-        LPF is_key_in_array STR_VAR array = "%array%" key = "resource" RET is_in = bool END
-        PATCH_IF is_in = 1 BEGIN
-            TEXT_SPRINT input $"%array%"("resist_dispel")
-            PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
-                LPF get_spell_res STR_VAR spell = "%input%" RET resource END
-                //Default to input if not found.
-                PATCH_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
-                    TEXT_SPRINT resource "%input%"
-                END
-                TEXT_SPRINT $opcode_array("resource") "%resource%"
+    LPF is_key_in_array STR_VAR array = "%array%" key = "resource" RET is_in = bool END
+    PATCH_IF is_in = 1 BEGIN
+        TEXT_SPRINT input $"%array%"("resource")
+        PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
+            LPF get_spell_res STR_VAR spell = "%input%" RET resource END
+            //Default to input if not found.
+            PATCH_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
+                TEXT_SPRINT resource "%input%"
             END
+            TEXT_SPRINT $opcode_array("resource") "%resource%"
         END
     END
 
     //Unconverted fields.
-    PATCH_WITH_SCOPE BEGIN
-        PATCH_FOR_EACH field IN
-            "power"
-            "duration"
-            "probability1"
-            "probability2"
-            "dicenumber"
-            "dicesize"
-            "savingthrow"
-            "savebonus"
-            "special"
-        BEGIN
-            LPF is_key_in_array STR_VAR array = "%array%" key = "%field%" RET is_in = bool END
-            PATCH_IF is_in = 1 BEGIN
-                TEXT_SPRINT $opcode_array("%field%") $"%array%"("%field%")
-            END
+    PATCH_FOR_EACH field IN
+        "power"
+        "duration"
+        "probability1"
+        "probability2"
+        "dicenumber"
+        "dicesize"
+        "savingthrow"
+        "savebonus"
+        "special"
+    BEGIN
+        LPF is_key_in_array STR_VAR array = "%array%" key = "%field%" RET is_in = bool END
+        PATCH_IF is_in = 1 BEGIN
+            TEXT_SPRINT $opcode_array("%field%") $"%array%"("%field%")
         END
     END
-
 END
 
 //Conversion functions.
