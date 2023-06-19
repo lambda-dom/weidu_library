@@ -53,8 +53,11 @@ END
 
 //Read-write functions.
 DEFINE_PATCH_FUNCTION get_spell_field STR_VAR field = "" RET value BEGIN
-    field_offset = $spell_offsets("%field%")
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+    
     //Match on field to decide which read function to use.
+    field_offset = $spell_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "name" "descr" "flags" "exclusion" "level" BEGIN
             READ_LONG field_offset value
@@ -74,8 +77,11 @@ DEFINE_PATCH_FUNCTION get_spell_field STR_VAR field = "" RET value BEGIN
 END
 
 DEFINE_PATCH_FUNCTION set_spell_field STR_VAR field = "" value = "" BEGIN
-    field_offset = $spell_offsets("%field%")
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+    
     //Match on field to decide which read function to use.
+    field_offset = $spell_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "name" "descr" "flags" "exclusion" "level" BEGIN
             WRITE_LONG field_offset value
@@ -98,6 +104,7 @@ END
 //Spell field utilities.
 DEFINE_DIMORPHIC_FUNCTION get_spell_type STR_VAR type = "" RET value BEGIN
     ACTION_TO_LOWER type
+
     LAF is_key_in_array STR_VAR array = "spell_types" key = "%type%" RET is_in_array = bool END
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
@@ -119,14 +126,17 @@ END
 DEFINE_PATCH_FUNCTION get_spell_header_field INT_VAR header = 0 STR_VAR field = "" RET value BEGIN
     //Get header and field offsets.
     LPF get_spell_header_offset INT_VAR header = header RET header_offset = offset END
-    field_offset = $spell_header_offsets("%field%")
 
     //Sanity check.
     PATCH_IF header_offset < 0 BEGIN
         PATCH_FAIL "get_spell_header_field: header %header% out of bounds."
     END
     
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field    
+
     //Match on field to select read function to use.
+    field_offset = $spell_header_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "type" "flags" "target" BEGIN
             READ_BYTE (header_offset + field_offset) value
@@ -145,14 +155,17 @@ END
 DEFINE_PATCH_FUNCTION set_spell_header_field INT_VAR header = 0 STR_VAR field = "" value = "" BEGIN
     //Get header and field offsets.
     LPF get_spell_header_offset INT_VAR header = header RET header_offset = offset END
-    field_offset = $spell_header_offsets("%field%")
 
     //Sanity check.
     PATCH_IF header_offset < 0 BEGIN
         PATCH_FAIL "set_spell_header_field: header %header% out of bounds."
     END
     
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field    
+
     //Match on field to select write function to use.
+    field_offset = $spell_header_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "type" "flags" "target" BEGIN
             WRITE_BYTE (header_offset + field_offset) value
@@ -187,7 +200,7 @@ DEFINE_PATCH_FUNCTION match_spell_header_against_array INT_VAR header = 0 STR_VA
             //Read value.
             LPF get_spell_header_field INT_VAR header = header STR_VAR field = "%field%" RET rhs = value END
             //Compare values as strings.
-            PATCH_IF NOT ("%lhs%" STRING_EQUAL "%rhs%") BEGIN
+            PATCH_IF NOT ("%lhs%" STRING_EQUAL_CASE "%rhs%") BEGIN
                 bool = 0
                 //Leave loop early.
                 PATCH_SILENT

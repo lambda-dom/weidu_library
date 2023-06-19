@@ -1,8 +1,8 @@
 2DA V1.0
 *
                             parameter1  parameter2  resource    insert
-ImmunityOpcode              0           Disease     *           *
-ImmunityIcon                0           7           *           below
-ImmunityIcon                0           126         *           below
-ImmunityDisplayString       39752       0           *           below
-ImmunityDisplayString       54337       0           *           below
+Immunity_Opcode             0           Disease     *           *
+Immunity_Icon               0           7           *           below
+Immunity_Icon               0           126         *           below
+Immunity_Display_String     39752       0           *           below
+Immunity_Display_String     54337       0           *           below

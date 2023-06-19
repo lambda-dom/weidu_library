@@ -1,7 +1,7 @@
 2DA V1.0
 *
                             parameter1  parameter2  resource    insert
-ImmunityOpcode              0           Stun        *           *
-ImmunityOpcode              0           Stun90      *           below
-ImmunityIcon                0           55          *           below
-ImmunityDisplayString       1280        0           *           below
+Immunity_Opcode             0           Stun        *           *
+Immunity_Opcode             0           Stun_90     *           below
+Immunity_Icon               0           55          *           below
+Immunity_Display_String     1280        0           *           below

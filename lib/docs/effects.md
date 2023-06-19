@@ -21,12 +21,16 @@ note(s):
 
 Generic read function. Return the `value` of effect `field`. If the field is not an effect field, function PATCH_FAIL's.
 
+note(s):
+* casing of `field` is irrelevant.
+
 `set_effect_field STR_VAR field value`
 
 Generic write function. Write `value`, passed as a string, to `field` of effect. If the field is not an effect field, function PATCH_FAIL's.
 
 note(s):
-* pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [creature_offsets.2da](../resources/2da/effect_offsets.2da) table.
+* casing of `field` is irrelevant.
+* pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [effect_offsets.2da](../resources/2da/effect_offsets.2da) table.
 
 ## C. Builders.
 

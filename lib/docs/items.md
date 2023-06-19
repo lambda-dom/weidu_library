@@ -64,11 +64,15 @@ Return number of equipped opcodes in the item.
 
 Generic read function. Return the value of item `field`. If field is not an item field, function PATCH_FAIL's.
 
+note(s):
+* casing of `field` is irrelevant.
+
 `set_item_field STR_VAR field value`
 
 Generic write function. Write `value`, passed as a string, to item `field`. If field is not an item field, function PATCH_FAIL's.
 
 note(s):
+* casing of `field` is irrelevant.
 * pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [item_offsets.2da table](../resources/2da/item_offsets.2da).
 
 #### B. 2. 1. Item field utilities.
@@ -81,6 +85,7 @@ note(s):
 Return the integer `value` corresponding to the symbolic name of item's `type`. The function returns -1 if `type` is not valid.
 
 note(s):
+* casing of `type` is irrelevant.
 * the symbolic names can be found in the [item_types.2da table](../resources/2da/item_types.2da).
 
 `get_item_proficiency STR_VAR proficiency RET value`
@@ -88,6 +93,7 @@ note(s):
 Return the integer `value` corresponding to the symbolic name of item's `proficiency`. The function returns -1 if `proficiency` is not valid.
 
 note(s):
+* casing of `proficiency` is irrelevant.
 * the symbolic names can be found in the [item_proficiencies.2da table](../resources/2da/item_proficiencies.2da).
 
 ### B. 3. Item header functions.
@@ -100,11 +106,15 @@ Return offset of `header` (0-indexed). If `header` out of bounds, return -1.
 
 Generic read function. Read the value of an item header `field`.
 
+note(s):
+* casing of `field` is irrelevant.
+
 `set_item_header_field INT_VAR header = 0 STR_VAR field value`
 
 Generic write function. Write `value`, passed as a string, to item header `field`. Function PATCH_FAIL's if `header` out of bounds or `field` is not an item header field.
 
 note(s):
+* casing of `field` is irrelevant.
 * pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [item_header_offsets.2da table](../resources/2da/item_header_offsets.2da).
 
 ### B. 4. Equipped opcode functions.

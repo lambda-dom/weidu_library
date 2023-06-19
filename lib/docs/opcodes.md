@@ -40,11 +40,15 @@ note(s):
 
 Generic read function. Return the value of `field` of opcode at `offset`. If field is not an opcode field, function PATCH_FAIL's.
 
+note(s):
+* casing of `field` is irrelevant.
+
 `set_opcode_field INT_VAR offset = 0 STR_VAR field value`
 
 Generic write function. Write `value`, passed as a string, to `field` of opcode at `offset`. If the field is not an opcode field, function PATCH_FAIL's.
 
 note(s):
+* casing of `field` is irrelevant.
 * pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [opcode_offsets.2da](../resources/2da/opcode_offsets.2da) table.
 
 `match_opcode_against_array INT_VAR offset = 0 STR_VAR array RET bool`
@@ -52,6 +56,7 @@ note(s):
 Matches opcode at `offset` field by field against the `array` fields. PATCH_FAIL's if any of the array fields is not an opcode field. Array `array` is passed by name.
 
 note(s):
+* casing of *both* fields and values in the array is irrelevant.
 * arguments stuffed in an array to simplify the function's signature.
 
 ## C. Opcode field utilities.
@@ -77,6 +82,7 @@ note(s):
 Return the integer `value` corresponding to the symbolic name of opcode's `target`. The function returns -1 if `target` is not valid.
 
 note(s):
+* casing of `target` is irrelevant.
 * the symbolic names can be found in the [opcode_targets.2da table](../resources/2da/opcode_targets.2da).
 
 `get_opcode_timing STR_VAR timing RET value`
@@ -84,6 +90,7 @@ note(s):
 Return the integer `value` corresponding to the symbolic name of opcode's `timing`. The function returns -1 if `timing` is not valid.
 
 note(s):
+* casing of `timing` is irrelevant.
 * the symbolic names can be found in the [opcode_timings.2da table](../resources/2da/opcode_timings.2da).
 
 `get_opcode_resist_dispel STR_VAR resist_dispel RET value`
@@ -91,6 +98,7 @@ note(s):
 Return the integer `value` corresponding to the symbolic name of opcode's `resist_dispel`. The function returns -1 if `resist_dispel` is not valid.
 
 note(s):
+* casing of `resist_dispel` is irrelevant.
 * the symbolic names can be found in the [opcode_resist_dispels.2da table](../resources/2da/opcode_resist_dispels.2da).
 
 `get_opcode_type STR_VAR type RET value`
@@ -98,4 +106,5 @@ note(s):
 Return the integer `value` corresponding to the symbolic name of the opcode's `type`. The function returns -1 if `type` is not valid.
 
 note(s):
+* casing of `type` is irrelevant.
 * the symbolic names of the opcode types can be found in the [opcode_types.2da table](../resources/2da/opcode_types.2da).

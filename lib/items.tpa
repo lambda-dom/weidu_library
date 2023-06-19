@@ -61,9 +61,11 @@ END
 
 //Read-write functions.
 DEFINE_PATCH_FUNCTION get_item_field STR_VAR field = "" RET value BEGIN
-    field_offset = $item_offsets("%field%")
-
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+    
     //Match on field to decide which read function to use.
+    field_offset = $item_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "id_name"
         "name"
@@ -110,9 +112,11 @@ DEFINE_PATCH_FUNCTION get_item_field STR_VAR field = "" RET value BEGIN
 END
 
 DEFINE_PATCH_FUNCTION set_item_field STR_VAR field = "" RET value BEGIN
-    field_offset = $item_offsets("%field%")
-
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+    
     //Match on field to decide which write function to use.
+    field_offset = $item_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "id_name"
         "name"
@@ -192,14 +196,17 @@ END
 DEFINE_PATCH_FUNCTION get_item_header_field INT_VAR header = 0 STR_VAR field = "" RET value BEGIN
     //Get header and field offsets.
     LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
-    field_offset = $item_header_offsets("%field%")
 
     //Sanity check.
     PATCH_IF header_offset < 0 BEGIN
         PATCH_FAIL "get_item_header_field: header %header% out of bounds."
     END
     
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+    
     //Match on field to select read function to use.
+    field_offset = $item_header_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "type"
         "identify"
@@ -248,6 +255,9 @@ DEFINE_PATCH_FUNCTION set_item_header_field INT_VAR header = 0 STR_VAR field = "
         PATCH_FAIL "set_item_header_field: header %header% out of bounds."
     END
     
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field    
+
     //Match on field to select write function to use.
     field_offset = $item_header_offsets("%field%")
     PATCH_MATCH "%field%" WITH
