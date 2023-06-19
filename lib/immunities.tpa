@@ -236,7 +236,7 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
                 match_resource = "%resource%"
             END
 
-            TEXT_SPRINT match_resource $matching_array("resource")
+            TEXT_SPRINT match_resource $matching_opcode_array("resource")
             PATCH_IF ("%resource%" STRING_EQUAL_CASE "SAME") BEGIN
                 TEXT_SPRINT resource ""
             END
@@ -246,21 +246,21 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
                 check_globals = check_globals
                 check_headers = check_headers
                 verbose = 1
-                match_opcode = $matching_array("opcode")
-                match_parameter1 = $matching_array("parameter1")
-                match_parameter2 = $matching_array("parameter2")
-                match_target = $matching_array("target")
-                match_power = $matching_array("power")
-                match_timing = $matching_array("timing")
-                match_resist_dispel = $matching_array("resist_dispel")
-                match_duration = $matching_array("duration")
-                match_probability1 = $matching_array("probability1")
-                match_probability2 = $matching_array("probability2")
-                match_dicenumber = $matching_array("dicenumber")
-                match_dicesize = $matching_array("dicesize")
-                match_savingthrow = $matching_array("savingthrow")
-                match_savebonus = $matching_array("savebonus")
-                match_special = $matching_array("special")
+                match_opcode = $matching_opcode_array("opcode")
+                match_parameter1 = $matching_opcode_array("parameter1")
+                match_parameter2 = $matching_opcode_array("parameter2")
+                match_target = $matching_opcode_array("target")
+                match_power = $matching_opcode_array("power")
+                match_timing = $matching_opcode_array("timing")
+                match_resist_dispel = $matching_opcode_array("resist_dispel")
+                match_duration = $matching_opcode_array("duration")
+                match_probability1 = $matching_opcode_array("probability1")
+                match_probability2 = $matching_opcode_array("probability2")
+                match_dicenumber = $matching_opcode_array("dicenumber")
+                match_dicesize = $matching_opcode_array("dicesize")
+                match_savingthrow = $matching_opcode_array("savingthrow")
+                match_savebonus = $matching_opcode_array("savebonus")
+                match_special = $matching_opcode_array("special")
                 opcode = $opcode_array("opcode")
                 parameter1 = $opcode_array("parameter1")
                 parameter2 = $opcode_array("parameter2")
