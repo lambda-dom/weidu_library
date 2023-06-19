@@ -78,63 +78,51 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
     END
 
     //Target.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "target" RET is_in = bool END
-    PATCH_IF is_in = 1 BEGIN
-        TEXT_SPRINT input $"%array%"("target")
-        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
-            LPF get_opcode_target STR_VAR target = "%input%" RET value END
-            PATCH_IF NOT (value = 0 - 1) BEGIN
-                TEXT_SPRINT $opcode_array("target") "%value%"
-            END ELSE BEGIN
-                PATCH_FAIL "construct_matching_opcode_array: target '%input%' unknown."
-            END
+    LPF get_array_element STR_VAR array = "%array%" key = "target" RET input = value END
+    PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
+        LPF get_opcode_target STR_VAR target = "%input%" RET value END
+        PATCH_IF (value = 0 - 1) BEGIN
+            PATCH_FAIL "construct_matching_opcode_array: target '%input%' unknown."
         END
+        TEXT_SPRINT $opcode_array("target") value
     END
 
     //Timing.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "timing" RET is_in = bool END
-    PATCH_IF is_in = 1 BEGIN
-        TEXT_SPRINT input $"%array%"("timing")
-        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
-            LPF get_opcode_target STR_VAR target = "%input%" RET value END
-            PATCH_IF NOT (value = 0 - 1) BEGIN
-                TEXT_SPRINT $opcode_array("timing") "%value%"
-            END ELSE BEGIN
-                PATCH_FAIL "construct_matching_opcode_array: timing '%input%' unknown."
-            END
+    LPF get_array_element STR_VAR array = "%array%" key = "timing" RET input = value END
+    PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
+        LPF get_opcode_timing STR_VAR timing = "%input%" RET value END
+        PATCH_IF (value = 0 - 1) BEGIN
+            PATCH_FAIL "construct_matching_opcode_array: timing '%input%' unknown."
         END
+        TEXT_SPRINT $opcode_array("timing") value
     END
 
     //Resist-dispel.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "resist_dispel" RET is_in = bool END
-    PATCH_IF is_in = 1 BEGIN
-        TEXT_SPRINT input $"%array%"("resist_dispel")
+    LPF get_array_element STR_VAR array = "%array%" key = "resist_dispel" RET input = value END
+    PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
         LPF get_opcode_resist_dispel STR_VAR resist_dispel = "%input%" RET value END
-        PATCH_IF NOT (value = 0 - 1) BEGIN
-            TEXT_SPRINT $opcode_array("resist_dispel") "%value%"
-        END ELSE BEGIN
+        PATCH_IF (value = 0 - 1) BEGIN
             PATCH_FAIL "construct_matching_opcode_array: resist_dispel '%input%' unknown."
         END
+        TEXT_SPRINT $opcode_array("resist_dispel") value
     END
 
     //Resource.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "resource" RET is_in = bool END
-    PATCH_IF is_in = 1 BEGIN
-        TEXT_SPRINT input $"%array%"("resource")
-        PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
-            LPF get_spell_res STR_VAR spell = "%input%" RET resource END
-            //Default to input if not found.
-            PATCH_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
-                TEXT_SPRINT resource "%input%"
-            END
+    LPF get_array_element STR_VAR array = "%array%" key = "resource" RET input = value END
+    PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
+        LPF get_spell_res STR_VAR spell = "%input%" RET resource END
 
-            //Resource sanity check.
-            PATCH_IF (STRING_LENGTH "%resource%" > 8) BEGIN
-                PATCH_FAIL "construct_matching_opcode_array: invalid resource '%resource%'."
-            END
-
-            TEXT_SPRINT $opcode_array("resource") "%resource%"
+        //Default to input if not found.
+        PATCH_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
+            TEXT_SPRINT resource "%input%"
         END
+
+        //Resource sanity check.
+        PATCH_IF (STRING_LENGTH "%resource%" > 8) BEGIN
+            PATCH_FAIL "construct_matching_opcode_array: invalid resource '%resource%'."
+        END
+
+        TEXT_SPRINT $opcode_array("resource") "%resource%"
     END
 
     //Unconverted fields.
