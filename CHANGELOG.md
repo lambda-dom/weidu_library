@@ -1,6 +1,8 @@
 # Changelog for `weidu_library`
 
-## version v1.0rc4 -- unreleased.
+## version v1.0rc5 -- unreleased.
+
+## version v1.0rc4.
 
 * Small readme corrections.
 * Add `load_2da_table`.
