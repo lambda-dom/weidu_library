@@ -9,4 +9,4 @@ note(s):
 
 `patch_opcode_block INT_VAR global = 0 STR_VAR table`
 
-Patch-in (a spell, an item or a cre) a block of opcodes as descriobed in the 2da file `table` (no extension) using WeiDU's `DELETE_EFFECT` to avoid duplicates and `CLONE_EFFECT`.
+Patch-in (a spell, an item or a cre) a block of opcodes as described in the 2da file `table` (no extension) using WeiDU's `CLONE_EFFECT` to patch them in and `DELETE_EFFECT` to avoid duplicates.
