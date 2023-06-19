@@ -59,15 +59,11 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
     END
 
     //Parameters.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "parameter1" RET is_in1 = bool END
-    LPF is_key_in_array STR_VAR array = "%array%" key = "parameter2" RET is_in2 = bool END
-    PATCH_IF (is_in1 = 1) AND (is_in2 = 1) BEGIN
-        TEXT_SPRINT input1 $"%array%"("parameter1")
-        TEXT_SPRINT input2 $"%array%"("parameter2")
-
-        LPF is_key_in_array STR_VAR array = "opcode_parameter_functions" key = "%opcode%" RET is_in = bool END
-        PATCH_IF (is_in = 1) BEGIN
-            TEXT_SPRINT func $opcode_parameter_functions("%opcode%")
+    LPF get_array_element STR_VAR array = "%array%" key = "parameter1" RET input1 = value END
+    LPF get_array_element STR_VAR array = "%array%" key = "parameter2" RET input2 = value END
+    PATCH_IF (NOT ("%input1%" STRING_EQUAL_CASE "*")) AND (NOT ("%input2%" STRING_EQUAL_CASE "*")) BEGIN
+        LPF get_array_element STR_VAR array = "opcode_parameter_functions" key = "%opcode%" RET func = value END
+        PATCH_IF NOT ("%func%" STRING_EQUAL_CASE "*") BEGIN
             LPF "%func%" STR_VAR input1 = "%input1%" input2 = "%input2%" RET value1 = output1 value2 = output2 END
             TEXT_SPRINT $opcode_array("parameter1") "%value1%"
             TEXT_SPRINT $opcode_array("parameter2") "%value2%"
