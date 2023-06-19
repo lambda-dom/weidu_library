@@ -12,7 +12,7 @@ END
 
 
 //Constructing arrays of opcode values.
-DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
+DEFINE_PATCH_FUNCTION construct_matching_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
     DEFINE_ASSOCIATIVE_ARRAY opcode_array BEGIN
         "opcode"        => "-1"
         "target"        => "-1"
@@ -37,7 +37,7 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
     PATCH_IF NOT (value = 0 - 1) BEGIN
         TEXT_SPRINT $opcode_array("opcode") "%value%"
     END ELSE BEGIN
-        PATCH_FAIL "construct_opcode_array: opcode '%opcode%' unknown."
+        PATCH_FAIL "construct_matching_opcode_array: opcode '%opcode%' unknown."
     END
 
     //Parameters.
@@ -68,7 +68,7 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
             PATCH_IF NOT (value = 0 - 1) BEGIN
                 TEXT_SPRINT $opcode_array("target") "%value%"
             END ELSE BEGIN
-                PATCH_FAIL "construct_opcode_array: target '%input%' unknown."
+                PATCH_FAIL "construct_matching_opcode_array: target '%input%' unknown."
             END
         END
     END
@@ -82,7 +82,7 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
             PATCH_IF NOT (value = 0 - 1) BEGIN
                 TEXT_SPRINT $opcode_array("timing") "%value%"
             END ELSE BEGIN
-                PATCH_FAIL "construct_opcode_array: timing '%input%' unknown."
+                PATCH_FAIL "construct_matching_opcode_array: timing '%input%' unknown."
             END
         END
     END
@@ -95,7 +95,7 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
         PATCH_IF NOT (value = 0 - 1) BEGIN
             TEXT_SPRINT $opcode_array("resist_dispel") "%value%"
         END ELSE BEGIN
-            PATCH_FAIL "construct_opcode_array: resist_dispel '%input%' unknown."
+            PATCH_FAIL "construct_matching_opcode_array: resist_dispel '%input%' unknown."
         END
     END
 
@@ -112,7 +112,7 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
 
             //Resource sanity check.
             PATCH_IF (STRING_LENGTH "%resource%" > 8) BEGIN
-                PATCH_FAIL "construct_opcode_array: invalid resource '%resource%'."
+                PATCH_FAIL "construct_matching_opcode_array: invalid resource '%resource%'."
             END
 
             TEXT_SPRINT $opcode_array("resource") "%resource%"
@@ -137,6 +137,20 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
         END
     END
 END
+
+DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
+    LPF construct_matching_opcode_array STR_VAR
+        opcode = "%opcode%"
+        array = "%array%"
+    RET_ARRAY opcode_array END
+
+    //Fix resource.
+    TEXT_SPRINT res_name $opcode_array("resource")
+    PATCH_IF ("%resource%" STRING_EQUAL_CASE "SAME") BEGIN
+        TEXT_SPRINT $opcode_array("resource") ""
+    END
+END
+
 
 //Conversion functions.
 DEFINE_PATCH_FUNCTION get_opcode STR_VAR input1 = "" input2 = "" RET output1 output2 BEGIN
@@ -180,7 +194,7 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
     TEXT_SPRINT $matching_array("parameter2") $opcodes("0" "2")
     TEXT_SPRINT $matching_array("resource") $opcodes("0" "3")
 
-    LPF construct_opcode_array STR_VAR
+    LPF construct_matching_opcode_array STR_VAR
         opcode = "%match_opcode%"
         array = "matching_array"
     RET_ARRAY matching_opcode_array = opcode_array END
