@@ -86,12 +86,12 @@ Return the integer `value` corresponding to the symbolic name of opcode's `timin
 note(s):
 * the symbolic names can be found in the [opcode_timings.2da table](../resources/2da/opcode_timings.2da).
 
-`get_opcode_dispel_resistance STR_VAR dispel_resistance RET value`
+`get_opcode_resist_dispel STR_VAR resist_dispel RET value`
 
-Return the integer `value` corresponding to the symbolic name of opcode's `dispel_resistance`. The function returns -1 if `dispel_resistance` is not valid.
+Return the integer `value` corresponding to the symbolic name of opcode's `resist_dispel`. The function returns -1 if `resist_dispel` is not valid.
 
 note(s):
-* the symbolic names can be found in the [opcode_dispel_resistance.2da table](../resources/2da/opcode_dispel_resistance.2da).
+* the symbolic names can be found in the [opcode_resist_dispels.2da table](../resources/2da/opcode_resist_dispels.2da).
 
 `get_opcode_type STR_VAR type RET value`
 

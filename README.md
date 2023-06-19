@@ -14,6 +14,7 @@ The library is divided in components. The components are:
 * [Items](./lib/docs/items.md): handle item .itm files.
 * [Kits](./lib/docs/kits.md): tweak kits and classes.
 * [Opcode](./lib/docs/opcodes.md): opcode patching.
+* [Patching](./lib/docs/patching.md): a high-level library to patch-in blocks of opcodes into resources.
 * [Resources](./lib/docs/resources.md): streamline resource installation.
 * [Spells](./lib/docs/spells.md): handle spell .spl files.
 * [Strings](./lib/docs/strings.md): manipulate strings.

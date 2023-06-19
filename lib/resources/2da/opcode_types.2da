@@ -3,7 +3,7 @@ AttacksRound                    1
 CureSleep                       2
 Berserk                         3
 CureBerserk                     4
-CharmSpecific                   5
+Charm                           5
 Charisma                        6
 ColorCharacterPalette           7
 ColorRGB                        8
@@ -203,7 +203,7 @@ ImmunitySpell                   206
 SpellBounceResource             207
 HPMinimumLimit                  208
 DeathKill60                     209
-SpellStun90                     210
+Stun90                          210
 Imprisonment                    211
 Freedom                         212
 Maze                            213

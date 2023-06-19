@@ -1,0 +1,286 @@
+//Libraries.
+INCLUDE "%library_dir%/arrays.tpa"
+INCLUDE "%library_dir%/opcodes.tpa"
+INCLUDE "%library_dir%/spells.tpa"
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Arrays to opcode => functions to convert values.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY opcode_parameter_functions BEGIN
+    "ImmunityOpcode" => "get_opcode"
+END
+
+
+//Conversion functions.
+DEFINE_PATCH_FUNCTION get_opcode STR_VAR input1 = "" input2 = "" RET output1 output2 BEGIN
+    PATCH_IF (IS_AN_INT input1) BEGIN
+        output1 = input1
+        PATCH_IF NOT (output1 = 0) BEGIN
+            PATCH_WARN "get_opcode: parameter1 '%input1%' should be '0'."
+        END
+    END ELSE BEGIN
+        PATCH_FAIL "get_opcode: parameter1 '%input1%' is not an integer."
+    END
+
+    LPF get_opcode_type STR_VAR type = "%input2%" RET output2 = value END
+    PATCH_IF (output2 = 0 - 1) BEGIN
+        PATCH_FAIL "get_opcode: parameter2 '%input2%' unknown opcode."
+    END
+END
+
+
+//Constructing arrays of opcode values.
+DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
+    DEFINE_ASSOCIATIVE_ARRAY opcode_array BEGIN
+        "opcode"        => "-1"
+        "target"        => "-1"
+        "power"         => "-1"
+        "parameter1"    => "-1"
+        "parameter2"    => "-1"
+        "timing"        => "-1"
+        "resist_dispel" => "-1"
+        "duration"      => "-1"
+        "probability1"  => "-1"
+        "probability2"  => "-1"
+        "dicenumber"    => "-1"
+        "dicesize"      => "-1"
+        "savingthrow"   => "-1"
+        "savebonus"     => "-11"
+        "special"       => "-1"
+        "resource"      => "SAME"
+    END
+
+    //Opcode.
+    LPF get_opcode_type STR_VAR type = "%opcode%" RET value END
+    PATCH_IF NOT (value = 0 - 1) BEGIN
+        TEXT_SPRINT $opcode_array("opcode") "%value%"
+    END ELSE BEGIN
+        PATCH_FAIL "construct_matching_opcode_array: opcode '%opcode%' unknown."
+    END
+
+    //Parameters.
+    LPF is_key_in_array STR_VAR array = "%array%" key = "parameter1" RET is_in1 = bool END
+    LPF is_key_in_array STR_VAR array = "%array%" key = "parameter2" RET is_in2 = bool END
+    PATCH_IF (is_in1 = 1) AND (is_in2 = 1) BEGIN
+        TEXT_SPRINT input1 $"%array%"("parameter1")
+        TEXT_SPRINT input2 $"%array%"("parameter2")
+
+        LPF is_key_in_array STR_VAR array = "opcode_parameter_functions" key = "%opcode%" RET is_in = bool END
+        PATCH_IF (is_in = 1) BEGIN
+            TEXT_SPRINT func $opcode_parameter_functions("%opcode%")
+            LPF "%func%" STR_VAR input1 = "%input1%" input2 = "%input2%" RET value1 = output1 value2 = output2 END
+            TEXT_SPRINT $opcode_array("parameter1") "%value1%"
+            TEXT_SPRINT $opcode_array("parameter2") "%value2%"
+        END ELSE BEGIN
+            TEXT_SPRINT $opcode_array("parameter1") "%input1%"
+            TEXT_SPRINT $opcode_array("parameter2") "%input2%"
+        END
+    END
+
+    //Target.
+    LPF is_key_in_array STR_VAR array = "%array%" key = "target" RET is_in = bool END
+    PATCH_IF is_in = 1 BEGIN
+        TEXT_SPRINT input $"%array%"("target")
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            LPF get_opcode_target STR_VAR target = "%input%" RET value END
+            PATCH_IF NOT (value = 0 - 1) BEGIN
+                TEXT_SPRINT $opcode_array("target") "%value%"
+            END ELSE BEGIN
+                PATCH_FAIL "construct_matching_opcode_array: target '%input%' unknown."
+            END
+        END
+    END
+
+    //Timing.
+    LPF is_key_in_array STR_VAR array = "%array%" key = "timing" RET is_in = bool END
+    PATCH_IF is_in = 1 BEGIN
+        TEXT_SPRINT input $"%array%"("timing")
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            LPF get_opcode_target STR_VAR target = "%input%" RET value END
+            PATCH_IF NOT (value = 0 - 1) BEGIN
+                TEXT_SPRINT $opcode_array("timing") "%value%"
+            END ELSE BEGIN
+                PATCH_FAIL "construct_matching_opcode_array: timing '%input%' unknown."
+            END
+        END
+    END
+
+    //Resist-dispel.
+    LPF is_key_in_array STR_VAR array = "%array%" key = "resist_dispel" RET is_in = bool END
+    PATCH_IF is_in = 1 BEGIN
+        TEXT_SPRINT input $"%array%"("resist_dispel")
+        LPF get_opcode_resist_dispel STR_VAR resist_dispel = "%input%" RET value END
+        PATCH_IF NOT (value = 0 - 1) BEGIN
+            TEXT_SPRINT $opcode_array("resist_dispel") "%value%"
+        END ELSE BEGIN
+            PATCH_FAIL "construct_matching_opcode_array: resist_dispel '%input%' unknown."
+        END
+    END
+
+    //Resource.
+    LPF is_key_in_array STR_VAR array = "%array%" key = "resource" RET is_in = bool END
+    PATCH_IF is_in = 1 BEGIN
+        TEXT_SPRINT input $"%array%"("resource")
+        PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
+            LPF get_spell_res STR_VAR spell = "%input%" RET resource END
+            //Default to input if not found.
+            PATCH_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
+                TEXT_SPRINT resource "%input%"
+            END
+
+            //Resource sanity check.
+            PATCH_IF (STRING_LENGTH "%resource%" > 8) BEGIN
+                PATCH_FAIL "construct_matching_opcode_array: invalid resource '%resource%'."
+            END
+
+            TEXT_SPRINT $opcode_array("resource") "%resource%"
+        END
+    END
+
+    //Unconverted fields.
+    PATCH_FOR_EACH field IN
+        "power"
+        "duration"
+        "probability1"
+        "probability2"
+        "dicenumber"
+        "dicesize"
+        "savingthrow"
+        "savebonus"
+        "special"
+    BEGIN
+        LPF is_key_in_array STR_VAR array = "%array%" key = "%field%" RET is_in = bool END
+        PATCH_IF is_in = 1 BEGIN
+            TEXT_SPRINT $opcode_array("%field%") $"%array%"("%field%")
+        END
+    END
+END
+
+
+//Public functions.
+DEFINE_PATCH_FUNCTION patch_opcode_block INT_VAR global = 0 STR_VAR table = "" BEGIN
+    PATCH_IF NOT (FILE_EXISTS "%library_dir%/resources/blocks/%table%.2da") BEGIN
+        PATCH_FAIL "patch_opcode_block: table file '%table%.2da' not found."
+    END
+
+    //Load table.
+    LPF load_2da_table STR_VAR
+        table = "%table%"
+        dir = "%library_dir%/resources/blocks"
+    RET rows cols RET_ARRAY opcodes = array END
+
+    //Sanitize.
+    PATCH_IF NOT (cols = 5) BEGIN
+        PATCH_FAIL "patch_opcode_block: expected 5 columns, got '%cols%'."
+    END
+
+    DEFINE_ASSOCIATIVE_ARRAY matching_array BEGIN END
+
+    TEXT_SPRINT match_opcode $opcodes("0" "0")
+    TEXT_SPRINT $matching_array("parameter1") $opcodes("0" "1")
+    TEXT_SPRINT $matching_array("parameter2") $opcodes("0" "2")
+    TEXT_SPRINT $matching_array("resource") $opcodes("0" "3")
+
+    LPF construct_opcode_array STR_VAR
+        opcode = "%match_opcode%"
+        array = "matching_array"
+    RET_ARRAY matching_opcode_array = opcode_array END
+
+    //Global variables for patching functions.
+    PATCH_IF global = 0 BEGIN
+        check_globals = 0
+        check_headers = 1
+    END ELSE BEGIN
+        check_globals = 1
+        check_headers = 0
+    END
+
+    FOR (i = rows - 1; i >= 1; --i) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+
+            TEXT_SPRINT opcode $opcodes("%i%" "0")
+            TEXT_SPRINT $array("parameter1") $opcodes("%i%" "1")
+            TEXT_SPRINT $array("parameter2") $opcodes("%i%" "2")
+            TEXT_SPRINT $array("resource") $opcodes("%i%" "3")
+            TEXT_SPRINT insert $opcodes("%i%" "4")
+
+            LPF construct_opcode_array STR_VAR
+                opcode = "%opcode%"
+                array = "array"
+            RET_ARRAY opcode_array END
+
+            TEXT_SPRINT resource $opcode_array("resource")
+
+            //Delete matching opcodes.
+            LPF DELETE_EFFECT INT_VAR
+                check_globals = check_globals
+                check_headers = check_headers
+                verbose = 1
+                match_opcode = $opcode_array("opcode")
+                match_parameter1 = $opcode_array("parameter1")
+                match_parameter2 = $opcode_array("parameter2")
+                match_target = $opcode_array("target")
+                match_power = $opcode_array("power")
+                match_timing = $opcode_array("timing")
+                match_resist_dispel = $opcode_array("resist_dispel")
+                match_duration = $opcode_array("duration")
+                match_probability1 = $opcode_array("probability1")
+                match_probability2 = $opcode_array("probability2")
+                match_dicenumber = $opcode_array("dicenumber")
+                match_dicesize = $opcode_array("dicesize")
+                match_savingthrow = $opcode_array("savingthrow")
+                match_savebonus = $opcode_array("savebonus")
+                match_special = $opcode_array("special")
+            STR_VAR
+                match_resource = "%resource%"
+            END
+
+            TEXT_SPRINT match_resource $matching_opcode_array("resource")
+            PATCH_IF ("%resource%" STRING_EQUAL_CASE "SAME") BEGIN
+                TEXT_SPRINT resource ""
+            END
+
+            //Clone effect.
+            LPF CLONE_EFFECT INT_VAR
+                check_globals = check_globals
+                check_headers = check_headers
+                verbose = 1
+                match_opcode = $matching_opcode_array("opcode")
+                match_parameter1 = $matching_opcode_array("parameter1")
+                match_parameter2 = $matching_opcode_array("parameter2")
+                match_target = $matching_opcode_array("target")
+                match_power = $matching_opcode_array("power")
+                match_timing = $matching_opcode_array("timing")
+                match_resist_dispel = $matching_opcode_array("resist_dispel")
+                match_duration = $matching_opcode_array("duration")
+                match_probability1 = $matching_opcode_array("probability1")
+                match_probability2 = $matching_opcode_array("probability2")
+                match_dicenumber = $matching_opcode_array("dicenumber")
+                match_dicesize = $matching_opcode_array("dicesize")
+                match_savingthrow = $matching_opcode_array("savingthrow")
+                match_savebonus = $matching_opcode_array("savebonus")
+                match_special = $matching_opcode_array("special")
+                opcode = $opcode_array("opcode")
+                parameter1 = $opcode_array("parameter1")
+                parameter2 = $opcode_array("parameter2")
+                target = $opcode_array("target")
+                power = $opcode_array("power")
+                timing = $opcode_array("timing")
+                resist_dispel = $opcode_array("resist_dispel")
+                duration = $opcode_array("duration")
+                probability1 = $opcode_array("probability1")
+                probability2 = $opcode_array("probability2")
+                dicenumber = $opcode_array("dicenumber")
+                dicesize = $opcode_array("dicesize")
+                savingthrow = $opcode_array("savingthrow")
+                savebonus = $opcode_array("savebonus")
+                special = $opcode_array("special")
+            STR_VAR
+                insert = "%insert%"
+                match_resource = "%match_resource%"
+                resource = "%resource%"
+            END
+        END
+    END
+END

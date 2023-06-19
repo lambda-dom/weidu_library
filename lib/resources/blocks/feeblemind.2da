@@ -1,0 +1,6 @@
+2DA V1.0
+*
+                            parameter1  parameter2      resource    insert
+ImmunityOpcode              0           Feebleminded    *           *
+ImmunityIcon                0           48              *           below
+ImmunityDisplayString       23744       0               *           below

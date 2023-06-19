@@ -1,0 +1,11 @@
+2DA V1.0
+*
+                        parameter1  parameter2  resource    insert
+ImmunityOpcode          0           LevelDrain  *           *
+ImmunityIcon            0           53          *           below
+ImmunityDisplayString   41495       0           *           below
+ImmunityDisplayString   40968       0           *           below
+ImmunityDisplayString   40969       0           *           below
+ImmunityDisplayString   40979       0           *           below
+ImmunityDisplayString   41616       0           *           below
+DisplayIcon             0           90          *           below
