@@ -169,10 +169,10 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
 
     DEFINE_ASSOCIATIVE_ARRAY matching_array BEGIN END
 
-    TEXT_SPRINT opcode $opcodes("%i%" "0")
-    TEXT_SPRINT $matching_array("parameter1") $opcodes("%i%" "1")
-    TEXT_SPRINT $matching_array("parameter2") $opcodes("%i%" "2")
-    TEXT_SPRINT $matching_array("resource") $opcodes("%i%" "3")
+    TEXT_SPRINT opcode $opcodes("0" "0")
+    TEXT_SPRINT $matching_array("parameter1") $opcodes("0" "1")
+    TEXT_SPRINT $matching_array("parameter2") $opcodes("0" "2")
+    TEXT_SPRINT $matching_array("resource") $opcodes("0" "3")
 
     LPF construct_opcode_array STR_VAR
         opcode = "%opcode%"
