@@ -2,6 +2,8 @@
 
 ## version v1.0rc5 -- unreleased.
 
+* Add `dir` argument to `patch_opcode_block`.
+
 ## version v1.0rc4.
 
 * Small readme corrections.
@@ -9,8 +11,8 @@
 * Delete spurious `copy_items_template.2da`.
 * Added `opcode_types` array and `get_opcode_type` function.
 * Add `patching` library.
-* Change `get_array_element`
-* Some code and resourced moved around. 
+* Change `get_array_element`.
+* Some code and resources moved around. 
 
 ## version v1.0rc3.
 

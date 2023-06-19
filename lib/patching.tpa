@@ -142,15 +142,24 @@ END
 
 
 //Public functions.
-DEFINE_PATCH_FUNCTION patch_opcode_block INT_VAR global = 0 STR_VAR table = "" BEGIN
-    PATCH_IF NOT (FILE_EXISTS "%library_dir%/resources/blocks/%table%.2da") BEGIN
-        PATCH_FAIL "patch_opcode_block: table file '%table%.2da' not found."
+DEFINE_PATCH_FUNCTION patch_opcode_block INT_VAR global = 0 STR_VAR table = "" dir = "*" BEGIN
+    //Standardize dir.
+    PATCH_IF ("%dir%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF (VARIABLE_IS_SET "component_resources_dir") BEGIN
+            TEXT_SPRINT dir "%component_resources_dir%/2da"
+        END ELSE BEGIN
+            PATCH_FAIL "patch_opcode_block: cannot resolve dir from which to fetch '%table%', variable 'component_resources_dir' not set."
+        END
+    END
+
+    PATCH_IF NOT (FILE_EXISTS "%dir%/%table%.2da") BEGIN
+        PATCH_FAIL "patch_opcode_block: table file '%dir%/%table%.2da' not found."
     END
 
     //Load table.
     LPF load_2da_table STR_VAR
         table = "%table%"
-        dir = "%library_dir%/resources/blocks"
+        dir = "%dir%"
     RET rows cols RET_ARRAY opcodes = array END
 
     //Sanitize.
