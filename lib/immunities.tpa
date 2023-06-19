@@ -11,6 +11,24 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY opcode_parameter_functions BEGIN
 END
 
 
+//Conversion functions.
+DEFINE_PATCH_FUNCTION get_opcode STR_VAR input1 = "" input2 = "" RET output1 output2 BEGIN
+    PATCH_IF (IS_AN_INT input1) BEGIN
+        output1 = input1
+        PATCH_IF NOT (output1 = 0) BEGIN
+            PATCH_WARN "get_opcode: parameter1 '%input1%' should be '0'."
+        END
+    END ELSE BEGIN
+        PATCH_FAIL "get_opcode: parameter1 '%input1%' is not an integer."
+    END
+
+    LPF get_opcode_type STR_VAR type = "%input2%" RET output2 = value END
+    PATCH_IF (output2 = 0 - 1) BEGIN
+        PATCH_FAIL "get_opcode: parameter2 '%input2%' unknown opcode."
+    END
+END
+
+
 //Constructing arrays of opcode values.
 DEFINE_PATCH_FUNCTION construct_matching_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
     DEFINE_ASSOCIATIVE_ARRAY opcode_array BEGIN
@@ -148,24 +166,6 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
     TEXT_SPRINT res_name $opcode_array("resource")
     PATCH_IF ("%resource%" STRING_EQUAL_CASE "SAME") BEGIN
         TEXT_SPRINT $opcode_array("resource") ""
-    END
-END
-
-
-//Conversion functions.
-DEFINE_PATCH_FUNCTION get_opcode STR_VAR input1 = "" input2 = "" RET output1 output2 BEGIN
-    PATCH_IF (IS_AN_INT input1) BEGIN
-        output1 = input1
-        PATCH_IF NOT (output1 = 0) BEGIN
-            PATCH_WARN "get_opcode: parameter1 '%input1%' should be '0'."
-        END
-    END ELSE BEGIN
-        PATCH_FAIL "get_opcode: parameter1 '%input1%' is not an integer."
-    END
-
-    LPF get_opcode_type STR_VAR type = "%input2%" RET output2 = value END
-    PATCH_IF (output2 = 0 - 1) BEGIN
-        PATCH_FAIL "get_opcode: parameter2 '%input2%' unknown opcode."
     END
 END
 
