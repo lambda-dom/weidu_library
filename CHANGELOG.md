@@ -3,6 +3,7 @@
 ## version v1.0rc5 -- unreleased.
 
 * Add `dir` argument to `patch_opcode_block`.
+* General pass to enforce case-insensivity almost everywhere.
 
 ## version v1.0rc4.
 
