@@ -18,6 +18,70 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY opcodes_resource_functions BEGIN
 END
 
 
+//Constructing arrays of opcode values.
+DEFINE_PATCH_FUNCTION construct_matching_opcode_array STR_VAR opcode = "" array = "" RET_ARRAY opcode_array BEGIN
+    DEFINE_ASSOCIATIVE_ARRAY opcode_array BEGIN
+        "opcode"        => "-1"
+        "target"        => "-1"
+        "power"         => "-1"
+        "parameter1"    => "-1"
+        "parameter2"    => "-1"
+        "resist_dispel" => "-1"
+        "duration"      => "-1"
+        "probability1"  => "-1"
+        "probability2"  => "-1"
+        "dicenumber"    => "-1"
+        "dicesize"      => "-1"
+        "savingthrow"   => "-1"
+        "savebonus"     => "-11"
+        "special"       => "-1"
+        "resource"      => "SAME"
+    END
+
+    //Opcode.
+    LPF get_opcode_type STR_VAR type = "%opcode%" RET opcode_value = value END
+    PATCH_IF NOT (opcode_value = 0 - 1) BEGIN
+        TEXT_SPRINT $opcode_array("opcode") "%opcode_value%"
+    END ELSE BEGIN
+        PATCH_FAIL "construct_matching_opcode_array: opcode '%opcode%' unknown."
+    END
+
+    //Target.
+    PATCH_WITH_SCOPE BEGIN
+        LPF is_key_in_array STR_VAR array = "%array%" key = "target" RET is_in = bool END
+        PATCH_IF is_in = 1 BEGIN
+            TEXT_SPRINT input $"%array%"("target")
+            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                LPF get_opcode_target STR_VAR target = "%input%" RET value END
+                TEXT_SPRINT $opcode_array("target") "%value%"
+            END
+        END
+    END
+
+    //Power.
+    PATCH_WITH_SCOPE BEGIN
+        LPF is_key_in_array STR_VAR array = "%array%" key = "power" RET is_in = bool END
+        PATCH_IF is_in = 1 BEGIN
+            TEXT_SPRINT $opcode_array("power") $"%array%"("power")
+        END
+    END
+
+    //Resist-dispel.
+    PATCH_WITH_SCOPE BEGIN
+        LPF is_key_in_array STR_VAR array = "%array%" key = "resist_dispel" RET is_in = bool END
+        PATCH_IF is_in = 1 BEGIN
+            TEXT_SPRINT input $"%array%"("resist_dispel")
+            LPF get_opcode_resist_dispel STR_VAR resist_dispel = "%input%" RET value END
+            PATCH_IF NOT (value = 0 - 1) BEGIN
+                TEXT_SPRINT $opcode_array("resist_dispel") "%value%"
+            END ELSE BEGIN
+                PATCH_FAIL "construct_matching_opcode_array: resist_dispel '%input%' unknown."
+            END
+        END
+    END
+
+END
+
 //Conversion functions.
 DEFINE_PATCH_FUNCTION get_opcode STR_VAR input = "" RET output BEGIN
     LPF get_opcode_type STR_VAR type = "%input%" RET output = value END

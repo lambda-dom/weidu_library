@@ -30,10 +30,10 @@ RET_ARRAY
 END
 
 LAF build_array_from_2da STR_VAR
-    table = "opcode_dispel_resistance"
+    table = "opcode_resist_dispels"
     dir = "%library_dir%/resources/2da"
 RET_ARRAY
-    opcode_dispel_resistance = array
+    opcode_resist_dispels = array
 END
 
 LAF build_array_from_2da STR_VAR
@@ -134,11 +134,11 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_timing STR_VAR timing = "" RET value BEGIN
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION get_opcode_dispel_resistance STR_VAR dispel_resistance = "" RET value BEGIN
-    LAF is_key_in_array STR_VAR array = "opcode_dispel_resistance" key = "%dispel_resistance%" RET is_in_array = bool END
+DEFINE_DIMORPHIC_FUNCTION get_opcode_resist_dispel STR_VAR resist_dispel = "" RET value BEGIN
+    LAF is_key_in_array STR_VAR array = "opcode_resist_dispels" key = "%resist_dispel%" RET is_in_array = bool END
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
-        OUTER_SET value = $opcode_dispel_resistance("%dispel_resistance%")
+        OUTER_SET value = $opcode_resist_dispels("%resist_dispel%")
     END
 END
 
