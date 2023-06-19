@@ -8,6 +8,7 @@
 * Added `opcode_types` array and `get_opcode_type` function.
 * Add `patching` library.
 * Change `get_array_element`
+* Some code and resourced moved around. 
 
 ## version v1.0rc3.
 
