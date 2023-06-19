@@ -185,6 +185,15 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
         array = "matching_array"
     RET_ARRAY matching_opcode_array = opcode_array END
 
+    //Global variables for patching functions.
+    PATCH_IF global = 0 BEGIN
+        check_globals = 0
+        check_headers = 1
+    END ELSE BEGIN
+        check_globals = 1
+        check_headers = 0
+    END
+
     FOR (i = rows - 1; i >= 1; --i) BEGIN
         PATCH_WITH_SCOPE BEGIN
             DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
