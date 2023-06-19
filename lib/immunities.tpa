@@ -109,6 +109,12 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
             PATCH_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
                 TEXT_SPRINT resource "%input%"
             END
+
+            //Resource sanity check.
+            PATCH_IF (8 > STRING_LENGTH "%resource%") BEGIN
+                PATCH_PRINT "construct_opcode_array: invalid resource '%resource%'."
+            END
+
             TEXT_SPRINT $opcode_array("resource") "%resource%"
         END
     END
