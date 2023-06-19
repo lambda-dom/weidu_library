@@ -10,12 +10,13 @@ DEFINE_DIMORPHIC_FUNCTION get_array_count STR_VAR array = "" RET count BEGIN
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION get_array_element STR_VAR array = "" key = "" RET value BEGIN
+DEFINE_DIMORPHIC_FUNCTION get_array_element STR_VAR default = "*" array = "" key = "" RET value BEGIN
+    OUTER_TEXT_SPRINT value "%default%"
+
     LAF is_key_in_array STR_VAR array = "%array%" key = "%key%" RET is_in_array = bool END
-    ACTION_IF (is_in_array = 0) BEGIN
-        FAIL "get_array_element: key '%key%' not present in array '%array%'."
+    ACTION_IF NOT (is_in_array = 0) BEGIN
+        OUTER_TEXT_SPRINT value $"%array%"("%key%")
     END
-    OUTER_TEXT_SPRINT value $"%array%"("%key%")
 END
 
 DEFINE_DIMORPHIC_FUNCTION find_key STR_VAR value = "" array = "" default = "*" RET key BEGIN

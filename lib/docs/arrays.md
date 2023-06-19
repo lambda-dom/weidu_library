@@ -21,7 +21,7 @@ Return the number of pairs `key => value` in the `array`. The `array` is passed 
 note(s):
 * this is O(n) since must loop through the array to count the entries.
 
-`get_array_element STR_VAR array key RET value`
+`get_array_element STR_VAR default = "*" array key RET value`
 
 Return the `value` associated to `key` in `array`. The advantage of this function in comparison with simply
 
@@ -29,7 +29,7 @@ Return the `value` associated to `key` in `array`. The advantage of this functio
 $"%array%"("%key%")
 ```
 
-is that it will automatically FAIL if `key` is not in `array`instead of returning garbage (e.g. un-expanded string).
+is that it will automatically return `default` if `key` is not in `array`instead of returning garbage (e.g. un-expanded string).
 
 `find_key STR_VAR value array default = "*" RET key`
 

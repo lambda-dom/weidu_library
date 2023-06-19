@@ -47,9 +47,9 @@ END
 
 DEFINE_PATCH_FUNCTION patch_damage_description INT_VAR descr = 0 STR_VAR arguments = "" BEGIN
     //Grab arguments.
-    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "dicenumber" RET dicenumber = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "dicesize" RET dicesize = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "dicenumber" RET dicenumber = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "dicesize" RET dicesize = value END
 
     //Compose damage string.
     LPF compose_damage_string INT_VAR
@@ -89,7 +89,7 @@ DEFINE_PATCH_FUNCTION patch_damage STR_VAR arguments = "" BEGIN
 END
 
 DEFINE_PATCH_FUNCTION patch_duration STR_VAR arguments = "" BEGIN
-    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "duration" RET duration = value END
     //Sanitize arguments.
     PATCH_IF (duration <= 0) BEGIN
         PATCH_FAIL "patch_duration: argument duration is '%duration%' but must be strictly positive."
@@ -103,8 +103,8 @@ END
 
 //Specific patchers.
 DEFINE_PATCH_FUNCTION poisoning STR_VAR arguments = "" BEGIN
-    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "amount" RET amount = value END
     //Sanitize arguments.
     PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
         PATCH_FAIL "poisoning: amount and duration must be strictly positive."
@@ -123,8 +123,8 @@ DEFINE_PATCH_FUNCTION poisoning STR_VAR arguments = "" BEGIN
 END
 
 DEFINE_PATCH_FUNCTION slow_movement_rate STR_VAR arguments = "" BEGIN
-    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "amount" RET amount = value END
     //Sanitize arguments.
     PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
         PATCH_FAIL "slow_movement_rate: amount and duration must be strictly positive."
@@ -143,8 +143,8 @@ DEFINE_PATCH_FUNCTION slow_movement_rate STR_VAR arguments = "" BEGIN
 END
 
 DEFINE_PATCH_FUNCTION cripple STR_VAR arguments = "" BEGIN
-    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "amount" RET amount = value END
     //Sanitize arguments.
     PATCH_IF (duration <= 0) BEGIN
         PATCH_FAIL "cripple: duration must be strictly positive."
@@ -166,8 +166,8 @@ DEFINE_PATCH_FUNCTION cripple STR_VAR arguments = "" BEGIN
 END
 
 DEFINE_PATCH_FUNCTION splash_damage STR_VAR arguments = "" BEGIN
-    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "amount" RET amount = value END
     //sanitize arguments.
     PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
         PATCH_FAIL "bleeding: both amount and duration arguments must be strictly positive."
@@ -200,8 +200,8 @@ DEFINE_PATCH_FUNCTION splash_damage STR_VAR arguments = "" BEGIN
 END
 
 DEFINE_PATCH_FUNCTION level_drain STR_VAR arguments = "" BEGIN
-    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "amount" RET amount = value END
     //Sanitize arguments.
     PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
         PATCH_FAIL "level_drain: amount and duration must be strictly positive."
@@ -220,8 +220,8 @@ DEFINE_PATCH_FUNCTION level_drain STR_VAR arguments = "" BEGIN
 END
 
 DEFINE_PATCH_FUNCTION drain_strength STR_VAR arguments = "" BEGIN
-    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "amount" RET amount = value END
     //Sanitize arguments.
     PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
         PATCH_FAIL "drain_strength: amount and duration must be strictly positive."
@@ -240,8 +240,8 @@ DEFINE_PATCH_FUNCTION drain_strength STR_VAR arguments = "" BEGIN
 END
 
 DEFINE_PATCH_FUNCTION knockback STR_VAR arguments = "" BEGIN
-    LPF get_array_element STR_VAR array = "%arguments%" key = "duration" RET duration = value END
-    LPF get_array_element STR_VAR array = "%arguments%" key = "amount" RET amount = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "duration" RET duration = value END
+    LPF get_array_element STR_VAR default = "0" array = "%arguments%" key = "amount" RET amount = value END
     //Sanitize arguments.
     PATCH_IF (amount <= 0) OR (duration <= 0) BEGIN
         PATCH_FAIL "knockback: amount and duration must be strictly positive."
