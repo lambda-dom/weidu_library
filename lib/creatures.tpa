@@ -18,6 +18,9 @@ END
 DEFINE_PATCH_FUNCTION get_cre_field STR_VAR field = "" RET value BEGIN
     field_offset = $creature_offsets("%field%")
 
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+
     //Match on field to decide which read function to use.
     PATCH_MATCH "%field%" WITH
         "name"
@@ -113,6 +116,9 @@ END
 DEFINE_PATCH_FUNCTION set_cre_field STR_VAR field = "" value = "" BEGIN
     field_offset = $creature_offsets("%field%")
 
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+    
     //Match on field to decide which write function to use.
     PATCH_MATCH "%field%" WITH
         "name"

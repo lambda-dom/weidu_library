@@ -1,6 +1,6 @@
 2DA V1.0
 *
                         parameter1  parameter2  resource    insert
-ImmunityOpcode          0           Silence     *           *
-ImmunityIcon            0           34          *           below
-ImmunityDisplayString   14676       0           *           below
+Immunity_Opcode         0           Silence     *           *
+Immunity_Icon           0           34          *           below
+Immunity_Display_String 14676       0           *           below

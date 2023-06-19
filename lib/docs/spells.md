@@ -60,11 +60,15 @@ note(s):
 
 Generic read function. Return the value of spell field. If field is not a spell field, or is an internal field like the headers count, function PATCH_FAIL's.
 
+note(s):
+* casing of `field` is irrelevant.
+
 `set_spell_field STR_VAR field value`
 
 Generic write function. Write value, passed as a string, to spell field. If field is not a spell field, or is an internal field like the headers count, function PATCH_FAIL's.
 
 note(s):
+* casing of `field` is irrelevant.
 * pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [spell_offsets.2da](../resources/2da/spell_offsets.2da) table.
 
 #### B. 2. 1. Spell field utilities.
@@ -77,6 +81,7 @@ note(s):
 Return the integer `value` corresponding to the symbolic name of spells's `type`. The function returns -1 if `type` is not valid.
 
 note(s):
+* casing of `type` is irrelevant.
 * the symbolic names can be found in the [spell_types.2da table](../resources/2da/spell_types.2da).
 
 ### B. 3. Spell header functions.
@@ -94,11 +99,15 @@ Return offset of (0-indexed) header. If header out of bounds return -1.
 
 Generic read function. Read the value of a spell header field. PATCH_FAIL's if header out of bounds or field is not a spell head field or is an internal, private field.
 
+note(s):
+* casing of `field` is irrelevant.
+
 `set_spell_header_field INT_VAR header = 0 STR_VAR field value`
 
 Generic write function. Write value, passed as a string, to spell header field. If field is not a spell header field, or is an internal field like the header opcode count, function PATCH_FAIL's.
 
 note(s):
+* casing of `field` is irrelevant.
 * pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [spell_header_offsets.2da](../resources/2da/spell_header_offsets.2da) table.
 
 `get_spell_header_array INT_VAR header RET_ARRAY array`
@@ -111,6 +120,7 @@ Matches spell `header` field by field against the associative `array`. Function 
 
 note(s):
 * arguments stuffed in array to simplify the function's signature.
+* casing of of both fields and values in the array is irrelevant.
 
 ### B. 4. Casting opcode functions.
 
@@ -173,9 +183,15 @@ Return resource associated to (symbolic) name of `spell`. Return `*` if `spell` 
 
 Return the magical school row index, -1 if `school` is not in `mschool.2da`.
 
+note(s):
+* casing of `school` is irrelevant.
+
 `get_sectype STR_VAR sectype RET id`
 
 Return the sectype row index, -1 if `sectype` is not in `msectype.2da`.
+
+note(s):
+* casing of `sectype` is irrelevant.
 
 `get_splprot_row STR_VAR name RET id`
 

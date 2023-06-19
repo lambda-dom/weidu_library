@@ -47,9 +47,11 @@ END
 //Patch functions.
 //Read functions.
 DEFINE_PATCH_FUNCTION get_opcode_field INT_VAR offset = 0 STR_VAR field = "" RET value BEGIN
-    field_offset = $opcode_offsets("%field%")
-
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+    
     //Match on field to decide which read function to use.
+    field_offset = $opcode_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "opcode" BEGIN
             READ_SHORT (offset + field_offset) value
@@ -70,9 +72,11 @@ END
 
 //Write functions.
 DEFINE_PATCH_FUNCTION set_opcode_field INT_VAR offset = 0 STR_VAR field = "" value = "" BEGIN
-    field_offset = $opcode_offsets("%field%")
-
+    //Lower-case field to avoid trivial mismatches.
+    TO_LOWER field
+    
     //Match on field to decide which write function to use.
+    field_offset = $opcode_offsets("%field%")
     PATCH_MATCH "%field%" WITH
         "opcode" BEGIN
             WRITE_SHORT (offset + field_offset) value
@@ -101,8 +105,8 @@ BEGIN
         PHP_EACH "%array%" AS field => lhs BEGIN
             //Read value.
             LPF get_opcode_field INT_VAR offset = offset STR_VAR field = "%field%" RET rhs = value END
-            //Compare values as strings.
-            PATCH_IF NOT ("%lhs%" STRING_EQUAL "%rhs%") BEGIN
+            //Compare values as strings. Case-insensitive.
+            PATCH_IF NOT ("%lhs%" STRING_EQUAL_CASE "%rhs%") BEGIN
                 bool = 0
                 //Leave loop early.
                 PATCH_SILENT
@@ -119,6 +123,9 @@ END
 
 //Opcode field utilities.
 DEFINE_DIMORPHIC_FUNCTION get_opcode_target STR_VAR target = "" RET value BEGIN
+    //Lower-case target to avoid trivial mismatches.
+    ACTION_TO_LOWER target
+
     LAF is_key_in_array STR_VAR array = "opcode_targets" key = "%target%" RET is_in_array = bool END
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
@@ -127,6 +134,9 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_target STR_VAR target = "" RET value BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_opcode_timing STR_VAR timing = "" RET value BEGIN
+    //Lower-case timing to avoid trivial mismatches.
+    ACTION_TO_LOWER timing
+
     LAF is_key_in_array STR_VAR array = "opcode_timings" key = "%timing%" RET is_in_array = bool END
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
@@ -135,6 +145,9 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_timing STR_VAR timing = "" RET value BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_opcode_resist_dispel STR_VAR resist_dispel = "" RET value BEGIN
+    //Lower-case resist_dispel to avoid trivial mismatches.
+    ACTION_TO_LOWER resist_dispel
+
     LAF is_key_in_array STR_VAR array = "opcode_resist_dispels" key = "%resist_dispel%" RET is_in_array = bool END
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN
@@ -143,6 +156,9 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_resist_dispel STR_VAR resist_dispel = "" RE
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_opcode_type STR_VAR type = "" RET value BEGIN
+    //Lower-case type to avoid trivial mismatches.
+    ACTION_TO_LOWER type
+
     LAF is_key_in_array STR_VAR array = "opcode_types" key = "%type%" RET is_in_array = bool END
     OUTER_SET value = 0 - 1
     ACTION_IF NOT (is_in_array = 0) BEGIN

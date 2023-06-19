@@ -1,11 +1,11 @@
 2DA V1.0
 *
                         parameter1  parameter2  resource    insert
-ImmunityOpcode          0           LevelDrain  *           *
-ImmunityIcon            0           53          *           below
-ImmunityDisplayString   41495       0           *           below
-ImmunityDisplayString   40968       0           *           below
-ImmunityDisplayString   40969       0           *           below
-ImmunityDisplayString   40979       0           *           below
-ImmunityDisplayString   41616       0           *           below
-DisplayIcon             0           90          *           below
+Immunity_Opcode         0           Level_Drain *           *
+Immunity_Icon           0           53          *           below
+Immunity_Display_String 41495       0           *           below
+Immunity_Display_String 40968       0           *           below
+Immunity_Display_String 40969       0           *           below
+Immunity_Display_String 40979       0           *           below
+Immunity_Display_String 41616       0           *           below
+Display_Icon            0           90          *           below
