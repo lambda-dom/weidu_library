@@ -158,14 +158,14 @@ END
 
 
 //Public functions.
-DEFINE_PATCH_FUNCTION patch_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGIN
-    PATCH_IF NOT (FILE_EXISTS "%library_dir%/resources/immunities/%immunity%.2da") BEGIN
-        PATCH_FAIL "patch_immunity: table file '%immunity%.2da' not found."
+DEFINE_PATCH_FUNCTION patch_immunity INT_VAR global = 0 STR_VAR table = "" BEGIN
+    PATCH_IF NOT (FILE_EXISTS "%library_dir%/resources/immunities/%table%.2da") BEGIN
+        PATCH_FAIL "patch_immunity: table file '%table%.2da' not found."
     END
 
     //Load table.
     LPF load_2da_table STR_VAR
-        table = "%immunity%"
+        table = "%table%"
         dir = "%library_dir%/resources/immunities"
     RET rows cols RET_ARRAY opcodes = array END
 
