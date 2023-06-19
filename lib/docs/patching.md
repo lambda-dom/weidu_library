@@ -2,6 +2,10 @@
 
 A higher-level library to patch-in opcodes into resources.
 
+note(s):
+
+    * library should still be considered experimental.
+
 ## A. Functions.
 
 note(s):
