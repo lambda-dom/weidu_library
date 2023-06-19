@@ -2,6 +2,8 @@
 
 ## version v1.0rc6 -- unreleased.
 
+* Changes to entangle subspell.
+
 ## version v1.0rc5.
 
 * Add `dir` argument to `patch_opcode_block`.
