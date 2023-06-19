@@ -7,7 +7,7 @@ INCLUDE "%library_dir%/tables.tpa"
 
 //Arrays to opcode => functions to convert values.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY opcode_parameter_functions BEGIN
-    "ImmunityOpcode" => "get_op_immunity_parameters"
+    "Immunity_Opcode" => "get_op_immunity_parameters"
 END
 
 
