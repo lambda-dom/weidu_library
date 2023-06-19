@@ -7,24 +7,24 @@ INCLUDE "%library_dir%/tables.tpa"
 
 //Arrays to opcode => functions to convert values.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY opcode_parameter_functions BEGIN
-    "ImmunityOpcode" => "get_opcode"
+    "ImmunityOpcode" => "get_op_immunity_parameters"
 END
 
 
 //Conversion functions.
-DEFINE_PATCH_FUNCTION get_opcode STR_VAR input1 = "" input2 = "" RET output1 output2 BEGIN
+DEFINE_PATCH_FUNCTION get_op_immunity_parameters STR_VAR input1 = "" input2 = "" RET output1 output2 BEGIN
     PATCH_IF (IS_AN_INT input1) BEGIN
         output1 = input1
         PATCH_IF NOT (output1 = 0) BEGIN
-            PATCH_WARN "get_opcode: parameter1 '%input1%' should be '0'."
+            PATCH_WARN "get_op_immunity_parameters: parameter1 '%input1%' should be '0'."
         END
     END ELSE BEGIN
-        PATCH_FAIL "get_opcode: parameter1 '%input1%' is not an integer."
+        PATCH_FAIL "get_op_immunity_parameters: parameter1 '%input1%' is not an integer."
     END
 
     LPF get_opcode_type STR_VAR type = "%input2%" RET output2 = value END
     PATCH_IF (output2 = 0 - 1) BEGIN
-        PATCH_FAIL "get_opcode: parameter2 '%input2%' unknown opcode."
+        PATCH_FAIL "get_op_immunity_parameters: parameter2 '%input2%' unknown opcode."
     END
 END
 
@@ -59,15 +59,11 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
     END
 
     //Parameters.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "parameter1" RET is_in1 = bool END
-    LPF is_key_in_array STR_VAR array = "%array%" key = "parameter2" RET is_in2 = bool END
-    PATCH_IF (is_in1 = 1) AND (is_in2 = 1) BEGIN
-        TEXT_SPRINT input1 $"%array%"("parameter1")
-        TEXT_SPRINT input2 $"%array%"("parameter2")
-
-        LPF is_key_in_array STR_VAR array = "opcode_parameter_functions" key = "%opcode%" RET is_in = bool END
-        PATCH_IF (is_in = 1) BEGIN
-            TEXT_SPRINT func $opcode_parameter_functions("%opcode%")
+    LPF get_array_element STR_VAR array = "%array%" key = "parameter1" RET input1 = value END
+    LPF get_array_element STR_VAR array = "%array%" key = "parameter2" RET input2 = value END
+    PATCH_IF (NOT ("%input1%" STRING_EQUAL_CASE "*")) AND (NOT ("%input2%" STRING_EQUAL_CASE "*")) BEGIN
+        LPF get_array_element STR_VAR array = "opcode_parameter_functions" key = "%opcode%" RET func = value END
+        PATCH_IF NOT ("%func%" STRING_EQUAL_CASE "*") BEGIN
             LPF "%func%" STR_VAR input1 = "%input1%" input2 = "%input2%" RET value1 = output1 value2 = output2 END
             TEXT_SPRINT $opcode_array("parameter1") "%value1%"
             TEXT_SPRINT $opcode_array("parameter2") "%value2%"
@@ -78,63 +74,51 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
     END
 
     //Target.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "target" RET is_in = bool END
-    PATCH_IF is_in = 1 BEGIN
-        TEXT_SPRINT input $"%array%"("target")
-        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
-            LPF get_opcode_target STR_VAR target = "%input%" RET value END
-            PATCH_IF NOT (value = 0 - 1) BEGIN
-                TEXT_SPRINT $opcode_array("target") "%value%"
-            END ELSE BEGIN
-                PATCH_FAIL "construct_matching_opcode_array: target '%input%' unknown."
-            END
+    LPF get_array_element STR_VAR array = "%array%" key = "target" RET input = value END
+    PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
+        LPF get_opcode_target STR_VAR target = "%input%" RET value END
+        PATCH_IF (value = 0 - 1) BEGIN
+            PATCH_FAIL "construct_matching_opcode_array: target '%input%' unknown."
         END
+        TEXT_SPRINT $opcode_array("target") value
     END
 
     //Timing.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "timing" RET is_in = bool END
-    PATCH_IF is_in = 1 BEGIN
-        TEXT_SPRINT input $"%array%"("timing")
-        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
-            LPF get_opcode_target STR_VAR target = "%input%" RET value END
-            PATCH_IF NOT (value = 0 - 1) BEGIN
-                TEXT_SPRINT $opcode_array("timing") "%value%"
-            END ELSE BEGIN
-                PATCH_FAIL "construct_matching_opcode_array: timing '%input%' unknown."
-            END
+    LPF get_array_element STR_VAR array = "%array%" key = "timing" RET input = value END
+    PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
+        LPF get_opcode_timing STR_VAR timing = "%input%" RET value END
+        PATCH_IF (value = 0 - 1) BEGIN
+            PATCH_FAIL "construct_matching_opcode_array: timing '%input%' unknown."
         END
+        TEXT_SPRINT $opcode_array("timing") value
     END
 
     //Resist-dispel.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "resist_dispel" RET is_in = bool END
-    PATCH_IF is_in = 1 BEGIN
-        TEXT_SPRINT input $"%array%"("resist_dispel")
+    LPF get_array_element STR_VAR array = "%array%" key = "resist_dispel" RET input = value END
+    PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
         LPF get_opcode_resist_dispel STR_VAR resist_dispel = "%input%" RET value END
-        PATCH_IF NOT (value = 0 - 1) BEGIN
-            TEXT_SPRINT $opcode_array("resist_dispel") "%value%"
-        END ELSE BEGIN
+        PATCH_IF (value = 0 - 1) BEGIN
             PATCH_FAIL "construct_matching_opcode_array: resist_dispel '%input%' unknown."
         END
+        TEXT_SPRINT $opcode_array("resist_dispel") value
     END
 
     //Resource.
-    LPF is_key_in_array STR_VAR array = "%array%" key = "resource" RET is_in = bool END
-    PATCH_IF is_in = 1 BEGIN
-        TEXT_SPRINT input $"%array%"("resource")
-        PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
-            LPF get_spell_res STR_VAR spell = "%input%" RET resource END
-            //Default to input if not found.
-            PATCH_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
-                TEXT_SPRINT resource "%input%"
-            END
+    LPF get_array_element STR_VAR array = "%array%" key = "resource" RET input = value END
+    PATCH_IF NOT ("%input%" STRING_EQUAL_CASE "*") BEGIN
+        LPF get_spell_res STR_VAR spell = "%input%" RET resource END
 
-            //Resource sanity check.
-            PATCH_IF (STRING_LENGTH "%resource%" > 8) BEGIN
-                PATCH_FAIL "construct_matching_opcode_array: invalid resource '%resource%'."
-            END
-
-            TEXT_SPRINT $opcode_array("resource") "%resource%"
+        //Default to input if not found.
+        PATCH_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
+            TEXT_SPRINT resource "%input%"
         END
+
+        //Resource sanity check.
+        PATCH_IF (STRING_LENGTH "%resource%" > 8) BEGIN
+            PATCH_FAIL "construct_matching_opcode_array: invalid resource '%resource%'."
+        END
+
+        TEXT_SPRINT $opcode_array("resource") "%resource%"
     END
 
     //Unconverted fields.
