@@ -4,6 +4,7 @@
 Immunity_Opcode             0           Horror          *           *
 Immunity_Opcode             0           MoraleBreak     *           below
 Immunity_Icon               0           36              *           below
+Immunity_Display_String     17007       0               *           below
 Immunity_Display_String     17427       0               *           below
 Immunity_Animation          0           0               cdhorror    below
 Display_Icon                0           37              *           below

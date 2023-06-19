@@ -3,6 +3,7 @@
 ## version v1.0rc6 -- unreleased.
 
 * Changes to entangle subspell.
+* One more immunity in fear.
 
 ## version v1.0rc5.
 
