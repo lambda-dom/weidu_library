@@ -163,7 +163,7 @@ DEFINE_PATCH_FUNCTION construct_opcode_array STR_VAR opcode = "" array = "" RET_
     RET_ARRAY opcode_array END
 
     //Fix resource.
-    TEXT_SPRINT res_name $opcode_array("resource")
+    TEXT_SPRINT resource $opcode_array("resource")
     PATCH_IF ("%resource%" STRING_EQUAL_CASE "SAME") BEGIN
         TEXT_SPRINT $opcode_array("resource") ""
     END
