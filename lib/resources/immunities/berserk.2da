@@ -1,6 +1,6 @@
 2DA V1.0
 *
-                            parameter1  parameter2      resource
-ImmunityOpcode              0           Berserk         *
-ImmunityIcon                0           4               *
-ImmunityDisplayString       54336       0               *
+                            parameter1  parameter2      resource    insert
+ImmunityOpcode              0           Berserk         *           *
+ImmunityIcon                0           4               *           below
+ImmunityDisplayString       54336       0               *           below

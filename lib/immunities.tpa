@@ -163,19 +163,31 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
     RET rows cols RET_ARRAY opcodes = array END
 
     //Sanitize.
-    PATCH_IF NOT (cols = 4) BEGIN
-        PATCH_FAIL "add_immunity: expected 4 columns, got '%cols%'."
+    PATCH_IF NOT (cols = 5) BEGIN
+        PATCH_FAIL "add_immunity: expected 5 columns, got '%cols%'."
     END
 
-    PATCH_PRINT "add_immunity: dumping table with '%cols%' columns and '%rows%' rows."
-    PATCH_WITH_SCOPE BEGIN
-        DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+    DEFINE_ASSOCIATIVE_ARRAY matching_array BEGIN END
 
-        FOR (i = 0; i < rows; ++i) BEGIN
+    TEXT_SPRINT opcode $opcodes("%i%" "0")
+    TEXT_SPRINT $matching_array("parameter1") $opcodes("%i%" "1")
+    TEXT_SPRINT $matching_array("parameter2") $opcodes("%i%" "2")
+    TEXT_SPRINT $matching_array("resource") $opcodes("%i%" "3")
+
+    LPF construct_opcode_array STR_VAR
+        opcode = "%opcode%"
+        array = "matching_array"
+    RET_ARRAY matching_opcode_array = opcode_array END
+
+    FOR (i = rows - 1; i >= 1; --i) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+
             TEXT_SPRINT opcode $opcodes("%i%" "0")
             TEXT_SPRINT $array("parameter1") $opcodes("%i%" "1")
             TEXT_SPRINT $array("parameter2") $opcodes("%i%" "2")
             TEXT_SPRINT $array("resource") $opcodes("%i%" "3")
+            TEXT_SPRINT insert $opcodes("%i%" "4")
 
             LPF construct_opcode_array STR_VAR
                 opcode = "%opcode%"
