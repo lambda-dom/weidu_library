@@ -236,10 +236,51 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
                 match_resource = "%resource%"
             END
 
+            TEXT_SPRINT match_resource $matching_array("resource")
             PATCH_IF ("%resource%" STRING_EQUAL_CASE "SAME") BEGIN
                 TEXT_SPRINT resource ""
             END
 
+            //Clone effect.
+            LPF CLONE_EFFECT INT_VAR
+                check_globals = check_globals
+                check_headers = check_headers
+                verbose = 1
+                match_opcode = $matching_array("opcode")
+                match_parameter1 = $matching_array("parameter1")
+                match_parameter2 = $matching_array("parameter2")
+                match_target = $matching_array("target")
+                match_power = $matching_array("power")
+                match_timing = $matching_array("timing")
+                match_resist_dispel = $matching_array("resist_dispel")
+                match_duration = $matching_array("duration")
+                match_probability1 = $matching_array("probability1")
+                match_probability2 = $matching_array("probability2")
+                match_dicenumber = $matching_array("dicenumber")
+                match_dicesize = $matching_array("dicesize")
+                match_savingthrow = $matching_array("savingthrow")
+                match_savebonus = $matching_array("savebonus")
+                match_special = $matching_array("special")
+                opcode = $opcode_array("opcode")
+                parameter1 = $opcode_array("parameter1")
+                parameter2 = $opcode_array("parameter2")
+                target = $opcode_array("target")
+                power = $opcode_array("power")
+                timing = $opcode_array("timing")
+                resist_dispel = $opcode_array("resist_dispel")
+                duration = $opcode_array("duration")
+                probability1 = $opcode_array("probability1")
+                probability2 = $opcode_array("probability2")
+                dicenumber = $opcode_array("dicenumber")
+                dicesize = $opcode_array("dicesize")
+                savingthrow = $opcode_array("savingthrow")
+                savebonus = $opcode_array("savebonus")
+                special = $opcode_array("special")
+            STR_VAR
+                insert = "%insert%"
+                match_resource = "%match_resource%"
+                resource = "%resource%"
+            END
         END
     END
 END
