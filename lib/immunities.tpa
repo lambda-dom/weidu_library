@@ -176,33 +176,18 @@ DEFINE_PATCH_FUNCTION add_immunity INT_VAR global = 0 STR_VAR immunity = "" BEGI
     LPF load_2da_table STR_VAR
         table = "%immunity%"
         dir = "%library_dir%/resources/immunities"
-    RET rows cols RET_ARRAY immunity_opcodes = array END
+    RET rows cols RET_ARRAY opcodes = array END
 
     //Sanitize.
     PATCH_IF NOT (cols = 4) BEGIN
         PATCH_FAIL "add_immunity: expected 4 columns, got '%cols%'."
     END
 
+    PATCH_PRINT "add_immunity: dumping table with '%cols%' columns and '%rows%' rows."
     FOR (i = 0; i < rows; ++i) BEGIN
-        //Gather data.
-        DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
-
-        TEXT_SPRINT opcode $immunity_opcodes(i 0)
-        TEXT_SPRINT $array("parameter1") $immunity_opcodes(i 1)
-        TEXT_SPRINT $array("parameter2") $immunity_opcodes(i 2)
-        TEXT_SPRINT $array("resource") $immunity_opcodes(i 3)
-
-        LPF construct_opcode_array STR_VAR
-            opcode = "%opcode%"
-            array = "array"
-        RET_ARRAY
-            opcode_array
-        END
-
-        //Patching.
-        //Debugging for now.
-        PHP_EACH opcode_array AS field => value BEGIN
-            PATCH_PRINT "add_immunity: row '%i%': '%field%' = '%value%'."
+        FOR (j = 0; j < cols; ++j) BEGIN
+            TEXT_SPRINT value $opcodes("%i%" "%j%")
+            PATCH_PRINT "add_immunity: row '%i%', col '%j%' => value '%value%'."
         END
     END
 END
