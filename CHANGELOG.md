@@ -5,6 +5,7 @@
 * Changes to entangle subspell.
 * One more immunity in fear.
 * Verbose flags in `patch_opcode_block`.
+* Allow directly setting school and sectype of subspells.
 
 ## version v1.0rc5.
 

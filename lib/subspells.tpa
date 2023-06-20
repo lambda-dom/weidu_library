@@ -5,7 +5,14 @@ INCLUDE "%library_dir%/tables.tpa"
 
 
 //Main function.
-DEFINE_DIMORPHIC_FUNCTION clone_subspell_from_table STR_VAR spell = "" dest = "" arguments = "" BEGIN
+DEFINE_DIMORPHIC_FUNCTION clone_subspell_from_table INT_VAR
+    school = 0
+    sectype = 0
+STR_VAR
+    spell = ""
+    dest = ""
+    arguments = ""
+BEGIN
     //Existence check.
     ACTION_IF NOT (VARIABLE_IS_SET "library_dir") BEGIN
         FAIL "clone_subspell_from_table: cannot resolve library dir, variable 'library_dir' not set."
@@ -78,6 +85,15 @@ DEFINE_DIMORPHIC_FUNCTION clone_subspell_from_table STR_VAR spell = "" dest = ""
                         silent = 1
                         match_resource = "self#res"
                         resource = "%dest%"
+                    END
+
+                    //Patch school and sectype.
+                    PATCH_IF NOT (school = 0) BEGIN
+                        LPF set_spell_field STR_VAR field = "school" value = "%school%" END
+                    END
+
+                    PATCH_IF NOT (sectype = 0) BEGIN
+                        LPF set_spell_field STR_VAR field = "sectype" value = "%sectype%" END
                     END
 
                     //Call patch.
