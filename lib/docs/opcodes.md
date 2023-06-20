@@ -66,10 +66,14 @@ note(s):
 
 ```
 create_opcode_array INT_VAR
+    opcode = 0
+    target = 0
+    power = 0
     parameter1 = 0
     parameter2 = 0
-    power = 0
+    timing = 0
     duration = 0
+    resist_dispel = 0
     probability1 = 100
     probability2 = 0
     dicenumber = 0
@@ -79,16 +83,12 @@ create_opcode_array INT_VAR
     special = 0
 STR_VAR
     opcode_array = ""
-    opcode = "ac_damage_type"
-    target = "none"
-    timing = "limited"
-    resist_dispel = "natural"
     resource = ""
 RET_ARRAY
     array
 ```
 
-Construct an opcode array by merging an array of defaults given by the various opcode fields and `opcode_array`, an array passed by name. Only valid field names in `opcode_array` are considered. No error checking is done so the values can be arbitrary, but note that for the fields `opcode`, `target`, `timing` and `resist_dispel` we use symbolic names.
+Construct an opcode array by merging an array of defaults given by the various opcode fields and `opcode_array`, an array passed by name. Only valid field names in `opcode_array` are considered. No error checking is done so the values can be arbitrary.
 
 note(s):
 * this function has both patch and action variants, coded via `DEFINE_DIMORPHIC_FUNCTION`.
