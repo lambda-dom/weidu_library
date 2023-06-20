@@ -142,7 +142,7 @@ END
 
 
 //Public functions.
-DEFINE_PATCH_FUNCTION patch_opcode_block INT_VAR global = 0 STR_VAR table = "" dir = "*" BEGIN
+DEFINE_PATCH_FUNCTION patch_opcode_block INT_VAR global = 0 verbose = 1 STR_VAR table = "" dir = "*" BEGIN
     //Standardize dir.
     PATCH_IF ("%dir%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_IF (VARIABLE_IS_SET "component_resources_dir") BEGIN
@@ -209,7 +209,8 @@ DEFINE_PATCH_FUNCTION patch_opcode_block INT_VAR global = 0 STR_VAR table = "" d
             LPF DELETE_EFFECT INT_VAR
                 check_globals = check_globals
                 check_headers = check_headers
-                verbose = 1
+                //Common case is there are no opcodes to delete.
+                silent = 1
                 match_opcode = $opcode_array("opcode")
                 match_parameter1 = $opcode_array("parameter1")
                 match_parameter2 = $opcode_array("parameter2")
@@ -238,7 +239,7 @@ DEFINE_PATCH_FUNCTION patch_opcode_block INT_VAR global = 0 STR_VAR table = "" d
             LPF CLONE_EFFECT INT_VAR
                 check_globals = check_globals
                 check_headers = check_headers
-                verbose = 1
+                verbose = verbose
                 match_opcode = $matching_opcode_array("opcode")
                 match_parameter1 = $matching_opcode_array("parameter1")
                 match_parameter2 = $matching_opcode_array("parameter2")
