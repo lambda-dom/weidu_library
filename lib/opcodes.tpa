@@ -130,57 +130,6 @@ BEGIN
     END
 END
 
-//Generic opcode array builder.
-DEFINE_DIMORPHIC_FUNCTION create_opcode_array INT_VAR
-    opcode = 0
-    target = 0
-    power = 0
-    parameter1 = 0
-    parameter2 = 0
-    timing = 0
-    duration = 0
-    resist_dispel = 0
-    probability1 = 100
-    probability2 = 0
-    dicenumber = 0
-    dicesize = 0
-    savingthrow = 0
-    savebonus = 0
-    special = 0
-STR_VAR
-    opcode_array = ""
-    resource = ""
-RET_ARRAY
-    array
-BEGIN
-    ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN
-        "opcode"        => "%opcode%"
-        "target"        => "%target%"
-        "power"         => "%power%"
-        "parameter1"    => "%parameter1%"
-        "parameter2"    => "%parameter2%"
-        "timing"        => "%timing%"
-        "resist_dispel" => "%resist_dispel%"
-        "duration"      => "%duration%"
-        "probability1"  => "%probability1%"
-        "probability2"  => "%probability2%"
-        "resource"      => "%resource%"
-        "dicenumber"    => "%dicenumber%"
-        "dicesize"      => "%dicesize%"
-        "savingthrow"   => "%savingthrow%"
-        "savebonus"     => "%savebonus%"
-        "special"       => "%special%"
-    END
-
-    //Fill in with values.
-    ACTION_PHP_EACH opcode_offsets AS field => _ BEGIN
-        LAF get_element_array STR_VAR array = "%opcode_array%" key = "%field%" RET value END
-        ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
-            OUTER_TEXT_SPRINT $array("%field%") "%value%"
-        END
-    END
-END
-
 DEFINE_PATCH_FUNCTION write_opcode_array INT_VAR offset = 0 STR_VAR array = "" BEGIN
     //Opcode.
     LPF get_element_array STR_VAR array = "%array%" key = "opcode" RET opcode = value END
@@ -337,6 +286,115 @@ DEFINE_PATCH_FUNCTION write_opcode_array INT_VAR offset = 0 STR_VAR array = "" B
     LPF get_element_array STR_VAR array = "%array%" key = "special" RET special = value END
     PATCH_IF NOT ("%special%" STRING_EQUAL_CASE "*") BEGIN
         LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "special" value = "%special%" END
+    END
+END
+
+//Generic opcode array builder.
+DEFINE_DIMORPHIC_FUNCTION create_opcode_array INT_VAR
+    opcode = 0
+    target = 0
+    power = 0
+    parameter1 = 0
+    parameter2 = 0
+    timing = 0
+    duration = 0
+    resist_dispel = 0
+    probability1 = 100
+    probability2 = 0
+    dicenumber = 0
+    dicesize = 0
+    savingthrow = 0
+    savebonus = 0
+    special = 0
+STR_VAR
+    opcode_array = ""
+    resource = ""
+RET_ARRAY
+    array
+BEGIN
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN
+        "opcode"        => "%opcode%"
+        "target"        => "%target%"
+        "power"         => "%power%"
+        "parameter1"    => "%parameter1%"
+        "parameter2"    => "%parameter2%"
+        "timing"        => "%timing%"
+        "resist_dispel" => "%resist_dispel%"
+        "duration"      => "%duration%"
+        "probability1"  => "%probability1%"
+        "probability2"  => "%probability2%"
+        "resource"      => "%resource%"
+        "dicenumber"    => "%dicenumber%"
+        "dicesize"      => "%dicesize%"
+        "savingthrow"   => "%savingthrow%"
+        "savebonus"     => "%savebonus%"
+        "special"       => "%special%"
+    END
+
+    //Fill in with values.
+    ACTION_PHP_EACH opcode_offsets AS field => _ BEGIN
+        LAF get_element_array STR_VAR array = "%opcode_array%" key = "%field%" RET value END
+        ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            OUTER_TEXT_SPRINT $array("%field%") "%value%"
+        END
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION convert_symbols_opcode_array STR_VAR opcode_array = "" RET_ARRAY array BEGIN
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+
+    ACTION_PHP_EACH opcode_offsets AS field => _ BEGIN
+        //Get value from array.
+        LAF get_element_array STR_VAR array = "%opcode_array%" key = "%field%" RET value END
+
+        //Match on field.
+        ACTION_MATCH "%field%" WITH
+            "opcode" BEGIN
+                ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                    LAF get_opcode_type STR_VAR type = "%value%" RET opcode = value END
+                    ACTION_IF NOT (opcode = 0 - 1) BEGIN
+                        OUTER_TEXT_SPRINT $array("opcode") "%opcode%"
+                    END ELSE BEGIN
+                        FAIL "convert_symbols_opcode_array: invalid opcode '%value%'."
+                    END
+                END
+            END
+            "target" BEGIN
+                ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                    LAF get_opcode_target STR_VAR target = "%value%" RET target = value END
+                    ACTION_IF NOT (target = 0 - 1) BEGIN
+                        OUTER_TEXT_SPRINT $array("target") "%target%"
+                    END ELSE BEGIN
+                        FAIL "convert_symbols_opcode_array: invalid target '%value%'."
+                    END
+                END
+            END
+            "timing" BEGIN
+                ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                    LAF get_opcode_timing STR_VAR timing = "%value%" RET timing = value END
+                    ACTION_IF NOT (timing = 0 - 1) BEGIN
+                        OUTER_TEXT_SPRINT $array("timing") "%timing%"
+                    END ELSE BEGIN
+                        FAIL "convert_symbols_opcode_array: invalid timing '%value%'."
+                    END
+                END
+            END
+            "resist_dispel" BEGIN
+                ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                    LAF get_opcode_resist_dispel STR_VAR resist_dispel = "%value%" RET resist_dispel = value END
+                    ACTION_IF NOT (resist_dispel = 0 - 1) BEGIN
+                        OUTER_TEXT_SPRINT $array("resist_dispel") "%resist_dispel%"
+                    END ELSE BEGIN
+                        FAIL "convert_symbols_opcode_array: invalid resist_dispel '%value%'."
+                    END
+                END
+            END
+            DEFAULT
+                //Just copy everything else.
+                ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                    OUTER_TEXT_SPRINT $array("%field%") "%value%"
+                END
+        END
     END
 END
 

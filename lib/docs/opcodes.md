@@ -53,6 +53,8 @@ note(s):
 
 ## C. Array opcode functions.
 
+### C. 1. Readers.
+
 `get_opcode_array INT_VAR offset RET_ARRAY array`
 
 Return the associative array of pairs `field => value` of opcode at `offset`.
@@ -63,6 +65,21 @@ Matches opcode at `offset` field by field against the `array` fields. PATCH_FAIL
 
 note(s):
 * casing of *both* fields and values in the array is irrelevant.
+
+### C. 2. Writers.
+
+`write_opcode_array INT_VAR offset STR_VAR array`
+
+Write the various opcode fields in `array` to opcode at `offset`. Only valid field names in `opcode_array` are considered. The function does error checking to avoid inserting garbage data as much as possible.
+
+note(s):
+* casing of array fields is irrelevant.
+
+### C. 3. Utilities..
+
+note(s):
+* all functions in this section have both patch and action variants, coded via `DEFINE_DIMORPHIC_FUNCTION`.
+* casing of array fields is irrelevant.
 
 ```
 create_opcode_array INT_VAR
@@ -88,17 +105,11 @@ RET_ARRAY
     array
 ```
 
-Construct an opcode array by merging an array of defaults given by the various opcode fields and `opcode_array`, an array passed by name. Only valid field names in `opcode_array` are considered. No error checking is done so the values can be arbitrary.
+Construct an opcode array by merging an array of defaults given by the various opcode fields and `opcode_array`, an array passed by name. Only valid opcode fields in `opcode_array` are considered. No error checking is done so the values can be arbitrary.
 
-note(s):
-* this function has both patch and action variants, coded via `DEFINE_DIMORPHIC_FUNCTION`.
+`convert_symbols_opcode_array STR_VAR opcode_array = "" RET_ARRAY array`
 
-`write_opcode_array INT_VAR offset STR_VAR array`
-
-Write the various opcode fields in `array` to opcode at `offset`. Only valid field names in `opcode_array` are considered. The function does extensive error checking to avoid inserting garbage data. The fields `opcode`, `target`, `timing` and `resist_dispel` use symbolic names and these are checked for validity.
-
-note(s):
-* casing of array fields is irrelevant.
+Copy and convert symbolic values in array `opcode_array` of opcode `field => value` pairs to their numeric counterparts, FAIL'ing if values are invalid. Only valid opcode fields are copied.
 
 ## D. Opcode field utilities.
 
