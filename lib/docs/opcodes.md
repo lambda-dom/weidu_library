@@ -51,13 +51,54 @@ note(s):
 * casing of `field` is irrelevant.
 * pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [opcode_offsets.2da](../resources/2da/opcode_offsets.2da) table.
 
+### B. 1. Array opcode functions.
+
+`get_opcode_array INT_VAR offset RET_ARRAY array`
+
+Return the associative array of pairs `field => value` of opcode at `offset`.
+
 `match_opcode_against_array INT_VAR offset = 0 STR_VAR array RET bool`
 
 Matches opcode at `offset` field by field against the `array` fields. PATCH_FAIL's if any of the array fields is not an opcode field. Array `array` is passed by name.
 
 note(s):
 * casing of *both* fields and values in the array is irrelevant.
-* arguments stuffed in an array to simplify the function's signature.
+
+```
+create_opcode_array INT_VAR
+    parameter1 = 0
+    parameter2 = 0
+    power = 0
+    duration = 0
+    probability1 = 100
+    probability2 = 0
+    dicenumber = 0
+    dicesize = 0
+    savingthrow = 0
+    savebonus = 0
+    special = 0
+STR_VAR
+    opcode_array = ""
+    opcode = "ac_damage_type"
+    target = "none"
+    timing = "limited"
+    resist_dispel = "natural"
+    resource = ""
+RET_ARRAY
+    array
+```
+
+Construct an opcode array by merging an array of defaults given by the various opcode fields and `opcode_array`, an array passed by name. Only valid field names in `opcode_array` are considered. No error checking is done so the values can be arbitrary, but note that for the fields `opcode`, `target`, `timing` and `resist_dispel` we use symbolic names.
+
+note(s):
+* this function has both patch and action variants, coded via `DEFINE_DIMORPHIC_FUNCTION`.
+
+`write_opcode_array INT_VAR offset STR_VAR array`
+
+Write the various opcode fields in `array` to opcode at `offset`. Only valid field names in `opcode_array` are considered. The function does extensive error checking to avoid inserting garbage data. The fields `opcode`, `target`, `timing` and `resist_dispel` use symbolic names and these are checked for validity.
+
+note(s):
+* casing of array fields is irrelevant.
 
 ## C. Opcode field utilities.
 
