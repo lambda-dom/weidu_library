@@ -268,8 +268,8 @@ DEFINE_PATCH_FUNCTION write_opcode_array INT_VAR offset = 0 STR_VAR array = "" B
     LPF get_element_array STR_VAR default = "-1" array = "%array%" key = "probability1" RET probability1 = value END
     PATCH_IF NOT (probability1 = 0 - 1) BEGIN
         //Sanitize upper bound.
-        PATCH_IF NOT ((1 <= probability1) AND (probability1 <= 100)) BEGIN
-            PATCH_FAIL "write_opcode_array: probability1 '%probability1%' must be in the interval [1, 100]."
+        PATCH_IF NOT ((0 <= probability1) AND (probability1 <= 100)) BEGIN
+            PATCH_FAIL "write_opcode_array: probability1 '%probability1%' must be in the interval [0, 100]."
         END
 
         LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "probability1" value = "%probability1%" END
