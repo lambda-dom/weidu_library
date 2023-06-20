@@ -51,7 +51,7 @@ note(s):
 * casing of `field` is irrelevant.
 * pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [opcode_offsets.2da](../resources/2da/opcode_offsets.2da) table.
 
-### B. 1. Array opcode functions.
+## C. Array opcode functions.
 
 `get_opcode_array INT_VAR offset RET_ARRAY array`
 
@@ -100,7 +100,7 @@ Write the various opcode fields in `array` to opcode at `offset`. Only valid fie
 note(s):
 * casing of array fields is irrelevant.
 
-## C. Opcode field utilities.
+## D. Opcode field utilities.
 
 This group of functions is designed to make it safer to mutate opcodes and not insert rubbish data. Unfortunately, because of fundamental limitations of the WeiDU language, using these ends up being a veritable PITA. To see this, consider the simplest example of inserting a valid target value into an opcode:
 
