@@ -7,6 +7,7 @@
 * Verbose flags in `patch_opcode_block`.
 * Allow directly setting school and sectype of subspells.
 * Suite of opcode array functions.
+* Add sleep subspell; tighten immunities of unconsciousness.
 
 ## version v1.0rc5.
 
