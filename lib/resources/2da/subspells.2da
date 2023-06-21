@@ -14,6 +14,7 @@ confusion           240     241     patch_duration      patch_expand_description
 blind               250     251     patch_duration      patch_expand_description    duration    *           *
 stun                260     261     patch_duration      patch_expand_description    duration    *           *
 sleep               270     271     patch_duration      patch_expand_description    duration    *           *
+slow                280     281     patch_duration      patch_expand_description    duration    *           *
 slow_movement_rate  300     301     slow_movement_rate  patch_expand_description    duration    amount      *
 cripple             310     311     cripple             patch_expand_description    duration    amount      *
 level_drain         320     321     level_drain         patch_expand_description    duration    amount      *

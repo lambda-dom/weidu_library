@@ -8,6 +8,7 @@
 * Allow directly setting school and sectype of subspells.
 * Suite of opcode array functions.
 * Add sleep subspell; tighten immunities of unconsciousness.
+* Add slow subspell.
 
 ## version v1.0rc5.
 
