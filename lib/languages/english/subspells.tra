@@ -51,6 +51,10 @@
 @260 = ~Stun~
 @261 = ~Victim is stunned for %duration% round(s).~
 
+//Sleep.
+@270 = ~Sleep~
+@271 = ~Victim is afflicted with magical sleep for %duration% round(s), awaking before the end of this period if it takes any damage. Dragons, incorporeal creatures like Elementals and non-living creatures are immune to the effect. Elves and Half-elves are especially resistant to magically-induced sleep.~
+
 
 //Duration and amount spells.
 //Slow movement rate.
