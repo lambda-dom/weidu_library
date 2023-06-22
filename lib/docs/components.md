@@ -38,3 +38,14 @@ Copies `resource` to the game folder with extension `ext` identifying the resour
 `clone_resource STR_VAR resource ext dest patch = "*"`
 
 Clones existing resource `resource` with extension `ext` as `dest` (*same* extension) and patches it with `patch`. The argument `patch` is the name of a patch function to call and it must be in scope if provided. No arguments are passed to the patch function. The function will FAIL if a similarly named resource already exists in game.
+
+## D. Data copying.
+
+note(s):
+* all the functions in this section are action functions.
+
+This group of functions deals with copying resources into folders other than override.
+
+`copy_data_resource STR_VAR dir resource dest_dir`
+
+Copy `resource`, located in `dir`, into dir `dest_dir`. Function FAIL's if a similarly named resource already exists.
