@@ -12,8 +12,6 @@ DEFINE_DIMORPHIC_FUNCTION append_clearair STR_VAR projectile = "" label = "" BEG
 
         //Get projectile number.
         pro = IDS_OF_SYMBOL ("projectl" "%projectile%")
-        pro += 1
-
         LPF find_first_row INT_VAR col = 1 STR_VAR key = "%label%" RET row_pro = index END
         PATCH_IF NOT (row_label = 0 - 1) BEGIN
             PATCH_FAIL "append_clearair: projectile '%projectile%' is already present in the table."
