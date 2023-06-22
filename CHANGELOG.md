@@ -2,8 +2,7 @@
 
 ## version v1.0beta6 -- unreleased.
 
-* Changes to entangle subspell.
-* One more immunity in fear.
+* Changes to entangle and fear subspells.
 * Verbose flags in `patch_opcode_block`.
 * Allow directly setting school and sectype of subspells.
 * Suite of opcode array functions.
