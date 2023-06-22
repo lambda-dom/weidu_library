@@ -1,0 +1,27 @@
+//Libraries.
+INCLUDE "%library_dir%/tables.tpa"
+
+
+//Functions.
+DEFINE_DIMORPHIC_FUNCTION append_clearair STR_VAR projectile = "" label = "" BEGIN
+    COPY_EXISTING ~clearair.2da~ ~override~
+        LPF find_first_row STR_VAR key = "%label%" RET row_label = index END
+        PATCH_IF NOT (row_label = 0 - 1) BEGIN
+            PATCH_FAIL "append_clearair: label '%label%' is already present in the table."
+        END
+
+        //Get projectile number.
+        pro = IDS_OF_SYMBOL ("projectl" "%projectile%")
+        pro += 1
+
+        LPF find_first_row INT_VAR col = 1 STR_VAR key = "%label%" RET row_pro = index END
+        PATCH_IF NOT (row_label = 0 - 1) BEGIN
+            PATCH_FAIL "append_clearair: projectile '%projectile%' is already present in the table."
+        END
+
+        COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols rows
+        INSERT_2DA_ROW rows cols "%label% %pro%"
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END

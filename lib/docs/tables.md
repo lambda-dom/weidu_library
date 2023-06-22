@@ -26,6 +26,7 @@ As per usual, if `dir` is not provided, the table file is looked up in component
 
 note(s):
 * if the 2da file has 2 named columns or less and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra entries. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
+* this is essentially `READ_"DA_ENTRIES_FORMER`, but the array is write-able if further processing is needed, at the cost of `$array` notation instead of `READ_2da_FORMER`.
 
 ## B. Search functions.
 
