@@ -130,3 +130,16 @@ DEFINE_ACTION_FUNCTION clone_resource STR_VAR resource = "" ext = "" dest = "" p
             LPF "%patch%" END
         END
 END
+
+//Data installation.
+DEFINE_ACTION_FUNCTION copy_data_resource STR_VAR dir = "" resource = "" dest_dir = "" BEGIN
+    ACTION_IF NOT DIRECTORY_EXISTS "%dest_dir%" BEGIN
+        MKDIR "%dest_dir%"
+    END
+
+    ACTION_IF NOT FILE_EXISTS "%dest_dir%/%resource%" BEGIN
+        COPY "%dir%/%resource%" "%dest_dir%/%resource%"
+    END ELSE BEGIN
+        FAIL "copy_data_resource: resource '%dest_dir%/%resource%' already exists."
+    END
+END
