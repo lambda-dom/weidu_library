@@ -183,20 +183,6 @@ BEGIN
 
     //Sound.
     PATCH_IF NOT ("%sound%" STRING_EQUAL_CASE "*") BEGIN
-        //Check if mod provides it.
-        PATCH_IF FILE_EXISTS "%component_resources_dir%/wav/%sound%.wav" BEGIN
-            INNER_ACTION BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR 
-                    override = 0
-                STR_VAR
-                    resource = "%sound%"
-                    ext = "wav"
-                    dir = "%component_resources_dir%/wav"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%sound%.wav") BEGIN
             PATCH_WARN "Warning: patch_spell: sound '%sound%.wav' does not exist in game."
@@ -208,20 +194,6 @@ BEGIN
 
     //Icons.
     PATCH_IF NOT ("%book_icon%" STRING_EQUAL_CASE "*") BEGIN
-        //Check if mod provides it.
-        PATCH_IF FILE_EXISTS "%component_resources_dir%/bam/%book_icon%.bam" BEGIN
-            INNER_ACTION BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR
-                    override = 0
-                STR_VAR
-                    resource = "%book_icon%"
-                    ext = "bam"
-                    dir = "%component_resources_dir%/bam"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%book_icon%.bam") BEGIN
             PATCH_WARN "Warn: patch_spell: icon '%book_icon%.bam' does not exist in game."
@@ -232,20 +204,6 @@ BEGIN
     END
 
     PATCH_IF NOT ("%abil_icon%" STRING_EQUAL_CASE "*") BEGIN
-        //Check if mod provides it.
-        PATCH_IF FILE_EXISTS "%component_resources_dir%/bam/%abil_icon%.bam" BEGIN
-            INNER_ACTION BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR
-                    override = 0
-                STR_VAR
-                    resource = "%abil_icon%"
-                    ext = "bam"
-                    dir = "%component_resources_dir%/bam"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%abil_icon%.bam") BEGIN
             PATCH_WARN "Warning: patch_spell: icon '%abil_icon%.bam' does not exist in game."
