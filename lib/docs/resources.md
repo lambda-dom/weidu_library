@@ -25,8 +25,6 @@ resource    1       *       0
 
 The field `install` is a flag to selectively enable or disable installation of a specific spell. The `override` field is a debug flag signaling whether to fail if a same-named resource already exists in-game. The `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patches` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
 
-### A. 1. Projectile installer.
-
 ## B. Spells.
 
 ### B. 1. Installers.
@@ -256,3 +254,12 @@ STR_VAR
 A creature patcher used by `copy_cres_from_table` but that is useful all by itself.
 
 The value of the field `name` is a tra reference used to set both the name and the tooltip of the creature.
+
+## E. Projectile installer.
+
+note(s):
+* all the functions in this section are action functions.
+
+`copy_projectiles_from_table STR_VAR table patches = "*" subdir = "*"`
+
+A projectile installer. It is very similar to `copy_resources_from_table`, except the `override` flag is interpreted slightly different: if it is `0` then a call to `ADD_PROJECTILE` is made.
