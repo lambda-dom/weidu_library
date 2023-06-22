@@ -11,6 +11,8 @@
 * Add `copy_data_resource` function.
 * Miscellaneous library.
 * Function `copy_resources_from_table`.
+* Function `copy_projectiles_from_table`.
+* Removed resource installation from spl and itm installers.
 
 Changed to beta releases, as some libraries are still in a state of flux, namely [Patching](./lib/docs/patching.md), and all the supporting code, currently located in the [Opcodes](./lib/docs/opcodes.md) library.
 
