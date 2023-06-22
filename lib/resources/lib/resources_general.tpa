@@ -1,0 +1,57 @@
+//Functions.
+DEFINE_ACTION_FUNCTION copy_resources_from_table STR_VAR table = "" ext = "" patches = "*" subdir = "*" BEGIN
+    //Existence check.
+    OUTER_TEXT_SPRINT table_file "%component_resources_dir%/2da/%table%.2da"
+    ACTION_IF NOT (FILE_EXISTS "%table_file%") BEGIN
+        FAIL "copy_resources_from_table: table '%table_file%' does not exist."
+    END
+
+    //Load patches file if passed.
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
+            INCLUDE "%component_dir%/lib/%patches%"
+        END ELSE BEGIN
+            FAIL "copy_resources_from_table: library file '%component_dir%/lib/%patches%' does not exist."
+        END
+    END
+
+    //Read table.
+    COPY - ~%table_file%~ ~override~
+        COUNT_2DA_COLS cols
+        //Number of columns check.
+        PATCH_IF NOT (cols = 4) BEGIN
+            PATCH_FAIL "copy_resources_from_table: number of columns '%cols%' in table '%table_file%' is not the required one."
+        END
+
+        //Set subdir where resource spell is located.
+        TEXT_SPRINT dir "%component_resources_dir%/%ext%"
+        PATCH_IF NOT ("%subdir%" STRING_EQUAL_CASE "*") BEGIN
+            TEXT_SPRINT dir "%subdir%"
+        END
+
+        //Loop.
+        READ_2DA_ENTRIES_NOW "table#rows" cols
+        FOR (i = 0; i < table#rows; ++i) BEGIN
+            //Collect data.
+            READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
+            READ_2DA_ENTRY_FORMER "table#rows" i 1 install
+            READ_2DA_ENTRY_FORMER "table#rows" i 2 patch
+            READ_2DA_ENTRY_FORMER "table#rows" i 3 override
+
+            PATCH_IF NOT (install = 0) BEGIN
+                TEXT_SPRINT dest "%resource%"
+                PATCH_IF (override = 0) AND (FILE_EXISTS_IN_GAME "%dest%.%ext%") BEGIN
+                    PATCH_FAIL "copy_spells_from_table: resource '%dest%.%ext%' already exists in game."
+                END
+
+                //Copy.
+                INNER_ACTION BEGIN
+                    COPY ~%dir%/%resource%.%ext%~ ~override/%dest%.%ext%~
+                        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF "%patch%" END
+                        END
+                END
+            END
+        END
+
+END

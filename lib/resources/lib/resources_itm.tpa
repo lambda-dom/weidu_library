@@ -296,7 +296,7 @@ DEFINE_ACTION_FUNCTION copy_items_from_table STR_VAR table = "" patches = "*" tr
         //Load patches file if passed.
         ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
             ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
-                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+                INCLUDE "%component_dir%/lib/%patches%"
             END ELSE BEGIN
                 FAIL "copy_items_from_table: library file '%component_dir%/lib/%patches%' does not exist."
             END
@@ -409,7 +409,7 @@ DEFINE_ACTION_FUNCTION patch_items_from_table STR_VAR table = "" patches = "*" t
         //Load patches file if passed.
         ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
             ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
-                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+                INCLUDE "%component_dir%/lib/%patches%"
             END ELSE BEGIN
                 FAIL "patch_items_from_table: library file '%component_dir%/lib/%patches%' does not exist."
             END

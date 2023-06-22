@@ -5,6 +5,26 @@ This library streamlines installation of mod resources. It relies on the convent
 note(s): implementation note:
 * since the functions here are all behemoths (for example, the current implementation of `patch_spell` is about 180 LOC, which is a lot -- WeiDU is a *very* verbose language), so they are are segregated to their own files and then `INCLUDE`-ed in the main file.
 
+## A. Generic installer.
+
+note(s):
+* all the functions in this section are action functions.
+
+`copy_resources_from_table STR_VAR table ext patches = "*" subdir = "*"`
+
+A generic resource installer. Copies resources with extension `ext` from `subdir`, defaulting to `%component_resources_dir%/%ext%`, with information read from table. The `patches` argument is a library of spell patchers to load; it should be in the component's `lib` folder, that is, `%component_dir%/lib`.
+
+The 2da table file must have the following the structure of the [Template Copy Spells Table](../resources/2da/copy_spells_template.2da):
+
+```
+2DA V1.0
+*
+            install patch   override
+resource    1       *       0
+```
+
+The field `install` is a flag to selectively enable or disable installation of a specific spell. The `override` field is a debug flag signaling whether to fail if a same-named resource already exists in-game. The `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patches` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
+
 ## A. Spells.
 
 ### A. 1. Installers.
@@ -36,7 +56,7 @@ wizard  2       spwi
 innate  3       spin
 class   4       spcl
 
-After this first phase of copying the resource into the game's folder, starts the patching phase. This is done by passing the data fields unchanged to the patcher `patch_spell` -- see its documentation for any specific information for the fields. Finally, the `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patchers` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
+After this first phase of copying the resource into the game's folder, starts the patching phase. This is done by passing the data fields unchanged to the patcher `patch_spell` -- see its documentation for any specific information for the fields. Finally, the `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patches` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
 
 note(s):
 * this final patch call is done after all the initial batch of copying and patching is done and therefore, the patch can assume that the resource already exists in-game and the table data has been patched in.
