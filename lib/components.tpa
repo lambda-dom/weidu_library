@@ -47,7 +47,6 @@ END
 DEFINE_ACTION_FUNCTION load_file STR_VAR file = "" dir = "*" tra = "*" tra_dir = "*" BEGIN
     //Clear on entry.
     CLEAR_ARRAYS
-    CLEAR_CODES
     CLEAR_INLINED
     CLEAR_IDS_MAP
 
