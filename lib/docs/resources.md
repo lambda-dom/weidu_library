@@ -25,9 +25,11 @@ resource    1       *       0
 
 The field `install` is a flag to selectively enable or disable installation of a specific spell. The `override` field is a debug flag signaling whether to fail if a same-named resource already exists in-game. The `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patches` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
 
-## A. Spells.
+### A. 1. Projectile installer.
 
-### A. 1. Installers.
+## B. Spells.
+
+### B. 1. Installers.
 
 note(s):
 * all the functions in this section are action functions.
@@ -87,7 +89,7 @@ resource    1       -1      -1      *       -1      *       *       *       *   
 
 The fields related to *adding* spells have, naturally enough, been deleted, as well as override. All the other fields have the same meaning as in the `copy_spells_from_table` function. `subdir` is a directory where the spell resources are located; defaults to `%component_resources_dir%/itm`.
 
-### A. 2. Patchers.
+### B. 2. Patchers.
 
 note(s):
 * all the functions in this section are patch functions.
@@ -122,9 +124,9 @@ STR_VAR
 
 A spell patcher used by `copy_spells_from_table` but that is useful all by itself.
 
-## B. Items.
+## C. Items.
 
-### B. 1. Installers.
+### C. 1. Installers.
 
 note(s):
 * all the functions in this section are action functions.
@@ -153,7 +155,7 @@ The other fields are passed to the `patch_item` function.
 
 `patch_items_from_table STR_VAR table = "" patches = "*" tra = "*"`
 
-### B. 2. Patchers.
+### C. 2. Patchers.
 
 `set_item_flags STR_VAR flags`
 
@@ -191,9 +193,9 @@ STR_VAR
 
 A spell patcher used by `copy_spells_from_table` but that is useful all by itself.
 
-## C. Creatures.
+## D. Creatures.
 
-### C. 1. Installers.
+### D. 1. Installers.
 
 note(s):
 * all the functions in this section are action functions.
@@ -215,7 +217,7 @@ All columns have a more or less evident meaning. The field `install` is a flag t
 
 All the other fields are passed to the `patch_cre` patcher.
 
-### C. 2. Patchers.
+### D. 2. Patchers.
 
 note(s):
 * all the functions in this section are patch functions.
