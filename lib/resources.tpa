@@ -1,4 +1,6 @@
 //Includes.
+INCLUDE "%library_dir%/resources/lib/resources_general.tpa"
+INCLUDE "%library_dir%/resources/lib/resources_pro.tpa"
 INCLUDE "%library_dir%/resources/lib/resources_cre.tpa"
 INCLUDE "%library_dir%/resources/lib/resources_itm.tpa"
 INCLUDE "%library_dir%/resources/lib/resources_spl.tpa"

@@ -183,20 +183,6 @@ BEGIN
 
     //Sound.
     PATCH_IF NOT ("%sound%" STRING_EQUAL_CASE "*") BEGIN
-        //Check if mod provides it.
-        PATCH_IF FILE_EXISTS "%component_resources_dir%/wav/%sound%.wav" BEGIN
-            INNER_ACTION BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR 
-                    override = 0
-                STR_VAR
-                    resource = "%sound%"
-                    ext = "wav"
-                    dir = "%component_resources_dir%/wav"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%sound%.wav") BEGIN
             PATCH_WARN "Warning: patch_spell: sound '%sound%.wav' does not exist in game."
@@ -208,20 +194,6 @@ BEGIN
 
     //Icons.
     PATCH_IF NOT ("%book_icon%" STRING_EQUAL_CASE "*") BEGIN
-        //Check if mod provides it.
-        PATCH_IF FILE_EXISTS "%component_resources_dir%/bam/%book_icon%.bam" BEGIN
-            INNER_ACTION BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR
-                    override = 0
-                STR_VAR
-                    resource = "%book_icon%"
-                    ext = "bam"
-                    dir = "%component_resources_dir%/bam"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%book_icon%.bam") BEGIN
             PATCH_WARN "Warn: patch_spell: icon '%book_icon%.bam' does not exist in game."
@@ -232,20 +204,6 @@ BEGIN
     END
 
     PATCH_IF NOT ("%abil_icon%" STRING_EQUAL_CASE "*") BEGIN
-        //Check if mod provides it.
-        PATCH_IF FILE_EXISTS "%component_resources_dir%/bam/%abil_icon%.bam" BEGIN
-            INNER_ACTION BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR
-                    override = 0
-                STR_VAR
-                    resource = "%abil_icon%"
-                    ext = "bam"
-                    dir = "%component_resources_dir%/bam"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%abil_icon%.bam") BEGIN
             PATCH_WARN "Warning: patch_spell: icon '%abil_icon%.bam' does not exist in game."
@@ -264,23 +222,14 @@ BEGIN
     PATCH_IF NOT ("%projectile%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_WITH_SCOPE BEGIN
             pro_number = IDS_OF_SYMBOL ("projectl" "%projectile%")
-            //Check if projectile exists.
-            PATCH_IF (pro_number = 0 - 1) BEGIN
-                PATCH_IF (FILE_EXISTS "%component_resources_dir%/pro/%projectile%.pro") BEGIN
-                    INNER_ACTION BEGIN
-                        //Add projectile.
-                        ADD_PROJECTILE "%component_resources_dir%/pro/%projectile%.pro"
-                    END
 
-                    //Grab new projectile number: double indirection.
-                    pro_number = EVAL "%projectile%"
-                END ELSE BEGIN
-                    PATCH_FAIL "patch_spell: projectile '%component_resources_dir%/pro/%projectile%.pro' not found."
-                END
-            END ELSE BEGIN
-                //Correct projectile number.
-                pro_number += 1
+            //Sanity existence check.
+            PATCH_IF (pro_number = 0 - 1) BEGIN
+                PATCH_FAIL "patch_spell: projectile '%projectile%' not listed in 'projectl.ids'."
             END
+
+            //Correct projectile number.
+            pro_number += 1
 
             //Write out projectile numbers.
             LPF get_spell_header_count RET headers_count = count END
@@ -316,12 +265,11 @@ DEFINE_ACTION_FUNCTION copy_spells_from_table STR_VAR table = "" patches = "*" t
         //Load patches file if passed.
         ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
             ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
-                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+                INCLUDE "%component_dir%/lib/%patches%"
             END ELSE BEGIN
                 FAIL "copy_spells_from_table: library file '%component_dir%/lib/%patches%' does not exist."
             END
         END
-
 
         //Read table.
         COPY - ~%table_file%~ ~override~
@@ -478,7 +426,7 @@ DEFINE_ACTION_FUNCTION patch_spells_from_table STR_VAR table = "" patches = "*" 
         //Load patches file if passed.
         ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
             ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
-                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+                INCLUDE "%component_dir%/lib/%patches%"
             END ELSE BEGIN
                 FAIL "patch_spells_from_table: library file '%component_dir%/lib/%patches%' does not exist."
             END

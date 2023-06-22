@@ -189,20 +189,6 @@ BEGIN
 
     //Icons.
     PATCH_IF NOT ("%inventory_icon%" STRING_EQUAL_CASE "*") BEGIN
-        INNER_ACTION BEGIN
-            //Check if mod provides it.
-            ACTION_IF FILE_EXISTS "%component_resources_dir%/bam/%inventory_icon%.bam" BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR
-                    override = 0
-                STR_VAR
-                    resource = "%inventory_icon%"
-                    ext = "bam"
-                    dir = "%component_resources_dir%/bam"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%inventory_icon%.bam") BEGIN
             PATCH_WARN "Warning: patch_item: icon '%inventory_icon%.bam' does not exist in game."
@@ -224,20 +210,6 @@ BEGIN
     END
 
     PATCH_IF NOT ("%ground_icon%" STRING_EQUAL_CASE "*") BEGIN
-        INNER_ACTION BEGIN
-            //Check if mod provides it.
-            ACTION_IF FILE_EXISTS "%component_resources_dir%/bam/%ground_icon%.bam" BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR
-                    override = 0
-                STR_VAR
-                    resource = "%ground_icon%"
-                    ext = "bam"
-                    dir = "%component_resources_dir%/bam"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%ground_icon%.bam") BEGIN
             PATCH_WARN "Warning: patch_item: icon '%ground_icon%.bam' does not exist in game."
@@ -248,20 +220,6 @@ BEGIN
     END
 
     PATCH_IF NOT ("%description_icon%" STRING_EQUAL_CASE "*") BEGIN
-        INNER_ACTION BEGIN
-            //Check if mod provides it.
-            ACTION_IF FILE_EXISTS "%component_resources_dir%/bam/%description_icon%.bam" BEGIN
-                //Install icon.
-                LAF copy_resource INT_VAR
-                    override = 0
-                STR_VAR
-                    resource = "%description_icon%"
-                    ext = "bam"
-                    dir = "%component_resources_dir%/bam"
-                END
-            END
-        END
-
         //Check existence in game.
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%description_icon%.bam") BEGIN
             PATCH_WARN "Warning: patch_item: icon '%description_icon%.bam' does not exist in game."
@@ -296,7 +254,7 @@ DEFINE_ACTION_FUNCTION copy_items_from_table STR_VAR table = "" patches = "*" tr
         //Load patches file if passed.
         ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
             ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
-                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+                INCLUDE "%component_dir%/lib/%patches%"
             END ELSE BEGIN
                 FAIL "copy_items_from_table: library file '%component_dir%/lib/%patches%' does not exist."
             END
@@ -409,7 +367,7 @@ DEFINE_ACTION_FUNCTION patch_items_from_table STR_VAR table = "" patches = "*" t
         //Load patches file if passed.
         ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
             ACTION_IF FILE_EXISTS "%component_dir%/lib/%patches%" BEGIN
-                LAF load_file STR_VAR file = "%patches%" dir = "%component_dir%/lib" END
+                INCLUDE "%component_dir%/lib/%patches%"
             END ELSE BEGIN
                 FAIL "patch_items_from_table: library file '%component_dir%/lib/%patches%' does not exist."
             END

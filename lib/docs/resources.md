@@ -5,9 +5,29 @@ This library streamlines installation of mod resources. It relies on the convent
 note(s): implementation note:
 * since the functions here are all behemoths (for example, the current implementation of `patch_spell` is about 180 LOC, which is a lot -- WeiDU is a *very* verbose language), so they are are segregated to their own files and then `INCLUDE`-ed in the main file.
 
-## A. Spells.
+## A. Generic installer.
 
-### A. 1. Installers.
+note(s):
+* all the functions in this section are action functions.
+
+`copy_resources_from_table STR_VAR table ext patches = "*" subdir = "*"`
+
+A generic resource installer. Copies resources with extension `ext` from `subdir`, defaulting to `%component_resources_dir%/%ext%`, with information read from table. The `patches` argument is a library of spell patchers to load; it should be in the component's `lib` folder, that is, `%component_dir%/lib`.
+
+The 2da table file must have the following the structure of the [Template Copy Spells Table](../resources/2da/copy_spells_template.2da):
+
+```
+2DA V1.0
+*
+            install patch   override
+resource    1       *       0
+```
+
+The field `install` is a flag to selectively enable or disable installation of a specific spell. The `override` field is a debug flag signaling whether to fail if a same-named resource already exists in-game. The `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patches` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
+
+## B. Spells.
+
+### B. 1. Installers.
 
 note(s):
 * all the functions in this section are action functions.
@@ -36,7 +56,7 @@ wizard  2       spwi
 innate  3       spin
 class   4       spcl
 
-After this first phase of copying the resource into the game's folder, starts the patching phase. This is done by passing the data fields unchanged to the patcher `patch_spell` -- see its documentation for any specific information for the fields. Finally, the `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patchers` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
+After this first phase of copying the resource into the game's folder, starts the patching phase. This is done by passing the data fields unchanged to the patcher `patch_spell` -- see its documentation for any specific information for the fields. Finally, the `patch` field is the name of a function to call; the function must be in scope (usually, brought into scope in the `patches` file) and is called with no arguments. A typical convention is to use `resource` as the function's name.
 
 note(s):
 * this final patch call is done after all the initial batch of copying and patching is done and therefore, the patch can assume that the resource already exists in-game and the table data has been patched in.
@@ -67,7 +87,7 @@ resource    1       -1      -1      *       -1      *       *       *       *   
 
 The fields related to *adding* spells have, naturally enough, been deleted, as well as override. All the other fields have the same meaning as in the `copy_spells_from_table` function. `subdir` is a directory where the spell resources are located; defaults to `%component_resources_dir%/itm`.
 
-### A. 2. Patchers.
+### B. 2. Patchers.
 
 note(s):
 * all the functions in this section are patch functions.
@@ -102,9 +122,9 @@ STR_VAR
 
 A spell patcher used by `copy_spells_from_table` but that is useful all by itself.
 
-## B. Items.
+## C. Items.
 
-### B. 1. Installers.
+### C. 1. Installers.
 
 note(s):
 * all the functions in this section are action functions.
@@ -133,7 +153,7 @@ The other fields are passed to the `patch_item` function.
 
 `patch_items_from_table STR_VAR table = "" patches = "*" tra = "*"`
 
-### B. 2. Patchers.
+### C. 2. Patchers.
 
 `set_item_flags STR_VAR flags`
 
@@ -171,9 +191,9 @@ STR_VAR
 
 A spell patcher used by `copy_spells_from_table` but that is useful all by itself.
 
-## C. Creatures.
+## D. Creatures.
 
-### C. 1. Installers.
+### D. 1. Installers.
 
 note(s):
 * all the functions in this section are action functions.
@@ -195,7 +215,7 @@ All columns have a more or less evident meaning. The field `install` is a flag t
 
 All the other fields are passed to the `patch_cre` patcher.
 
-### C. 2. Patchers.
+### D. 2. Patchers.
 
 note(s):
 * all the functions in this section are patch functions.
@@ -234,3 +254,12 @@ STR_VAR
 A creature patcher used by `copy_cres_from_table` but that is useful all by itself.
 
 The value of the field `name` is a tra reference used to set both the name and the tooltip of the creature.
+
+## E. Projectile installer.
+
+note(s):
+* all the functions in this section are action functions.
+
+`copy_projectiles_from_table STR_VAR table patches = "*" subdir = "*"`
+
+A projectile installer. It is very similar to `copy_resources_from_table`, except the `override` flag is interpreted slightly different: if it is `0` then a call to `ADD_PROJECTILE` is made.
