@@ -13,6 +13,7 @@ The library is divided in components. The components are:
 * [Effects](./lib/docs/effects.md): handle effect .eff files.
 * [Items](./lib/docs/items.md): handle item .itm files.
 * [Kits](./lib/docs/kits.md): tweak kits and classes.
+* [Miscellaneous](./lib/docs/miscellaneous.md): miscellaneous utility functions
 * [Opcode](./lib/docs/opcodes.md): opcode patching.
 * [Patching](./lib/docs/patching.md): a high-level library to patch-in blocks of opcodes into resources.
 * [Resources](./lib/docs/resources.md): streamline resource installation.
