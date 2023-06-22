@@ -222,23 +222,14 @@ BEGIN
     PATCH_IF NOT ("%projectile%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_WITH_SCOPE BEGIN
             pro_number = IDS_OF_SYMBOL ("projectl" "%projectile%")
-            //Check if projectile exists.
-            PATCH_IF (pro_number = 0 - 1) BEGIN
-                PATCH_IF (FILE_EXISTS "%component_resources_dir%/pro/%projectile%.pro") BEGIN
-                    INNER_ACTION BEGIN
-                        //Add projectile.
-                        ADD_PROJECTILE "%component_resources_dir%/pro/%projectile%.pro"
-                    END
 
-                    //Grab new projectile number: double indirection.
-                    pro_number = EVAL "%projectile%"
-                END ELSE BEGIN
-                    PATCH_FAIL "patch_spell: projectile '%component_resources_dir%/pro/%projectile%.pro' not found."
-                END
-            END ELSE BEGIN
-                //Correct projectile number.
-                pro_number += 1
+            //Sanity existence check.
+            PATCH_IF (pro_number = 0 - 1) BEGIN
+                PATCH_FAIL "patch_spell: projectile '%projectile%' not listed in 'projectl.ids'."
             END
+
+            //Correct projectile number.
+            pro_number += 1
 
             //Write out projectile numbers.
             LPF get_spell_header_count RET headers_count = count END
