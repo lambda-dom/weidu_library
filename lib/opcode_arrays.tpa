@@ -198,7 +198,7 @@ DEFINE_PATCH_FUNCTION alter_opcode_with_array INT_VAR offset = 0 STR_VAR array =
 END
 
 
-//Generic opcode array functions.
+//Builders.
 DEFINE_DIMORPHIC_FUNCTION create_null_opcode_array RET_ARRAY array BEGIN
     ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN
         "opcode"        => "0"
@@ -220,3 +220,53 @@ DEFINE_DIMORPHIC_FUNCTION create_null_opcode_array RET_ARRAY array BEGIN
     END
 END
 
+//Utilities.
+DEFINE_DIMORPHIC_FUNCTION convert_symbols_opcode_array STR_VAR opcode_array = "" RET_ARRAY array BEGIN
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+
+    ACTION_PHP_EACH opcode_offsets AS field => _ BEGIN
+        //Get value from array.
+        LAF get_element_array STR_VAR array = "%opcode_array%" key = "%field%" RET value END
+
+        ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            //Match on field.
+            ACTION_MATCH "%field%" WITH
+                "opcode" BEGIN                    
+                    LAF get_opcode_type STR_VAR type = "%value%" RET opcode = value END
+                    ACTION_IF NOT (opcode = 0 - 1) BEGIN
+                        OUTER_TEXT_SPRINT $array("opcode") "%opcode%"
+                    END ELSE BEGIN
+                        FAIL "convert_symbols_opcode_array: invalid opcode '%value%'."
+                    END
+                END
+                "target" BEGIN
+                    LAF get_opcode_target STR_VAR target = "%value%" RET target = value END
+                    ACTION_IF NOT (target = 0 - 1) BEGIN
+                        OUTER_TEXT_SPRINT $array("target") "%target%"
+                    END ELSE BEGIN
+                        FAIL "convert_symbols_opcode_array: invalid target '%value%'."
+                    END
+                END
+                "timing" BEGIN
+                    LAF get_opcode_timing STR_VAR timing = "%value%" RET timing = value END
+                    ACTION_IF NOT (timing = 0 - 1) BEGIN
+                        OUTER_TEXT_SPRINT $array("timing") "%timing%"
+                    END ELSE BEGIN
+                        FAIL "convert_symbols_opcode_array: invalid timing '%value%'."
+                    END
+                END
+                "resist_dispel" BEGIN
+                    LAF get_opcode_resist_dispel STR_VAR resist_dispel = "%value%" RET resist_dispel = value END
+                    ACTION_IF NOT (resist_dispel = 0 - 1) BEGIN
+                        OUTER_TEXT_SPRINT $array("resist_dispel") "%resist_dispel%"
+                    END ELSE BEGIN
+                        FAIL "convert_symbols_opcode_array: invalid resist_dispel '%value%'."
+                    END
+                END
+                DEFAULT
+                    //Copy everything else.
+                    OUTER_TEXT_SPRINT $array("%field%") "%value%"
+            END
+        END
+    END
+END

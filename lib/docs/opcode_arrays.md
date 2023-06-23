@@ -29,7 +29,7 @@ Write the various opcode fields in `array` to opcode at `offset`. Only valid fie
 note(s):
 * casing of array fields is irrelevant.
 
-### A. 2. Utilities.
+### A. 2. Builders.
 
 note(s):
 * all functions in this section have both patch and action variants, coded via `DEFINE_DIMORPHIC_FUNCTION`.
@@ -38,3 +38,13 @@ note(s):
 `create_null_opcode_array RET_ARRAY array`
 
 Return an opcode array with all values set to null, with the exception of `probability1` set to 100.
+
+### A. 3. Utilities.
+
+note(s):
+* all functions in this section have both patch and action variants, coded via `DEFINE_DIMORPHIC_FUNCTION`.
+* casing of array fields is irrelevant.
+
+`convert_symbols_opcode_array STR_VAR opcode_array = "" RET_ARRAY array`
+
+Convert any fields with symbolic values to their (numeric) counterparts. Currently, this means the fields `opcode`, `target`, `timing` and `resist_dispel`.
