@@ -36,9 +36,7 @@ For proper usage of the library, the global flag `AUTO_EVAL_STRINGS` *must* be s
 //Flags.
 AUTO_EVAL_STRINGS
 ```
-Then just `INCLUDE` the components you want.
-
-One way to set it up, so as to be more robust against renamings and moves, is to have a variable pointing to the components dir and then `INCLUDE "%variable%/component`, e.g. something like this:
+Then `INCLUDE` the components you want. One way to set it up, so as to be more robust against renamings and moves, is to have a variable pointing to the components dir and then `INCLUDE "%variable%/component`, e.g. something like this:
 
 ```
 //Flags.
@@ -54,7 +52,7 @@ END
 INCLUDE "%library_dir%/components.tpa"
 ```
 
-One important note: the directory where the library components are located is not the root, but the `lib` subdir.
+This convention *must* be followed, as it is used throughout the library, that is, when one component of the library needs another component, it `INCLUDE`'s it via `INCLUDE "%library_dir%/components.tpa`. Therefore, for proper usage, the convention must be followed, and the variable `library_dir` must be set and point to the library. Note also that the directory where the library components are located is not the root, but the `lib` subdir.
 
 ## C. Using `git submodules`.
 
