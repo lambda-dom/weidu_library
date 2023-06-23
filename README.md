@@ -2,6 +2,8 @@
 
 A library of WeiDU functions.
 
+Latest version: v1.0beta1
+
 ## A. Libraries.
 
 The library is divided in components. The components are:
@@ -28,7 +30,13 @@ Either `git clone` the repo to get the latest version of the source or download 
 
 ## B. Usage.
 
-Just `INCLUDE` the components you want. One way to set it up, so as to be more robust against renamings and moves, is to have a variable pointing to the components dir and then `INCLUDE "%variable%/component`, e.g. something like this:
+For proper usage of the library, the global flag `AUTO_EVAL_STRINGS` *must* be set, e.g. at the top of the main mod's .tp2 file
+
+```
+//Flags.
+AUTO_EVAL_STRINGS
+```
+Then `INCLUDE` the components you want. One way to set it up, so as to be more robust against renamings and moves, is to have a variable pointing to the components dir and then `INCLUDE "%variable%/component`, e.g. something like this:
 
 ```
 //Flags.
@@ -44,11 +52,11 @@ END
 INCLUDE "%library_dir%/components.tpa"
 ```
 
-Two important notes. First, the directory where the library components are located is not the root, but the `lib` subdir. Second, the flag `AUTO_EVAL_STRINGS` is *necessary*.
+This convention *must* be followed, as it is used throughout the library. Specifically, when one component of the library needs another component, it `INCLUDE`'s it via `INCLUDE "%library_dir%/components.tpa`. Therefore, for proper usage, the convention must be followed, and the variable `library_dir` must be set and point to the library. Note also that the directory where the library components are located is not the root, but the `lib` subdir.
 
 ## C. Using `git submodules`.
 
-If you want to use the library in your nown mods, you have to include the source.
+If you want to use the library in your own mods, you have to include the source.
 
 Another way, is to insert it into the repository itself using `git submodules`, and use git as a makeshift dependency management tool. A tutorial on using git submodules can be found in [Git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), For our purposes, and since we only want to fetch the contents of the repository keeping abreast of the most recent changes, the workflow is pretty simple. From the root dir of your mod:
 
