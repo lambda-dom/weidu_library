@@ -39,6 +39,13 @@ note(s):
 
 Return an opcode array with all values set to null, with the exception of `probability1` set to 100.
 
+`merge_opcode_arrays STR_VAR left right RET_ARRAY array`
+
+Merge opcode arrays `left` and `right`. The merging is right-biased, that is, if both `left` and `right` have a given field, the `right` one wins out. Only valid opcode fields are considered.
+
+note(s):
+* this function returns a *new* array, the argument arrays are not touched.
+
 ### A. 3. Utilities.
 
 note(s):
