@@ -12,7 +12,7 @@ note(s):
 Builds an associative array from the table file and a column index. The keys are the values in the first column (0-indexed) and the values are the values in the `col` column. This function implicitly assumes the keys are unique. If `dir` is not provided, the table file is looked up in component's resources 2da dir.
 
 note(s):
-* if the 2da file has 2 named columns or less and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra keys. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
+* if the 2da file has 2 columns and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra keys. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
 
 `load_2da_table STR_VAR table dir = "*" names RET rows RET_ARRAY array`
 
@@ -27,7 +27,7 @@ TEXT_SPRINT entry $array("%row%" "%field%")
 If `dir` is not provided, the table file is looked up in the component's resources 2da dir.
 
 note(s):
-* if the 2da file has 2 named columns or less and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra entries. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
+* if the 2da file has 2 columns and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra entries. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
 
 ## B. Search functions.
 
