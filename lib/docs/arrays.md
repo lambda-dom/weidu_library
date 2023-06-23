@@ -35,15 +35,15 @@ Return the `value` associated to `key` in `array`. The advantage of this functio
 $"%array%"("%key%")
 ```
 
-is that it will automatically return `default` if `key` is not in `array`instead of returning garbage (e.g. un-expanded string). The disadvantage is that it is O(n) because it must loop through the array.
+is that it will automatically return `default` if `key` is not in `array` instead of returning garbage (e.g. un-expanded string). The disadvantage is that it is O(n) because it must loop through the array.
 
 `find_key STR_VAR value array default = "*" RET key`
 
 Return the first key whose value matches `value`. Returns `default` (defaulting to "*") if no match is found.
 
 note(s):
-* different keys can match the same value and the first key returned depends on the iteration order of `ACTION_PHP_EACH`; because of this, this function is mostly useful if it is guaranteed that the association `keys => values` is injective or alçternatively you have sorted the keys via a call to `SORT_ARRAY_INDICES`.
+* different keys can match the same value and the first key returned depends on the iteration order of `ACTION_PHP_EACH`; because of this, this function is mostly useful if it is guaranteed that the association `keys => values` is injective or alternatively you have sorted the keys via something like a call to `SORT_ARRAY_INDICES`.
 
 `find_all_keys STR_VAR value associations RET_ARRAY array`
 
-Return the array of all keys whose associated value matches `value`. Returns empty array if no match is found.
+Return the array of all keys whose associated value matches `value`. Returns the empty array if no match is found.
