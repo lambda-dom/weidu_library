@@ -52,11 +52,11 @@ END
 INCLUDE "%library_dir%/components.tpa"
 ```
 
-This convention *must* be followed, as it is used throughout the library, that is, when one component of the library needs another component, it `INCLUDE`'s it via `INCLUDE "%library_dir%/components.tpa`. Therefore, for proper usage, the convention must be followed, and the variable `library_dir` must be set and point to the library. Note also that the directory where the library components are located is not the root, but the `lib` subdir.
+This convention *must* be followed, as it is used throughout the library. Specifically, when one component of the library needs another component, it `INCLUDE`'s it via `INCLUDE "%library_dir%/components.tpa`. Therefore, for proper usage, the convention must be followed, and the variable `library_dir` must be set and point to the library. Note also that the directory where the library components are located is not the root, but the `lib` subdir.
 
 ## C. Using `git submodules`.
 
-If you want to use the library in your nown mods, you have to include the source.
+If you want to use the library in your own mods, you have to include the source.
 
 Another way, is to insert it into the repository itself using `git submodules`, and use git as a makeshift dependency management tool. A tutorial on using git submodules can be found in [Git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), For our purposes, and since we only want to fetch the contents of the repository keeping abreast of the most recent changes, the workflow is pretty simple. From the root dir of your mod:
 
