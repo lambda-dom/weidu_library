@@ -14,8 +14,7 @@
 * Removed resource installation from spl and itm installers.
 * `load_file` behaves as `load_component` on entry and `CLEAR`'s.
 * Opcode arrays library.
-
-Changed to beta releases, as some libraries are still in a state of flux, namely [Patching](./lib/docs/patching.md), and all the supporting code, currently located in the [Opcode Arrays](./lib/docs/opcode_arrays.md) library.
+* Dropped Patching library.
 
 ## version v1.0beta5.
 
