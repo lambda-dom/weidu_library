@@ -41,8 +41,8 @@ The 2da table file must have the following the structure of the [Template Copy S
 ```
 2DA V1.0
 *
-            install name    descr   type    level   flags   school  sectype sound   book_icon   abil_icon   projectile  patch   override    type    id
-resource    1       -1      -1      *       -1      *       *       *       *       *           *           *           *       0           *       *
+            install name    descr   type    level   flags   school  sectype book_icon   abil_icon   projectile  patch   override    type    id
+resource    1       -1      -1      *       -1      *       *       *       *           *           *           *       0           *       *
 ```
 
 The field `install` is a flag to selectively enable or disable installation of a specific spell. The `override` field is a debug flag signaling whether to fail if a same-named resource already exists in-game. The resource's destination name will depend on the last field `id` of the table. If the latter is `*` then the destination is simply the resource; if it is not equal to `*` then it is a symbolic name which either is in `spell.ids` or not. In the first case, this is interpreted as overriding the existing resource, in which case the destination is simply it. If the symbolic name does not exist in `spell.ids` then this means we are adding the spell (via an underlying call to `ADD_SPELL`) in which case the destination name is whatever the `ADD_SPELL` sets it to.
@@ -81,8 +81,8 @@ The 2da table file must have the structure of the [Template Paste Spells Table](
 ```
 2DA V1.0
 *
-            install name    descr   type    level   flags   school  sectype sound   book_icon   abil_icon   projectile  patch
-resource    1       -1      -1      *       -1      *       *       *       *       *           *           *           *
+            install name    descr   type    level   flags   school  sectype book_icon   abil_icon   projectile  patch
+resource    1       -1      -1      *       -1      *       *       *       *           *           *           *
 ```
 
 The fields related to *adding* spells have, naturally enough, been deleted, as well as override. All the other fields have the same meaning as in the `copy_spells_from_table` function. `subdir` is a directory where the spell resources are located; defaults to `%component_resources_dir%/itm`.
