@@ -101,10 +101,12 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_target STR_VAR target = "" RET value BEGIN
     //Lower-case target to avoid trivial mismatches.
     ACTION_TO_LOWER target
 
-    LAF is_key_in_array STR_VAR array = "opcode_targets" key = "%target%" RET is_in_array = bool END
-    OUTER_SET value = 0 - 1
-    ACTION_IF NOT (is_in_array = 0) BEGIN
-        OUTER_SET value = $opcode_targets("%target%")
+    LAF get_array_element STR_VAR
+        default = "-1"
+        array = "opcode_targets"
+        key = "%target%" 
+    RET
+        value
     END
 END
 
@@ -112,10 +114,12 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_timing STR_VAR timing = "" RET value BEGIN
     //Lower-case timing to avoid trivial mismatches.
     ACTION_TO_LOWER timing
 
-    LAF is_key_in_array STR_VAR array = "opcode_timings" key = "%timing%" RET is_in_array = bool END
-    OUTER_SET value = 0 - 1
-    ACTION_IF NOT (is_in_array = 0) BEGIN
-        OUTER_SET value = $opcode_timings("%timing%")
+    LAF get_array_element STR_VAR
+        default = "-1"
+        array = "opcode_timings"
+        key = "%timing%" 
+    RET
+        value
     END
 END
 
@@ -123,10 +127,12 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_resist_dispel STR_VAR resist_dispel = "" RE
     //Lower-case resist_dispel to avoid trivial mismatches.
     ACTION_TO_LOWER resist_dispel
 
-    LAF is_key_in_array STR_VAR array = "opcode_resist_dispels" key = "%resist_dispel%" RET is_in_array = bool END
-    OUTER_SET value = 0 - 1
-    ACTION_IF NOT (is_in_array = 0) BEGIN
-        OUTER_SET value = $opcode_resist_dispels("%resist_dispel%")
+    LAF get_array_element STR_VAR
+        default = "-1"
+        array = "opcode_resist_dispels"
+        key = "%resist_dispel%" 
+    RET
+        value
     END
 END
 
@@ -134,9 +140,11 @@ DEFINE_DIMORPHIC_FUNCTION get_opcode_type STR_VAR type = "" RET value BEGIN
     //Lower-case type to avoid trivial mismatches.
     ACTION_TO_LOWER type
 
-    LAF is_key_in_array STR_VAR array = "opcode_types" key = "%type%" RET is_in_array = bool END
-    OUTER_SET value = 0 - 1
-    ACTION_IF NOT (is_in_array = 0) BEGIN
-        OUTER_SET value = $opcode_types("%type%")
+    LAF get_array_element STR_VAR
+        default = "-1"
+        array = "opcode_types"
+        key = "%type%" 
+    RET
+        value
     END
 END

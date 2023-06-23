@@ -60,11 +60,11 @@ BEGIN
             ACTION_DEFINE_ASSOCIATIVE_ARRAY patch_arguments BEGIN END
             ACTION_FOR_EACH arg IN "%arg1%" "%arg2%" "%arg3%" BEGIN
                 ACTION_IF NOT ("%arg%" STRING_EQUAL_CASE "*") BEGIN
-                    LAF is_key_in_array STR_VAR key = "%arg%" array = "%arguments%" RET is_arg = bool END
-                    ACTION_IF (is_arg = 0) BEGIN
+                    LAF get_element_array STR_VAR array = "%arguments%" key = "%arg%" RET arg_value = value END
+                    ACTION_IF ("%arg_value%" STRING_EQUAL_CASE "*") BEGIN
                         FAIL "clone_subspell_from_table: argument '%arg%' not in the arguments array."
                     END
-                    OUTER_TEXT_SPRINT $patch_arguments("%arg%") $"%arguments%"("%arg%")
+                    OUTER_TEXT_SPRINT $patch_arguments("%arg%") "%arg_value%"
                 END
             END
 

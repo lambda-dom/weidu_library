@@ -166,19 +166,25 @@ END
 //Item field utilities.
 DEFINE_DIMORPHIC_FUNCTION get_item_type STR_VAR type = "" RET value BEGIN
     ACTION_TO_LOWER type
-    LAF is_key_in_array STR_VAR array = "item_types" key = "%type%" RET is_in_array = bool END
-    OUTER_SET value = 0 - 1
-    ACTION_IF NOT (is_in_array = 0) BEGIN
-        OUTER_SET value = $item_types("%type%")
+    
+    LAF get_array_element STR_VAR
+        default = "-1"
+        array = "item_types"
+        key = "%type%" 
+    RET
+        value
     END
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_item_proficiency STR_VAR proficiency = "" RET value BEGIN
     ACTION_TO_LOWER proficiency
-    LAF is_key_in_array STR_VAR array = "item_proficiencies" key = "%proficiency%" RET is_in_array = bool END
-    OUTER_SET value = 0 - 1
-    ACTION_IF NOT (is_in_array = 0) BEGIN
-        OUTER_SET value = $item_proficiencies("%proficiency%")
+    
+    LAF get_array_element STR_VAR
+        default = "-1"
+        array = "item_proficiencies"
+        key = "%proficiency%"
+    RET
+        value
     END
 END
 
