@@ -153,7 +153,7 @@ The next batch of functions, adds and removes item headers. They should not be n
 
 `insert_item_header INT_VAR index = 0`
 
-Inserts a new, blank item header at `index`. Function PATCH_FAIL's if `index` not in the interval `[-1, count]` where count is the number of existing headers and `-1` means insert at the end.
+Inserts a new, blank item header at `index`. Function PATCH_FAIL's if `index` not in the interval `[-1, count]` where count is the number of existing headers and `-1` means insert at the end (same as `count`).
 
 note(s):
 * any other header fields must be set via existing functions such as `ALTER_ITEM_HEADER` or the functions in this library.
