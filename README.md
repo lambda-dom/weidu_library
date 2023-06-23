@@ -15,6 +15,7 @@ The library is divided in components. The components are:
 * [Kits](./lib/docs/kits.md): tweak kits and classes.
 * [Miscellaneous](./lib/docs/miscellaneous.md): miscellaneous utility functions.
 * [Opcode](./lib/docs/opcodes.md): opcode patching.
+* [Opcode Arrays](./lib/docs/opcode_arrays.md): a library to process opcodes with associative arrays.
 * [Patching](./lib/docs/patching.md): a high-level library to patch-in blocks of opcodes into resources.
 * [Resources](./lib/docs/resources.md): streamline resource installation.
 * [Spells](./lib/docs/spells.md): handle spell .spl files.

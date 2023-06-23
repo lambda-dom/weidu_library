@@ -1,0 +1,222 @@
+//Libraries.
+INCLUDE "%library_dir%/opcodes.tpa"
+
+
+//Array opcode functions.
+DEFINE_PATCH_FUNCTION get_opcode_array INT_VAR offset = 0 RET_ARRAY array BEGIN
+    DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+
+    PHP_EACH opcode_offsets AS field => _ BEGIN
+        LPF get_opcode_field INT_VAR offset = offset STR_VAR field = "%field%" RET value END
+        TEXT_SPRINT $array("%field%") "%value%"
+    END
+END
+
+//Generic comparison.
+DEFINE_PATCH_FUNCTION match_opcode_against_array INT_VAR offset = 0 STR_VAR array = "" RET bool
+BEGIN
+    bool = 1
+    PATCH_TRY
+        //Loop through array.
+        PHP_EACH "%array%" AS field => lhs BEGIN
+            //Read value.
+            LPF get_opcode_field INT_VAR offset = offset STR_VAR field = "%field%" RET rhs = value END
+            //Compare values as strings, case-insensitive.
+            PATCH_IF NOT ("%lhs%" STRING_EQUAL_CASE "%rhs%") BEGIN
+                bool = 0
+                //Leave loop early.
+                PATCH_SILENT
+                PATCH_FAIL "Match failed."
+            END
+        END
+    //Silence error signaling match.
+    WITH ~Failure("Match failed.")~ BEGIN PATCH_VERBOSE END
+    DEFAULT
+        PATCH_RERAISE
+    END
+END
+
+
+//Writers.
+DEFINE_PATCH_FUNCTION alter_opcode_with_array INT_VAR offset = 0 STR_VAR array = "" BEGIN
+    //Opcode.
+    LPF get_element_array STR_VAR array = "%array%" key = "opcode" RET opcode = value END
+    PATCH_IF NOT ("%opcode%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF NOT ((0 <= opcode) AND (opcode <= 367)) BEGIN
+            PATCH_FAIL "alter_opcode_with_array: opcode '%opcode%' must be in the interval [0, 367]."
+        END
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "opcode" value = "%opcode%" END
+    END
+
+    //Parameters.
+    LPF get_element_array STR_VAR array = "%array%" key = "parameter1" RET parameter1 = value END
+    PATCH_IF NOT ("%parameter1%" STRING_EQUAL_CASE "*") BEGIN
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "parameter1" value = "%parameter1%" END
+    END
+
+    LPF get_element_array STR_VAR array = "%array%" key = "parameter2" RET parameter2 = value END
+    PATCH_IF NOT ("%parameter2%" STRING_EQUAL_CASE "*") BEGIN
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "parameter2" value = "%parameter2%" END
+    END
+
+    //Power.
+    LPF get_element_array STR_VAR array = "%array%" key = "power" RET power = value END
+    PATCH_IF NOT ("%power%" STRING_EQUAL_CASE "*") BEGIN
+        //Sanitize power.
+        PATCH_IF NOT ((0 <= power) AND (power <= 10)) BEGIN
+            PATCH_FAIL "alter_opcode_with_array: opcode power '%power%' must be in the interval [0, 10]."
+        END
+
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "power" value = "%power%" END
+    END
+
+    //Target.
+    LPF get_element_array STR_VAR array = "%array%" key = "target" RET target = value END
+    PATCH_IF NOT ("%target%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF NOT ((0 <= target) AND (target <= 9)) BEGIN
+            PATCH_FAIL "alter_opcode_with_array: opcode target '%target%' must be in the interval [0, 9]."
+        END
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "target" value = "%target%" END
+    END
+
+    //Timing.
+    LPF get_element_array STR_VAR array = "%array%" key = "timing" RET timing = value END
+    PATCH_IF NOT ("%timing%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF NOT ((0 <= timing) AND (timing <= 10)) BEGIN
+            PATCH_FAIL "alter_opcode_with_array: opcode timing '%timing%' must be in the interval [0, 10]."
+        END
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "timing" value = "%timing%" END
+    END
+
+    //Duration.
+    LPF get_element_array STR_VAR default = "-1" array = "%array%" key = "duration" RET duration = value END
+    PATCH_IF NOT (duration = 0 - 1) BEGIN
+        //Sanitize timing modes.
+        PATCH_IF ("%timing%" STRING_EQUAL_CASE "*") BEGIN
+            PATCH_FAIL "alter_opcode_with_array: opcodes with no defined timing do not have a duration."
+        END
+        
+        PATCH_IF
+            (timing = 1) OR     //Instant.
+            (timing = 2) OR     //Equipped.
+            (timing = 9)        //Permanent.
+        BEGIN
+            PATCH_FAIL "alter_opcode_with_array: opcodes with timing '%timing%' do not have a duration."
+        END
+
+        //Sanitize duration.
+        PATCH_IF duration < 0 BEGIN
+            PATCH_FAIL "alter_opcode_with_array: duration '%duration%' must be positive."
+        END
+
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "duration" value = "%duration%" END
+    END
+
+    //Resist-dispel.
+    LPF get_element_array STR_VAR array = "%array%" key = "resist_dispel" RET resist_dispel = value END
+    PATCH_IF NOT ("%resist_dispel%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF NOT ((0 <= resist_dispel) AND (resist_dispel <= 3)) BEGIN
+            PATCH_FAIL "alter_opcode_with_array: opcode resist_dispel '%resist_dispel%' must be in the interval [0, 3]."
+        END
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "resist_dispel" value = "%resist_dispel%" END
+    END
+
+    //Probability.
+    LPF get_element_array STR_VAR default = "-1" array = "%array%" key = "probability1" RET probability1 = value END
+    PATCH_IF NOT (probability1 = 0 - 1) BEGIN
+        //Sanitize upper bound.
+        PATCH_IF NOT ((0 <= probability1) AND (probability1 <= 100)) BEGIN
+            PATCH_FAIL "alter_opcode_with_array: probability1 '%probability1%' must be in the interval [0, 100]."
+        END
+
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "probability1" value = "%probability1%" END
+    END
+
+    LPF get_element_array STR_VAR default = "-1" array = "%array%" key = "probability2" RET probability2 = value END
+    PATCH_IF NOT (probability2 = 0 - 1) BEGIN
+        //Sanitize lower bound.
+        PATCH_IF NOT ((0 <= probability2) AND (probability2 <= probability1)) BEGIN
+            PATCH_FAIL "alter_opcode_with_array: probability2 '%probability2%' must be in the interval [0, %probability1%]."
+        END
+
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "probability2" value = "%probability2%" END
+    END
+
+    //Resource.
+    LPF get_element_array STR_VAR array = "%array%" key = "resource" RET resource = value END
+    PATCH_IF NOT ("%resource%" STRING_EQUAL_CASE "*") BEGIN
+        //No existence check, as we cannot glob with the likes of FILE_EXISTS_IN_GAME.
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "resource" value = "%resource%" END
+    END
+
+    //Dice.
+    LPF get_element_array STR_VAR array = "%array%" key = "dicenumber" RET dicenumber = value END
+    PATCH_IF NOT ("%dicenumber%" STRING_EQUAL_CASE "*") BEGIN
+        //Sanitize.
+        PATCH_IF dicenumber < 0 BEGIN
+            PATCH_FAIL "alter_opcode_with_array: dicenumber '%dicenumber%' must be positive."
+        END
+
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "dicenumber" value = "%dicenumber%" END
+    END
+
+    LPF get_element_array STR_VAR array = "%array%" key = "dicesize" RET dicesize = value END
+    PATCH_IF NOT ("%dicesize%" STRING_EQUAL_CASE "*") BEGIN
+        //Sanitize.
+        PATCH_IF dicesize < 0 BEGIN
+            PATCH_FAIL "alter_opcode_with_array: dicesize '%dicesize%' must be positive."
+        END
+
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "dicesize" value = "%dicesize%" END
+    END
+
+    //Saves.
+    LPF get_element_array STR_VAR default = "0" array = "%array%" key = "savingthrow" RET savingthrow = value END
+    PATCH_IF NOT (savingthrow = 0) BEGIN
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "savingthrow" value = "%savingthrow%" END
+    END
+
+    LPF get_element_array STR_VAR array = "%array%" key = "savebonus" RET savebonus = value END
+    PATCH_IF NOT ("%savebonus%" STRING_EQUAL_CASE "*") BEGIN
+        //Sanitize.
+        PATCH_IF savingthrow = 0 BEGIN
+            PATCH_FAIL "alter_opcode_with_array: savebonus provided but not savingthrow."
+        END
+
+        PATCH_IF NOT ((0 - 10 <= savebonus) AND (savebonus <= 10)) BEGIN
+            PATCH_FAIL "alter_opcode_with_array: savebonus '%savebonus%' must be in the interval [-10, 10]."
+        END
+
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "savebonus" value = "%savebonus%" END
+    END
+
+    //Special.
+    LPF get_element_array STR_VAR array = "%array%" key = "special" RET special = value END
+    PATCH_IF NOT ("%special%" STRING_EQUAL_CASE "*") BEGIN
+        LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "special" value = "%special%" END
+    END
+END
+
+
+//Generic opcode array functions.
+DEFINE_DIMORPHIC_FUNCTION create_null_opcode_array RET_ARRAY array BEGIN
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN
+        "opcode"        => "0"
+        "target"        => "0"
+        "power"         => "0"
+        "parameter1"    => "0"
+        "parameter2"    => "0"
+        "timing"        => "0"
+        "resist_dispel" => "0"
+        "duration"      => "0"
+        "probability1"  => "100"
+        "probability2"  => "0"
+        "resource"      => ""
+        "dicenumber"    => "0"
+        "dicesize"      => "0"
+        "savingthrow"   => "0"
+        "savebonus"     => "0"
+        "special"       => "0"
+    END
+END
+
