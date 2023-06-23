@@ -3,6 +3,7 @@
 ## version v1.0beta2 -- unreleased.
 
 * Drop mutators from base spells and items libraries.
+* `insert_*_header` and `insert_*_opcode` functions.
 
 ## version v1.0beta1.
 
