@@ -48,3 +48,6 @@ note(s):
 `convert_symbols_opcode_array STR_VAR opcode_array = "" RET_ARRAY array`
 
 Convert any fields with symbolic values to their (numeric) counterparts. Currently, this means the fields `opcode`, `target`, `timing` and `resist_dispel`.
+
+note(s):
+* this function returns a *new* array, the argument array is not touched.
