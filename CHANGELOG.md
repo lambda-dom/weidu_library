@@ -1,5 +1,9 @@
 # Changelog for `weidu_library`
 
+## version v1.0beta2 -- unreleased.
+
+* Drop mutators from base spells and items libraries.
+
 ## version v1.0beta1.
 
 * Initial release.
