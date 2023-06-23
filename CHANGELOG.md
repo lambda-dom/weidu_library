@@ -5,7 +5,6 @@
 * Changes to entangle and fear subspells.
 * Verbose flags in `patch_opcode_block`.
 * Allow directly setting school and sectype of subspells.
-* Suite of opcode array functions.
 * Add sleep subspell; tighten immunities of unconsciousness.
 * Add slow subspell.
 * Add `copy_data_resource` function.
@@ -14,8 +13,9 @@
 * Function `copy_projectiles_from_table`.
 * Removed resource installation from spl and itm installers.
 * `load_file` behaves as `load_component` on entry and `CLEAR`'s.
+* Opcode arrays library.
 
-Changed to beta releases, as some libraries are still in a state of flux, namely [Patching](./lib/docs/patching.md), and all the supporting code, currently located in the [Opcodes](./lib/docs/opcodes.md) library.
+Changed to beta releases, as some libraries are still in a state of flux, namely [Patching](./lib/docs/patching.md), and all the supporting code, currently located in the [Opcode Arrays](./lib/docs/opcode_arrays.md) library.
 
 ## version v1.0beta5.
 
