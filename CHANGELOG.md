@@ -1,9 +1,12 @@
 # Changelog for `weidu_library`
 
-## version v1.0beta6 -- unreleased.
+## version v1.0beta1.
+
+* Initial release.
+
+## version v1.0alpha6.
 
 * Changes to entangle and fear subspells.
-* Verbose flags in `patch_opcode_block`.
 * Allow directly setting school and sectype of subspells.
 * Add sleep subspell; tighten immunities of unconsciousness.
 * Add slow subspell.
@@ -16,12 +19,12 @@
 * Opcode arrays library.
 * Dropped Patching library.
 
-## version v1.0beta5.
+## version v1.0alpha5.
 
 * Add `dir` argument to `patch_opcode_block`.
 * General pass to enforce case-insensivity almost everywhere.
 
-## version v1.0beta4.
+## version v1.0alpha4.
 
 * Small readme corrections.
 * Add `load_2da_table`.
@@ -31,7 +34,7 @@
 * Change `get_array_element`.
 * Some code and resources moved around. 
 
-## version v1.0beta3.
+## version v1.0alpha3.
 
 * Move final patching in `copy_items_from_table` to its own `COPY_EXISTING` block to ensure that calls to `set_ability_tooltip` and similar functions do not barf on new items as the documentation states.
 * Same change for `copy_cres_from_table`.
@@ -39,12 +42,12 @@
 * Add ids entries to `copy_cres_from_table` and `patch_cre`.
 * Fix defaulting on exclusion flags.
 
-## version v1.0beta2.
+## version v1.0alpha2.
 
 * Bug fixes in hla functions.
 * New `insert_item_header` to insert headers in items.
 * Add fields to `copy_cres_from_table` and `patch_cre`.
 
-## version v1.0beta1.
+## version v1.0alpha1.
 
 Initial release.

@@ -2,6 +2,8 @@
 
 A library of WeiDU functions.
 
+Latest version: v1.0beta1
+
 ## A. Libraries.
 
 The library is divided in components. The components are:
