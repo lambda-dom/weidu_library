@@ -8,7 +8,7 @@ Note that because of the way WeiDU treats arrays as bundles of variables, checki
 VARIABLE_IS_SET $array("%key%")
 ```
 
-is O(log_2(n)) because arrays are implemented as binary trees, but this will return a false positive if the variable `array_%key%` is set. Therefore, to be safe, one must loop through the array and extract what one wants which is O(n).
+will return a false positive if the variable `array_%key%` is set. Therefore, to be safe, one must loop through the array and extract what one wants which is O(n).
 
 ## A. Functions.
 
@@ -42,7 +42,7 @@ is that it will automatically return `default` if `key` is not in `array`instead
 Return the first key whose value matches `value`. Returns `default` (defaulting to "*") if no match is found.
 
 note(s):
-* different keys can match the same value and the first key returned depends on the iteration order of `ACTION_PHP_EACH`; because of this, this function is mostly useful if it is guaranteed that the association `keys => values` is injective.
+* different keys can match the same value and the first key returned depends on the iteration order of `ACTION_PHP_EACH`; because of this, this function is mostly useful if it is guaranteed that the association `keys => values` is injective or alçternatively you have sorted the keys via a call to `SORT_ARRAY_INDICES`.
 
 `find_all_keys STR_VAR value associations RET_ARRAY array`
 
