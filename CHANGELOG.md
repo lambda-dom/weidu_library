@@ -3,6 +3,7 @@
 ## version v1.0beta1.
 
 * Initial release.
+* Drop sounds from spell installer.
 
 ## version v1.0alpha6.
 
