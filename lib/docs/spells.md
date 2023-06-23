@@ -119,20 +119,6 @@ note(s):
 
 Return offset of index casting (global) opcode. If index out of bounds, return -1.
 
-`get_casting_opcodes_array RET_ARRAY offsets`
-
-Return the array of casting opcode offsets. Returns the empty array if spell has no casting opcodes. This is useful if you want to apply a function to every opcode like `set_opcode_field` from the [opcodes library](./opcodes.md). The general template is:
-
-```weidu
-LPF get_casting_opcodes_array RET_ARRAY offsets END
-PHP_EACH offsets AS index => offset BEGIN
-    LPF set_opcode_field INT_VAR offset = offset ...
-END
-```
-
-note(s):
-* be *very* careful if adding or removing opcodes with this pattern, as it is *very easy* to get the bounds wrong and invalidate the file -- in other words, as a general advice, unless you know exactly what you are doing do *not* add or remove opcodes while looping through the sequence of casting opcodes.
-
 ### B. 5. Spell header opcode functions.
 
 `get_spell_header_opcode_count INT_VAR header = 0 RET count`
@@ -147,18 +133,11 @@ Return offset of the opcode block for the header. If header is out of bounds, re
 
 Return offset of index opcode of header. If any of index or header are out of bounds, it returns -1.
 
-`get_spell_header_opcodes_array INT_VAR header = 0 RET_ARRAY offsets`
-
-Return the array of the header's opcode offsets. Returns the empty array if header has no casting opcodes. The function PATCH_FAIL's if `header` out of bounds.
-
-note(s):
-* same advice as `get_casting_opcodes_array`.
-
 ## C. Spell mutators.
 
 ### C. 1. Addition and removal of headers.
 
-The next batch of functions, adds and removes item headers. They should not be needed, but either WeiDU lacks some of such basic functionality or it does not work quite the way we need.
+The next batch of functions add and remove headers from spells. They should not be needed, but either WeiDU lacks some of such basic functionality or it does not work quite the way we need.
 
 `insert_spell_header INT_VAR index = 0`
 
@@ -166,6 +145,17 @@ Inserts a new, blank spell header at `index`. Function PATCH_FAIL's if `index` n
 
 note(s):
 * any other header fields must be set via existing functions such as `ALTER_SPELL_HEADER` or the functions in this library.
+
+### C. 2. Addition and removal of opcodes.
+
+The next batch of functions add and remove opcodes. They should not be needed, but either WeiDU lacks some of such basic functionality or it does not work quite the way we need.
+
+`insert_spell_opcode INT_VAR block = 0 index = 0`
+
+Insert a new, blank opcode in `block` at `index`. If `block` is `-1` then it is treated as inserting a global opcode in the casting block; all other values correspond to (0-index) spell headers, in which case the function PATCH_FAIL's if the condition `0 <= block < count` is not satisfied, with count the number of headers. The function PATCH_FAIL's if, given `block`, the index is out of bounds.
+
+note(s):
+* all the fields have null value with the exception of `probability1`that is set to `100`. Any other opcode fields must be set via existing functions such as `ALTER_EFFECT` or the functions in this library.
 
 ## D. Utilities.
 

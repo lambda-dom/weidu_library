@@ -312,16 +312,6 @@ DEFINE_PATCH_FUNCTION get_equipped_opcode_offset INT_VAR index = 0 RET offset BE
     END
 END
 
-DEFINE_PATCH_FUNCTION get_equipped_opcodes_array RET_ARRAY offsets BEGIN
-    DEFINE_ASSOCIATIVE_ARRAY offsets BEGIN END
-    //Loop.
-    LPF get_equipped_opcode_count RET opcode_count = count END
-    FOR (i = 0; i < count; ++i) BEGIN
-        LPF get_equipped_opcode_offset INT_VAR index = i RET offset END
-        TEXT_SPRINT $offsets("%i%") "%offset%"
-    END
-END
-
 
 //Item header opcode functions.
 DEFINE_PATCH_FUNCTION get_item_header_opcode_count INT_VAR header = 0 RET count BEGIN
@@ -354,22 +344,6 @@ DEFINE_PATCH_FUNCTION get_item_header_opcode_offset INT_VAR header = 0 index = 0
             READ_SHORT (header_offset + 0x20) op_index
             offset = op_start + (op_index + index) * opcode_size
         END
-    END
-END
-
-DEFINE_PATCH_FUNCTION get_item_header_opcodes_array INT_VAR header = 0 RET_ARRAY offsets BEGIN
-    //Sanitize.
-    LPF get_item_header_count END
-    PATCH_IF NOT ((0 <= header) AND (header < count)) BEGIN
-        PATCH_FAIL "get_item_header_opcodes_array: header '%header%' out of bounds."
-    END
-
-    DEFINE_ASSOCIATIVE_ARRAY offsets BEGIN END
-    //Loop.
-    LPF get_item_header_opcode_count INT_VAR header = header RET header_count = count END
-    FOR (i = 0; i < header_count; ++i) BEGIN
-        LPF get_item_header_opcode_offset INT_VAR header = header index = i RET offset END
-        TEXT_SPRINT $offsets("%i%") "%offset%"
     END
 END
 
