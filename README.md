@@ -30,7 +30,15 @@ Either `git clone` the repo to get the latest version of the source or download 
 
 ## B. Usage.
 
-Just `INCLUDE` the components you want. One way to set it up, so as to be more robust against renamings and moves, is to have a variable pointing to the components dir and then `INCLUDE "%variable%/component`, e.g. something like this:
+For proper usage of the library, the global flag `AUTO_EVAL_STRINGS` *must* be set, e.g. at the top of the main mod's .tp2 file
+
+```
+//Flags.
+AUTO_EVAL_STRINGS
+```
+Then just `INCLUDE` the components you want.
+
+One way to set it up, so as to be more robust against renamings and moves, is to have a variable pointing to the components dir and then `INCLUDE "%variable%/component`, e.g. something like this:
 
 ```
 //Flags.
@@ -46,7 +54,7 @@ END
 INCLUDE "%library_dir%/components.tpa"
 ```
 
-Two important notes. First, the directory where the library components are located is not the root, but the `lib` subdir. Second, the flag `AUTO_EVAL_STRINGS` is *necessary*.
+One important note: the directory where the library components are located is not the root, but the `lib` subdir.
 
 ## C. Using `git submodules`.
 
