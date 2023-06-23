@@ -45,6 +45,12 @@ END
 
 //Library functions.
 DEFINE_ACTION_FUNCTION load_file STR_VAR file = "" dir = "*" tra = "*" tra_dir = "*" BEGIN
+    //Clear on entry.
+    CLEAR_ARRAYS
+    CLEAR_CODES
+    CLEAR_INLINED
+    CLEAR_IDS_MAP
+
     //Standardize dir.
     ACTION_IF "%dir%" STRING_EQUAL_CASE "*" BEGIN
         ACTION_IF VARIABLE_IS_SET "component_dir" BEGIN
