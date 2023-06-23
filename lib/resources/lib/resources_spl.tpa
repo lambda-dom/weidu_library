@@ -21,6 +21,23 @@ RET_ARRAY
     spell_school_animations = array
 END
 
+LAF build_array_from_2da INT_VAR
+    col = 1
+STR_VAR
+    table = "spell_school_sounds"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    spell_school_sounds_priest = array
+END
+
+LAF build_array_from_2da INT_VAR
+    col = 2
+STR_VAR
+    table = "spell_school_sounds"
+    dir = "%library_dir%/resources/2da"
+RET_ARRAY
+    spell_school_sounds_wizard = array
+END
 
 //Patchers.
 DEFINE_PATCH_FUNCTION set_spell_flags STR_VAR flags = "" BEGIN
