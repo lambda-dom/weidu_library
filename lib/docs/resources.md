@@ -70,7 +70,7 @@ LPF get_spell_res STR_VAR spell = "%id%" RET resource END
 where id is the symbolic name of the spell.
 
 note(s): implementation note:
-* the correction of self-references is vulnerable to resource renamings. A better way to handle self-references, would be to use a fixed resource reference, e.g. use the convention of the [subspells library](./subspells.md) and use `self#res` as reference to self.
+* the correction of self-references is vulnerable to resource renamings. A better way to handle self-references, would be to use a fixed resource reference, e.g. use the convention of the [subspells library](./subspells.md) and use `self#res` (or even the null string) as reference to self.
 
 `patch_spells_from_table STR_VAR table patches = "*" tra = "*"`
 
