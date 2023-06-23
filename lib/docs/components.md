@@ -17,6 +17,9 @@ Installs a component. First it clears up arrays, unloads included and inlined fi
 
 The function then loads the component's tra file and inside this tra scope, it `INCLUDE`'s the component's main file `main.tpa`.
 
+note(s):
+* this functions `CLEAR`'s everything except memory on entry.
+
 ## B. Utility functions.
 
 note(s):
@@ -25,6 +28,9 @@ note(s):
 `load_file STR_VAR file dir = "*" tra = "*" tra_dir = "*"`
 
 `INCLUDE` the `file` located at `dir` in its own scope. If dir (relative to the `%MOD_FOLDER%`) not provided then it searches for file in the `lib` dir of the current component. If `tra` (no .tra extension) is provided, it is a tra file that is loaded before loading the file. It is then automatically unloaded after execution. This file is looked up in `%tra_dir%` if provided, defaulting to `%MOD_FOLDER%/languages/%LANGUAGE%/components/%component%`.
+
+note(s):
+* this functions `CLEAR`'s everything except memory on entry.
 
 ## C. Basic resource install functions.
 
