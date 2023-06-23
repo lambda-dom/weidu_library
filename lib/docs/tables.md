@@ -14,7 +14,7 @@ Builds an associative array from the table file and a column index. The keys are
 note(s):
 * if the 2da file has 2 named columns or less and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra keys. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
 
-`load_2da_table STR_VAR table dir = "*" RET rows cols RET_ARRAY array`
+`load_2da_table_array STR_VAR table dir = "*" RET rows cols RET_ARRAY array`
 
 Sometimes, the builder `build_array_from_2da` is not enough and one really needs to load the whole table into memory. Since WeiDU has no data abstraction facilities, we have to make do with what is available, namely associative arrays, and encode the table entries in it. Every entry in a table is uniquely determined by its row, a positive integer, and the column, another positive integer, so the return value `array` is an associative array indexed by pairs `row col` of positive integers. The values `cols` and `rows` give the upper bounds of, respectively, the columns and rows indices. Once you have the array in hand, use the usual array indexing, e.g. assuming `array` is the array's name:
 

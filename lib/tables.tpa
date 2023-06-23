@@ -136,13 +136,13 @@ DEFINE_DIMORPHIC_FUNCTION build_array_from_2da INT_VAR col = 1 STR_VAR table = "
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION load_2da_table STR_VAR table = "" dir = "*" RET rows cols RET_ARRAY array BEGIN
+DEFINE_DIMORPHIC_FUNCTION load_2da_table_array STR_VAR table = "" dir = "*" RET rows cols RET_ARRAY array BEGIN
     //Standardize dir.
     ACTION_IF "%dir%" STRING_EQUAL_CASE "*" BEGIN
         ACTION_IF VARIABLE_IS_SET "component_resources_dir" BEGIN
             OUTER_TEXT_SPRINT dir "%component_resources_dir%/2da"
         END ELSE BEGIN
-            FAIL "load_2da_table: cannot resolve dir from which to read table, variable 'component_resources_dir' not set."
+            FAIL "load_2da_table_array: cannot resolve dir from which to read table, variable 'component_resources_dir' not set."
         END
     END
 
@@ -165,7 +165,7 @@ DEFINE_DIMORPHIC_FUNCTION load_2da_table STR_VAR table = "" dir = "*" RET rows c
             //Set rows.
             rows = table#rows
     END ELSE BEGIN
-        FAIL "load_2da_table: table file '%dir%/%table%.2da' does not exist."
+        FAIL "load_2da_table_array: table file '%dir%/%table%.2da' does not exist."
     END
 END
 
