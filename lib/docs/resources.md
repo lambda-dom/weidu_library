@@ -114,7 +114,6 @@ STR_VAR
     flags = "*"
     school = "*"
     sectype = "*"
-    sound = "*"
     book_icon = "*"
     abil_icon = "*"
     projectile = "*"
