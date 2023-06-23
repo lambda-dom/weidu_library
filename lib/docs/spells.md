@@ -154,7 +154,20 @@ Return the array of the header's opcode offsets. Returns the empty array if head
 note(s):
 * same advice as `get_casting_opcodes_array`.
 
-## C. Utilities.
+## C. Spell mutators.
+
+### C. 1. Addition and removal of headers.
+
+The next batch of functions, adds and removes item headers. They should not be needed, but either WeiDU lacks some of such basic functionality or it does not work quite the way we need.
+
+`insert_spell_header INT_VAR index = 0`
+
+Inserts a new, blank spell header at `index`. Function PATCH_FAIL's if `index` not in the interval `[-1, count]` where count is the number of existing headers and `-1` means insert at the end (same as `count`).
+
+note(s):
+* any other header fields must be set via existing functions such as `ALTER_SPELL_HEADER` or the functions in this library.
+
+## D. Utilities.
 
 Miscellaneous utilities.
 
