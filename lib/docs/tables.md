@@ -16,7 +16,7 @@ note(s):
 
 `load_2da_table STR_VAR table dir = "*" names RET rows RET_ARRAY array`
 
-This function loads the entire 2da table into an associative array where each entry is indexed by the row and column, where row is an integer and column is a name from the 0-indexed `names` array. The `rows` return value is the number of rows in the array. The function FAIL's if the number of columns is different from the number of labels. Uniqueness of labels as well as 0-indexing of the `names` array are *not* checked; if these conditions are not met the returning array will be malformed.
+This function loads the entire 2da table into an associative array where each entry is indexed by the row and column, where row is an integer and column is a name from the 0-indexed `names` array. The `rows` return value is the number of rows in the table. The function FAIL's if the number of columns is different from the number of labels. Uniqueness of labels as well as 0-indexing of the `names` array are *not* checked; if these conditions are not met the returning array will be malformed.
 
 Once the table is loaded into an array, use the usual array indexing, e.g. assuming `array` is the array's name:
 
