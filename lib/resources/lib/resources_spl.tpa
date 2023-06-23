@@ -39,6 +39,7 @@ RET_ARRAY
     spell_school_sounds_wizard = array
 END
 
+
 //Patchers.
 DEFINE_PATCH_FUNCTION set_spell_flags STR_VAR flags = "" BEGIN
     //Sanitize.
@@ -121,7 +122,6 @@ STR_VAR
     flags = "*"
     school = "*"
     sectype = "*"
-    sound = "*"
     book_icon = "*"
     abil_icon = "*"
     projectile = "*"
@@ -177,12 +177,20 @@ BEGIN
                 PATCH_FAIL "patch_spell: school '%school%' not found."
             END
 
-            //Set animation if known school.
             TO_LOWER school
+            //Set animation if known school.
             LPF is_key_in_array STR_VAR key = "%school%" array = "spell_school_animations" RET is_known_school = bool END
             PATCH_IF NOT (is_known_school = 0) BEGIN
                 animation = $spell_school_animations("%school%")
                 LPF set_spell_field STR_VAR field = "animation" value = "%animation%" END
+            END
+
+            //Set sound if known school and type priest or wizard.
+            PATCH_IF ("%type%" STRING_EQUAL_CASE "priest") OR ("%type%" STRING_EQUAL_CASE "wizard") BEGIN
+                LPF get_array_element STR_VAR array = "spell_school_sounds_%type%" key = "%school%" RET sound = value END
+                PATCH_IF NOT ("%sound%" STRING_EQUAL_CASE "*") BEGIN
+                    LPF set_spell_field STR_VAR field = "sound" value = "%sound%" END
+                END
             END
         END
     END
@@ -196,17 +204,6 @@ BEGIN
                 PATCH_FAIL "patch_spell: sectype '%sectype%' not found."
             END
         END
-    END
-
-    //Sound.
-    PATCH_IF NOT ("%sound%" STRING_EQUAL_CASE "*") BEGIN
-        //Check existence in game.
-        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%sound%.wav") BEGIN
-            PATCH_WARN "Warning: patch_spell: sound '%sound%.wav' does not exist in game."
-        END
-
-        //Set.
-        LPF set_spell_field STR_VAR field = "sound" value = "%sound%" END
     END
 
     //Icons.
@@ -292,7 +289,7 @@ DEFINE_ACTION_FUNCTION copy_spells_from_table STR_VAR table = "" patches = "*" t
         COPY - ~%table_file%~ ~override~
             COUNT_2DA_COLS cols
             //Number of columns check.
-            PATCH_IF NOT (cols = 17) BEGIN
+            PATCH_IF NOT (cols = 16) BEGIN
                 PATCH_FAIL "copy_spells_from_table: number of columns '%cols%' in table '%table_file%' is not the required one."
             END
 
@@ -315,14 +312,13 @@ DEFINE_ACTION_FUNCTION copy_spells_from_table STR_VAR table = "" patches = "*" t
                 READ_2DA_ENTRY_FORMER "table#rows" i 6 flags
                 READ_2DA_ENTRY_FORMER "table#rows" i 7 school
                 READ_2DA_ENTRY_FORMER "table#rows" i 8 sectype
-                READ_2DA_ENTRY_FORMER "table#rows" i 9 sound
-                READ_2DA_ENTRY_FORMER "table#rows" i 10 book_icon
-                READ_2DA_ENTRY_FORMER "table#rows" i 11 abil_icon
-                READ_2DA_ENTRY_FORMER "table#rows" i 12 projectile
-                READ_2DA_ENTRY_FORMER "table#rows" i 13 patch
-                READ_2DA_ENTRY_FORMER "table#rows" i 14 override
-                READ_2DA_ENTRY_FORMER "table#rows" i 15 type_add
-                READ_2DA_ENTRY_FORMER "table#rows" i 16 id
+                READ_2DA_ENTRY_FORMER "table#rows" i 9 book_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 abil_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 projectile
+                READ_2DA_ENTRY_FORMER "table#rows" i 12 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 13 override
+                READ_2DA_ENTRY_FORMER "table#rows" i 14 type_add
+                READ_2DA_ENTRY_FORMER "table#rows" i 15 id
 
                 PATCH_IF NOT (install = 0) BEGIN
                     //Install resource.
@@ -405,7 +401,6 @@ DEFINE_ACTION_FUNCTION copy_spells_from_table STR_VAR table = "" patches = "*" t
                                 flags = "%flags%"
                                 school = "%school%"
                                 sectype = "%sectype%"
-                                sound = "%sound%"
                                 book_icon = "%book_icon%"
                                 abil_icon = "%abil_icon%"
                                 projectile = "%projectile%"
@@ -453,7 +448,7 @@ DEFINE_ACTION_FUNCTION patch_spells_from_table STR_VAR table = "" patches = "*" 
         COPY - ~%table_file%~ ~override~
             COUNT_2DA_COLS cols
             //Number of columns check.
-            PATCH_IF NOT (cols = 14) BEGIN
+            PATCH_IF NOT (cols = 13) BEGIN
                 PATCH_FAIL "patch_spells_from_table: number of columns '%cols%' in table '%table_file%' is not the required."
             END
 
@@ -470,11 +465,10 @@ DEFINE_ACTION_FUNCTION patch_spells_from_table STR_VAR table = "" patches = "*" 
                 READ_2DA_ENTRY_FORMER "table#rows" i 6 flags
                 READ_2DA_ENTRY_FORMER "table#rows" i 7 school
                 READ_2DA_ENTRY_FORMER "table#rows" i 8 sectype
-                READ_2DA_ENTRY_FORMER "table#rows" i 9 sound
-                READ_2DA_ENTRY_FORMER "table#rows" i 10 book_icon
-                READ_2DA_ENTRY_FORMER "table#rows" i 11 abil_icon
-                READ_2DA_ENTRY_FORMER "table#rows" i 12 projectile
-                READ_2DA_ENTRY_FORMER "table#rows" i 13 patch
+                READ_2DA_ENTRY_FORMER "table#rows" i 9 book_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 10 abil_icon
+                READ_2DA_ENTRY_FORMER "table#rows" i 11 projectile
+                READ_2DA_ENTRY_FORMER "table#rows" i 12 patch
 
                 PATCH_IF NOT (install = 0) BEGIN
                     //Copy.
@@ -490,7 +484,6 @@ DEFINE_ACTION_FUNCTION patch_spells_from_table STR_VAR table = "" patches = "*" 
                                 flags = "%flags%"
                                 school = "%school%"
                                 sectype = "%sectype%"
-                                sound = "%sound%"
                                 book_icon = "%book_icon%"
                                 abil_icon = "%abil_icon%"
                                 projectile = "%projectile%"
