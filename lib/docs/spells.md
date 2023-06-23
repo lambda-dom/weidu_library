@@ -110,18 +110,6 @@ note(s):
 * casing of `field` is irrelevant.
 * pay attention to the types of the fields, so as not to pass the wrong argument and get a clobbered file. These can be checked in the [spell_header_offsets.2da](../resources/2da/spell_header_offsets.2da) table.
 
-`get_spell_header_array INT_VAR header RET_ARRAY array`
-
-Return the associative array of pairs `field => value`.
-
-`match_spell_header_against_array INT_VAR header = 0 STR_VAR array RET bool`
-
-Matches spell `header` field by field against the associative `array`. Function PATCH_FAIL's if `header` out of bounds or any of the array fields is not a spell header field.
-
-note(s):
-* arguments stuffed in array to simplify the function's signature.
-* casing of of both fields and values in the array is irrelevant.
-
 ### B. 4. Casting opcode functions.
 
 note(s):
