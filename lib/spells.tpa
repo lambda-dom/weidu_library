@@ -270,6 +270,61 @@ DEFINE_PATCH_FUNCTION insert_spell_header INT_VAR index = 0 BEGIN
 END
 
 
+//Addition and removal of opcodes.
+DEFINE_PATCH_FUNCTION insert_spell_opcode INT_VAR block = 0 index = 0 BEGIN
+    //Sanitize block.
+    LPF get_spell_header_count RET headers_count = count END
+    PATCH_IF NOT ((block >= 0 - 1) AND (block < headers_count)) BEGIN
+        PATCH_FAIL "insert_spell_opcode: block '%block%' out of bounds."
+    END
+
+    PATCH_IF (block = 0 - 1) BEGIN
+        LPF get_casting_opcode_count RET op_count = count END
+    END ELSE BEGIN
+        LPF get_spell_header_opcode_count INT_VAR header = block RET op_count = count END
+    END
+
+    //Normalize and sanitize index.
+    PATCH_IF (index = 0 - 1) BEGIN
+        index = op_count
+    END
+
+    PATCH_IF NOT ((0 <= index) AND (index <= op_count)) BEGIN
+        PATCH_FAIL "insert_spell_opcode: index '%index%' out of bounds."
+    END
+
+    //Compute opcode insertion offset.
+    PATCH_IF (block = 0 - 1) BEGIN
+        LPF get_spell_opcodes_offset RET base_offset = offset END
+    END ELSE BEGIN
+        LPF get_spell_header_opcode_block_offset INT_VAR header = block RET base_offset = offset END
+    END
+    insertion_offset = base_offset + (index * opcode_size)
+
+    //Insert byte block.
+    INSERT_BYTES insertion_offset opcode_size
+    
+    //Write out probability1.
+    WRITE_BYTE (insertion_offset + $opcode_offsets("probability1")) 100
+
+    //Adjust opcode count.
+    PATCH_IF (block = 0 - 1) BEGIN
+        WRITE_SHORT 0x70 (THIS + 1)
+    END ELSE BEGIN
+        LPF get_spell_header_offset INT_VAR header = block RET header_offset = offset END
+        WRITE_SHORT (header_offset + 0x1e) (THIS + 1)
+    END
+
+    //Adjust opcode indices.
+    PATCH_IF NOT (headers_count = 0) BEGIN
+        LPF get_spell_headers_offset RET header_offset = offset END
+        FOR (i = block + 1; i < headers_count; ++i) BEGIN
+            WRITE_SHORT (header_offset + (i * header_size) + 0x20) (THIS + 1)
+        END
+    END
+END
+
+
 //Utilities.
 DEFINE_DIMORPHIC_FUNCTION get_spell_res STR_VAR spell = "" RET resource BEGIN
     OUTER_TEXT_SPRINT resource "*"
