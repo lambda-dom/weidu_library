@@ -374,6 +374,45 @@ DEFINE_PATCH_FUNCTION get_item_header_opcodes_array INT_VAR header = 0 RET_ARRAY
 END
 
 
+//Mutators.
+//Addition and removal of headers.
+DEFINE_PATCH_FUNCTION insert_item_header INT_VAR index = 0 BEGIN
+    LPF get_item_header_count RET headers_count = count END
+
+    //Normalize and sanitize.
+    PATCH_IF (index = 0 - 1) BEGIN
+        index = headers_count
+    END
+
+    PATCH_IF NOT ((0 <= index) AND (index <= headers_count)) BEGIN
+        PATCH_FAIL "insert_item_header: index %index% out of bounds."
+    END
+
+    //Header insert offset.
+    LPF get_item_headers_offset RET header_offset = offset END
+    insert_offset = header_offset + (index * item_header_size)
+
+    //Header opcode index.
+    PATCH_IF (index = 0) BEGIN
+        LPF get_equipped_opcode_count RET last_op_count = count END
+        READ_SHORT 0x6e last_op_index
+    END ELSE BEGIN
+        READ_SHORT (header_offset + ((index - 1) * item_header_size) + 0x1e) last_op_count
+        READ_SHORT (header_offset + ((index - 1) * item_header_size) + 0x20) last_op_index
+    END
+    op_index = last_op_index + last_op_count
+    
+    //Insert byte block.
+    INSERT_BYTES insert_offset item_header_size
+
+    //Initialize block: opcode index.
+    WRITE_SHORT (insert_offset + 0x20) op_index
+
+    //Adjust header count and opcode block offset.
+    WRITE_SHORT 0x68 (THIS + 1)
+    WRITE_LONG 0x6a (THIS + item_header_size)
+END
+
 //Miscellaneous functions.
 DEFINE_DIMORPHIC_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item = "" BEGIN
     //Existence check.

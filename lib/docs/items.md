@@ -145,7 +145,20 @@ Return offset of `index` opcode of `header`. If any of `index` or `header` are o
 
 Return the array of the header's opcode offsets. Returns the empty array if header has no casting opcodes. The function PATCH_FAIL's if `header` out of bounds.
 
-## C. Miscellaneous utilities.
+## C. Item mutators.
+
+### C. 1. Addition and removal of headers.
+
+The next batch of functions, adds and removes item headers. They should not be needed, but either WeiDU lacks some of such basic functionality or it does not work quite the way we need.
+
+`insert_item_header INT_VAR index = 0`
+
+Inserts a new, blank item header at `index`. Function PATCH_FAIL's if `index` not in the interval `[-1, count]` where count is the number of existing headers and `-1` means insert at the end.
+
+note(s):
+* any other header fields must be set via existing functions such as `ALTER_ITEM_HEADER` or the functions in this library.
+
+## D. Miscellaneous utilities.
 
 note(s):
 * all functions in this section have action and patch versions, coded via `DEFINE_DIMORPHIC_FUNCTION`.
