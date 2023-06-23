@@ -5,6 +5,7 @@
 * Drop mutators from base spells and items libraries.
 * Re-introduce mutators in the form of `insert_*_header` and `insert_*_opcode` functions.
 * Drop array functions from spells and items libraries.
+* Change `load_2da_table` to return an array indexed by column *names*.
 
 ## version v1.0beta1.
 
