@@ -6,6 +6,8 @@
 * Re-introduce mutators in the form of `insert_*_header` and `insert_*_opcode` functions.
 * Drop array functions from spells and items libraries.
 * Change `load_2da_table` to return an array indexed by column *names*.
+* Fix `is_key_in_array`.
+* Remove uses of `is_key_in_array`.
 
 ## version v1.0beta1.
 
