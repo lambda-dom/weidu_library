@@ -1,6 +1,6 @@
 # Changelog for `weidu_library`
 
-## version v1.0beta2 -- unreleased.
+## version v1.0beta2.
 
 * Drop mutators from base spell and item libraries.
 * Re-introduce mutators in the form of `insert_*_header` and `insert_*_opcode` functions.

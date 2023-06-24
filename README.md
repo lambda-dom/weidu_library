@@ -2,7 +2,7 @@
 
 A library of WeiDU functions.
 
-Latest version: v1.0beta1
+Latest version: v1.0beta2
 
 ## A. Libraries.
 
