@@ -20,6 +20,9 @@ note(s):
 
 Return true if `key` is a key of `array`, false otherwise. The `array` is passed by name.
 
+note(s):
+* there is almost never a good use case for this function. Use `get_array_element` with an appropriate default instead.
+
 `get_array_count STR_VAR array RET count`
 
 Return the number of pairs `key => value` in the `array`. The `array` is passed by name.
