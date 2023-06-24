@@ -12,21 +12,22 @@ note(s):
 Builds an associative array from the table file and a column index. The keys are the values in the first column (0-indexed) and the values are the values in the `col` column. This function implicitly assumes the keys are unique. If `dir` is not provided, the table file is looked up in component's resources 2da dir.
 
 note(s):
-* if the 2da file has 2 named columns or less and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra keys. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
+* if the 2da file has 2 columns and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra keys. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
 
-`load_2da_table STR_VAR table dir = "*" RET rows cols RET_ARRAY array`
+`load_2da_table STR_VAR table dir = "*" names RET rows RET_ARRAY array`
 
-Sometimes, the builder `build_array_from_2da` is not enough and one really needs to load the whole table into memory. Since WeiDU has no data abstraction facilities, we have to make do with what is available, namely associative arrays, and encode the table entries in it. Every entry in a table is uniquely determined by its row, a positive integer, and the column, another positive integer, so the return value `array` is an associative array indexed by pairs `row col` of positive integers. The values `cols` and `rows` give the upper bounds of, respectively, the columns and rows indices. Once you have the array in hand, use the usual array indexing, e.g. assuming `array` is the array's name:
+This function loads the entire 2da table into an associative array where each entry is indexed by the row and column, where row is an integer and column is a name from the 0-indexed `names` array. The `rows` return value is the number of rows in the table. The function FAIL's if the number of columns is different from the number of labels. Uniqueness of labels as well as 0-indexing of the `names` array are *not* checked; if these conditions are not met the returning array will be malformed.
+
+Once the table is loaded into an array, use the usual array indexing, e.g. assuming `array` is the array's name:
 
 ```
-TEXT_SPRINT entry $array("%row%" "%col%")
+TEXT_SPRINT entry $array("%row%" "%field%")
 ```
 
-As per usual, if `dir` is not provided, the table file is looked up in component's resources 2da dir.
+If `dir` is not provided, the table file is looked up in the component's resources 2da dir.
 
 note(s):
-* if the 2da file has 2 named columns or less and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra entries. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
-* this is essentially `READ_"DA_ENTRIES_FORMER`, but the array is write-able if further processing is needed, at the cost of `$array` notation instead of `READ_2da_FORMER`.
+* if the 2da file has 2 columns and its header is something like the usual 2da header "2DA V1.0", the array returned will have extra entries. This is a bug in the WeiDU parser. To avoid such a problem, make sure the file has no header and no named columns, just the data rows.
 
 ## B. Search functions.
 

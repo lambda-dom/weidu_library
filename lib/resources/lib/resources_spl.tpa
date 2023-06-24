@@ -178,10 +178,10 @@ BEGIN
             END
 
             TO_LOWER school
+            
             //Set animation if known school.
-            LPF is_key_in_array STR_VAR key = "%school%" array = "spell_school_animations" RET is_known_school = bool END
-            PATCH_IF NOT (is_known_school = 0) BEGIN
-                animation = $spell_school_animations("%school%")
+            LPF get_element_array STR_VAR array = "spell_school_animations" key = "%school%" RET animation = value END
+            PATCH_IF NOT ("%animation%" STRING_EQUAL_CASE "*") BEGIN
                 LPF set_spell_field STR_VAR field = "animation" value = "%animation%" END
             END
 
@@ -333,17 +333,15 @@ DEFINE_ACTION_FUNCTION copy_spells_from_table STR_VAR table = "" patches = "*" t
 
                             //Sanitize addition type.
                             TO_LOWER type_add
-                            PATCH_WITH_SCOPE BEGIN
-                                LPF is_key_in_array STR_VAR array = "add_spell_types" key = "%type_add%" RET bool END
-                                PATCH_IF bool = 0 BEGIN
-                                    PATCH_FAIL "copy_spells_from_table: type '%type_add%' not valid."
-                                END
+
+                            LPF get_element_array STR_VAR array = "add_spell_types" key = "%type_add%" RET type_add_id = value END
+                            PATCH_IF ("%type_add_id%" STRING_EQUAL_CASE "*") BEGIN
+                                PATCH_FAIL "copy_spells_from_table: type '%type_add%' not valid."
                             END
 
                             //Adding new spell.
                             INNER_ACTION BEGIN
                                 WITH_SCOPE BEGIN
-                                    OUTER_SET type_add_id = $add_spell_types("%type_add%")
                                     ADD_SPELL "%dir%/%resource%.spl" type_add_id level "%id%"
                                 END
                             END
