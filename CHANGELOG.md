@@ -2,16 +2,16 @@
 
 ## version v1.0beta2 -- unreleased.
 
-* Drop mutators from base spells and items libraries.
+* Drop mutators from base spell and item libraries.
 * Re-introduce mutators in the form of `insert_*_header` and `insert_*_opcode` functions.
-* Drop array functions from spells and items libraries.
+* Drop array functions from spell and item libraries.
 * Change `load_2da_table` to return an array indexed by column *names*.
 * Fix `is_key_in_array`.
 * Remove uses of `is_key_in_array`.
 
 ## version v1.0beta1.
 
-* Initial release.
+* First beta release.
 * Drop sounds from spell installer.
 
 ## version v1.0alpha6.
