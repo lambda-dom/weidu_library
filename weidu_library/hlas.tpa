@@ -1,0 +1,386 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Elementary functions.
+DEFINE_DIMORPHIC_FUNCTION get_hla_table STR_VAR kit = "" RET table BEGIN
+    //Read kit HLA tables file.
+    COPY_EXISTING - "luabbr.2da" "override"
+	    COUNT_2DA_COLS cols
+
+        //Find kit.
+        TEXT_SPRINT table "*"
+
+        LPF find_row_index STR_VAR key = "%kit%" RET index END
+        PATCH_IF NOT (0 - 1 = index) BEGIN
+            READ_2DA_ENTRY index 1 cols tbl
+            TEXT_SPRINT table "lu%tbl%"
+        END
+END
+
+DEFINE_DIMORPHIC_FUNCTION set_hla_table STR_VAR kit = "" table = "" BEGIN
+    //Table name length check.
+    ACTION_IF NOT (3 = STRING_LENGTH "%table%") BEGIN
+        FAIL "set_hla_table: table name '%table%' must be 3 characters long."
+    END
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "lu%table%.2da") BEGIN
+        FAIL "set_hla_table: table 'lu%table%.2da' does not exist in-game."
+    END
+
+    //Read kit HLA tables file.
+    COPY_EXISTING "luabbr.2da" "override"
+	    COUNT_2DA_COLS cols
+
+        //Find kit.
+        LPF find_row_index STR_VAR key = "%kit%" RET index END
+
+        //Barf if table not found.
+        PATCH_IF NOT (index = 0 - 1) BEGIN
+            //Set new abbreviation.
+            SET_2DA_ENTRY index 1 cols "%table%"
+        END ELSE BEGIN
+            PATCH_FAIL "set_hla_table: kit '%kit%' not found in table 'luabbr.2da'."
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+DEFINE_ACTION_FUNCTION replace_table STR_VAR kit = "" original = "" new = "" BEGIN
+    LAF get_hla_table STR_VAR kit = "%kit%" RET tbl = table END
+    ACTION_IF ("%tbl%" STRING_EQUAL_CASE "%original%") BEGIN
+        //Clone and set table.
+        COPY_EXISTING "%original%.2da" "override/lu%new%.2da"
+        LAF set_hla_table STR_VAR kit = "%kit%" table = "%new%" END
+    END
+END
+
+//Getters.
+DEFINE_DIMORPHIC_FUNCTION deconstruct_ability STR_VAR ability = "" RET prefix resource BEGIN
+    OUTER_TEXT_SPRINT regexp "^\(AP\|GA\)_\(.*\)$"
+    OUTER_TEXT_SPRINT prefix "*"
+    OUTER_TEXT_SPRINT resource "*"
+    //Extract values via regexp matching.
+    OUTER_INNER_PATCH "%ability%" BEGIN
+        REPLACE_EVALUATE "%regexp%" BEGIN
+            PATCH_IF ("%ability%" STRING_EQUAL_CASE "%MATCH0%") BEGIN
+                TEXT_SPRINT prefix "%MATCH1%"
+                TEXT_SPRINT resource "%MATCH2%"
+            END
+        END ~~
+    END
+END
+
+//HLA functions.
+DEFINE_PATCH_FUNCTION set_hla_attributes INT_VAR
+    min_level = 0 - 1
+    max_level = 0 - 1
+    num_allowed = 0 - 1
+STR_VAR
+    hla = ""
+    icon = "*"
+    strref = "*"
+    prerequisite = "*"
+    excluded = "*"
+    alignment = "*"
+BEGIN
+    //Find hla row and sanitize.
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "%hla%" RET row = index END
+    PATCH_IF (row = 0 - 1) BEGIN
+        PATCH_FAIL "set_hla_attributes: hla '%hla%' not found."
+    END
+
+    COUNT_2DA_COLS cols        
+    //Write out data.
+    PATCH_IF NOT ("%strref%" STRING_EQUAL_CASE "*") BEGIN
+        SET_2DA_ENTRY row 3 cols "%strref%"
+    END
+    PATCH_IF NOT (min_level = 0 - 1) BEGIN
+        SET_2DA_ENTRY row 4 cols "%min_level%"
+    END
+    PATCH_IF NOT (max_level = 0 - 1) BEGIN
+        SET_2DA_ENTRY row 5 cols "%max_level%"
+    END
+    PATCH_IF NOT (num_allowed = 0 - 1) BEGIN
+        SET_2DA_ENTRY row 6 cols "%num_allowed%"
+    END
+
+    //Alignment.
+    PATCH_IF NOT ("%alignment%" STRING_EQUAL_CASE "*") BEGIN
+        is_in_ids = IDS_OF_SYMBOL ("align" "%alignment%")
+        PATCH_IF is_in_ids = 0 - 1 BEGIN
+            PATCH_FAIL "set_hla_attributes: alignment '%alignment%' not in 'align.ids'."
+        END
+        SET_2DA_ENTRY row 9 cols "%alignment%"
+    END
+
+    //Resources.
+    PATCH_IF NOT ("%icon%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%icon%.bam") BEGIN
+            PATCH_FAIL "set_hla_attributes: icon '%icon%.bam' does not exist in-game."
+        END
+        SET_2DA_ENTRY row 2 cols "%icon%"
+    END
+
+    PATCH_IF NOT ("%prerequisite%" STRING_EQUAL_CASE "*") BEGIN
+        LPF find_row_index INT_VAR col = 1 STR_VAR key = "%prerequisite%" RET found = index END
+        PATCH_IF found = 0 - 1 BEGIN
+            PATCH_FAIL "set_hla_attributes: pre-requisite '%prerequisite%' is not present in the table."
+        END
+
+        //Fill in attribute.
+        SET_2DA_ENTRY row 7 cols "%prerequisite%"
+    END
+
+    PATCH_IF NOT ("%excluded%" STRING_EQUAL_CASE "*") BEGIN
+        LPF find_row_index INT_VAR col = 1 STR_VAR key = "%excluded%" RET found = index END
+        PATCH_IF found = 0 - 1 BEGIN
+            PATCH_FAIL "set_hla_attributes: excluded-by '%excluded%' is not present in the table."
+        END
+
+        //Fill in attribute.
+        SET_2DA_ENTRY row 8 cols "%excluded%"
+    END
+END
+
+//HLA table manipulation.
+DEFINE_PATCH_FUNCTION add_hla INT_VAR
+    min_level = 1
+    max_level = 99
+    num_allowed = 1
+STR_VAR
+    hla = ""
+    icon = "*"
+    strref = "*"
+    prerequisite = "*"
+    excluded = "*"
+    alignment = "*"
+BEGIN
+    //Existence check.
+    LPF deconstruct_ability STR_VAR
+        ability = "%hla%"
+    RET
+        prefix = prefix
+        res = resource
+    END
+
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%res%.spl") BEGIN
+        PATCH_FAIL "add_hla: spell '%res%.spl' does not exist in-game."
+    END
+
+    //Check if ability is already in.
+    TEXT_SPRINT ability "%prefix%_%res%"
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "%ability%" RET row = index END
+    PATCH_IF NOT (row = 0 - 1) BEGIN
+        PATCH_FAIL "add_hla: hla '%ability%' already listed in table."
+    END
+
+    COUNT_2DA_COLS cols        
+    //Find first empty line.
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "*" RET row_to_change = index END
+    PATCH_IF NOT (row_to_change = 0 - 1) BEGIN
+        //Fill in ability name.
+        SET_2DA_ENTRY row_to_change 1 cols "%ability%"
+    END ELSE BEGIN
+        //Not found: insert row at the end.
+        COUNT_2DA_ROWS cols row_to_change
+
+        //Fullness check.
+        PATCH_IF (row_to_change >= 24) BEGIN
+            PATCH_FAIL "add_hla: hla table '%table%.2da' already has 24 entries."
+        END
+
+        INSERT_2DA_ROW row_to_change cols "%row_to_change% %ability% * * 1 99 1 * * *"
+    END
+
+    //Set attributes: extra safety checks for free.
+    LPF set_hla_attributes INT_VAR
+        min_level = min_level
+        max_level = max_level
+        num_allowed = num_allowed
+    STR_VAR
+        hla = "%ability%"
+        icon = "%icon%"
+        strref = "%strref%"
+        prerequisite = "%prerequisite%"
+        excluded = "%excluded%"
+        alignment = "%alignment%"
+    END
+END
+
+DEFINE_PATCH_FUNCTION delete_hla STR_VAR hla = "" BEGIN
+    //Check if listed hla is a pre-requisite.
+    LPF find_row_index INT_VAR col = 7 STR_VAR key = "%hla%" RET is_prereq = index END
+    PATCH_IF NOT (is_prereq = 0 - 1) BEGIN
+        PATCH_FAIL "delete_hla: hla '%hla%' is a pre-requisite for other abilities."
+    END
+
+    //Find hla row.
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "%hla%" RET row = index END
+    PATCH_IF NOT (row = 0 - 1) BEGIN
+        COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols rows
+
+        //Remove row.
+        REMOVE_2DA_ROW row cols
+
+        //Re-index rows.
+        FOR (i = row; i < rows - 1; ++i) BEGIN
+            SET_2DA_ENTRY i 0 cols (i + 1)
+        END
+    END ELSE BEGIN
+        PATCH_WARN "delete_hla: hla '%hla%' not listed in table."
+    END
+END
+
+//TODO: change algorithm to search and replace.
+DEFINE_PATCH_FUNCTION rename_hla STR_VAR old = "" new = "" BEGIN
+    //Existence check.
+    LPF deconstruct_ability STR_VAR
+        ability = "%new%"
+    RET
+        prefix = prefix
+        res = resource
+    END
+
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%res%.spl") BEGIN
+        PATCH_FAIL "rename_hla: resource '%res%.spl' for hla '%new%' does not exist in game."
+    END
+
+    //Batch replace.
+    REPLACE_TEXTUALLY CASE_INSENSITIVE "%old%" "%new%"
+END
+
+
+//Table installers.
+DEFINE_PATCH_FUNCTION delete_hlas STR_VAR table = "" BEGIN
+    LPF load_table STR_VAR
+        file = "%table%"
+        fields = "hla:install"
+    RET_ARRAY hlas = table END
+
+    //Loop.
+    LPF get_table_row_count STR_VAR table = "hlas" RET row_count = count END
+    FOR (i = 0; i < row_count; ++i) BEGIN
+        LPF get_row_from_table INT_VAR row = i STR_VAR
+            table = "hlas"
+        RET_ARRAY
+            row = array
+        END
+
+        PATCH_WITH_SCOPE BEGIN
+            //Inject names in local scope.
+            TEXT_SPRINT hla $"row"("hla")
+            TEXT_SPRINT install $"row"("install")
+
+            PATCH_IF NOT (install = 0) BEGIN
+                LPF deconstruct_ability STR_VAR
+                    ability = "%hla%"
+                RET
+                    prefix = prefix
+                    ability = resource
+                END
+
+                LPF get_spell_res STR_VAR
+                    spell = "%ability%"
+                RET res = resource END
+
+                PATCH_IF ("%res%" STRING_EQUAL_CASE "*") BEGIN
+                    PATCH_FAIL "delete_hlas: hla '%hla%' not found."
+                END
+
+                //Delete hla.
+                LPF delete_hla STR_VAR
+                    hla = "%prefix%_%res%"
+                END
+            END
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION add_hlas STR_VAR table = "" BEGIN
+    LPF load_table STR_VAR
+        file = "%table%"
+        fields = "hla:install:num_allowed:prerequisite"
+    RET_ARRAY hlas = table END
+
+    //Loop.
+    LPF get_table_row_count STR_VAR table = "hlas" RET row_count = count END
+    FOR (i = 0; i < row_count; ++i) BEGIN
+        LPF get_row_from_table INT_VAR row = i STR_VAR
+            table = "hlas"
+        RET_ARRAY
+            row = array
+        END
+
+        PATCH_WITH_SCOPE BEGIN
+            //Inject names in local scope.
+            TEXT_SPRINT hla $"row"("hla")
+            TEXT_SPRINT install $"row"("install")
+            TEXT_SPRINT num_allowed $"row"("num_allowed")
+            TEXT_SPRINT prerequisite $"row"("prerequisite")
+
+            PATCH_IF NOT (install = 0) BEGIN
+                LPF deconstruct_ability STR_VAR
+                    ability = "%hla%"
+                RET
+                    hla_prefix = prefix
+                    ability = resource
+                END
+
+                LPF get_spell_res STR_VAR
+                    spell = "%ability%"
+                RET res = resource END
+
+                PATCH_IF ("%res%" STRING_EQUAL_CASE "*") BEGIN
+                    PATCH_FAIL "add_hlas: hla '%hla%' not found."
+                END
+
+                PATCH_IF NOT ("%prerequisite%" STRING_EQUAL_CASE "*") BEGIN
+                    LPF deconstruct_ability STR_VAR
+                        ability = "%prerequisite%"
+                    RET
+                        pre_prefix = prefix
+                        pre_ability = resource
+                    END
+
+                    LPF get_spell_res STR_VAR
+                        spell = "%pre_ability%"
+                    RET pre_res = resource END
+
+                    PATCH_IF ("%pre_res%" STRING_EQUAL_CASE "*") BEGIN
+                        PATCH_FAIL "add_hlas: hla '%prerequisite%' not found."
+                    END
+
+                    TEXT_SPRINT prerequisite "%pre_prefix%_%pre_res%"
+                END
+
+                //Add hla.
+                LPF add_hla INT_VAR
+                    num_allowed = num_allowed
+                STR_VAR
+                    hla = "%hla_prefix%_%res%"
+                    prerequisite = "%prerequisite%"
+                END
+            END
+        END
+    END
+END
+
+DEFINE_ACTION_FUNCTION patch_hla_table STR_VAR kit = "" deletions = "" additions = "" BEGIN
+    LAF get_hla_table STR_VAR kit = "%kit%" RET table END
+
+    //Sanitize.
+    ACTION_IF ("%table%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "patch_hla_tables: hla table of kit '%kit%' not found."
+    END
+
+    COPY_EXISTING "%table%.2da" "override"
+        LPF delete_hlas STR_VAR table = "%deletions%" END
+        LPF add_hlas STR_VAR table = "%additions%" END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END

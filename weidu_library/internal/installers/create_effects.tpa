@@ -1,0 +1,80 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/effects.tpa"
+
+
+//Effect creator.
+DEFINE_ACTION_FUNCTION create_effect STR_VAR
+    resource = "*"
+    dir = "*"
+    destination = ""
+    ext = "*"
+    patch = "*"
+    fields = ""
+BEGIN
+    //Create effect and patch it.
+    CREATE EFF "%destination%"
+        DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
+            "opcode"        => "encode_opcode_type"
+            "target"        => "encode_opcode_target"
+            "parameter1"    => "encode_identity"
+            "parameter2"    => "encode_identity"
+            "parameter3"    => "encode_identity"
+            "parameter4"    => "encode_identity"
+            "power"         => "encode_positive"
+            "timing"        => "encode_opcode_timing"
+            "duration"      => "encode_positive"
+            "probability1"  => "encode_percentage"
+            "probability2"  => "encode_percentage"
+            "dicenumber"    => "encode_positive"
+            "dicesize"      => "encode_positive"
+            "resist_dispel" => "encode_opcode_resist_dispel"
+            //Currently can only insert saves as integers.
+            "savingthrow"   => "encode_positive"
+            "savebonus"     => "encode_save_bonus"
+            "resource"      => "encode_resource_ref"
+            "resource2"     => "encode_resource_ref"
+            "resource3"     => "encode_resource_ref"
+            "special"       => "encode_identity"
+            "projectile"    => "encode_projectile_ref"
+            "school"        => "encode_school"
+            "sectype"       => "encode_sectype"
+        END
+
+        //Write defaults.
+        LPF set_effect_field STR_VAR
+            field = "probability1"
+            value = "100"
+        END
+
+        //Write fields.
+        PHP_EACH "%fields%" AS field => value BEGIN
+            //Skip * values.
+            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                //Get converter.
+                LPF get_array_element STR_VAR
+                    array = "encoders"
+                    key = "%field%"
+                RET encoder = value END
+
+                //Do nothing with unknown fields.
+                PATCH_IF NOT ("%encoder%" STRING_EQUAL_CASE "*") BEGIN
+                    //Write value.
+                    LPF "%encoder%" STR_VAR value = "%value%" RET return END
+                    PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                        LPF set_effect_field STR_VAR
+                            field = "%field%"
+                            value = "%return%"
+                        END
+                    END
+                END
+            END
+        END
+
+        //Call user patch.
+        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+            LPF "%patch%" STR_VAR
+                destination = "%destination%"
+            END
+        END
+END

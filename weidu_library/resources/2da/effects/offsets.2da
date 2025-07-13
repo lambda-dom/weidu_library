@@ -1,0 +1,26 @@
+2DA V1.0
+*
+                offset  reader          writer
+opcode          0x10    read_long       write_long
+target          0x14    read_long       write_long
+power           0x18    read_long       write_long
+parameter1      0x1c    read_long       write_long
+parameter2      0x20    read_long       write_long
+timing          0x24    read_short      write_short
+duration        0x28    read_long       write_long
+probability1    0x2c    read_short      write_short
+probability2    0x2e    read_short      write_short
+resource        0x30    read_resource   write_resource
+dicenumber      0x38    read_long       write_long
+dicesize        0x3c    read_long       write_long
+savingthrow     0x40    read_long       write_long
+savebonus       0x44    read_long       write_long_signed
+special         0x48    read_long       write_long
+school          0x4c    read_long       write_long
+resist_dispel   0x5c    read_long       write_long
+parameter3      0x60    read_long       write_long
+parameter4      0x64    read_long       write_long
+resource2       0x70    read_resource   write_resource
+resource3       0x78    read_resource   write_resource
+projectile      0xa0    read_long       write_long
+sectype         0xd0    read_long       write_long

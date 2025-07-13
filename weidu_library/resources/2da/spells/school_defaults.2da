@@ -1,0 +1,11 @@
+2DA V1.0
+*
+                animation   priest      wizard      opposite
+necromancer     9           cas_p07     cas_m07     10
+transmuter      10          cas_p08     cas_m08     6
+enchanter       11          cas_p05     cas_m05     11
+abjurer         12          cas_p02     cas_m02     13
+illusionist     13          cas_p01     cas_m01     12
+conjurer        14          cas_p03     cas_m03     8
+invoker         15          cas_p06     cas_m06     9
+diviner         16          cas_p04     cas_m04     7

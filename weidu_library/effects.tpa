@@ -1,0 +1,37 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/generic.tpa"
+
+
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION get_effect_size RET size BEGIN
+    OUTER_SET size = 0x110
+END
+
+
+//Constants.
+//Tables.
+LAF load_offsets_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/effects/offsets.2da"
+RET_ARRAY effect_offsets = table END
+
+
+//Readers and writers.
+DEFINE_PATCH_FUNCTION get_effect_field STR_VAR field = "" RET value BEGIN
+    LPF get_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "effect_offsets"
+    RET value END
+END
+
+DEFINE_PATCH_FUNCTION set_effect_field STR_VAR field = "" value = "" BEGIN
+    LPF set_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "effect_offsets"
+        value = "%value%"
+    END
+END

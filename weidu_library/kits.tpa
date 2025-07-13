@@ -1,0 +1,137 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/hlas.tpa"
+
+
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION get_kit_clab STR_VAR kit = "" RET clab BEGIN
+    COPY_EXISTING - "kitlist.2da" "override"
+        //Find clab file of kit.
+        LPF find_column_index STR_VAR key = "abilities" RET col = index END
+        PATCH_IF (col = 0 - 1) BEGIN
+            PATCH_FAIL "get_kit_clab: column 'abilities' not found in 'kitlist.2da'."
+        END
+
+        LPF find_row_index INT_VAR col = 1 STR_VAR key = "%kit%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            COUNT_2DA_COLS cols
+            READ_2DA_ENTRY row col cols clab
+        END ELSE BEGIN
+            TEXT_SPRINT clab "*"
+        END
+END
+
+//Descriptions.
+DEFINE_DIMORPHIC_FUNCTION set_class_description INT_VAR descr = 0 STR_VAR class = "" BEGIN
+    COPY_EXISTING "clastext.2da" "override"
+        //Find row.
+        LPF find_row_index STR_VAR key = "%class%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            //Set description.
+            COUNT_2DA_COLS cols
+            SET_2DA_ENTRY row 4 cols (RESOLVE_STR_REF ((AT descr)))
+        END ELSE BEGIN
+            PATCH_FAIL "set_class_description: class '%class%' not found in 'clastext.2da'."
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = "" BEGIN
+    COPY_EXISTING "kitlist.2da" "override"
+        //Find row.
+        LPF find_row_index INT_VAR col = 1 STR_VAR key = "%kit%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            //Set description.
+            COUNT_2DA_COLS cols
+            SET_2DA_ENTRY row 4 cols (RESOLVE_STR_REF ((AT descr)))
+        END ELSE BEGIN
+            PATCH_FAIL "set_kit_description: kit '%kit%' not found in 'kitlist.2da'."
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+//Proficiencies.
+DEFINE_PATCH_FUNCTION get_proficiency STR_VAR kit = "" proficiency = "" RET level BEGIN
+    level = 0 - 1
+    //Find kit.
+    LPF find_column_index STR_VAR key = "%kit%" RET col = index END
+    PATCH_IF NOT (col = 0 - 1) BEGIN
+        //Find proficiency: from the end to skip BG1 proficiencies with overlapping names.
+        LPF find_row_index_from_end STR_VAR key = "%proficiency%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            COUNT_2DA_COLS cols
+            READ_2DA_ENTRY row col cols level
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION set_proficiency INT_VAR level = 0 STR_VAR kit = "" proficiency = "" BEGIN
+    //Sanitize level.
+    PATCH_IF NOT ((0 <= level) AND (level <= 5)) BEGIN
+        PATCH_FAIL "set_proficiency: '%level%' must be in the [0-5] range."
+    END
+
+    //Find kit.
+    LPF find_column_index STR_VAR key = "%kit%" RET col = index END
+    PATCH_IF NOT (col = 0 - 1) BEGIN
+        LPF find_row_index_from_end STR_VAR key = "%proficiency%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            COUNT_2DA_COLS cols
+            SET_2DA_ENTRY row col cols level
+        END ELSE BEGIN
+            PATCH_FAIL "set_proficiency: proficiency '%proficiency%' not found in 'weapprof.2da'."
+        END
+    END ELSE BEGIN
+        PATCH_FAIL "set_proficiency: kit '%kit%' not found in 'weapprof.2da'."
+    END
+END
+
+//Batch patchers.
+DEFINE_PATCH_FUNCTION patch_proficiencies STR_VAR kit = "" array = "" BEGIN
+    PHP_EACH "%array%" AS prof => level BEGIN
+        LPF set_proficiency INT_VAR
+            level = level
+        STR_VAR
+            kit = "%kit%"
+            proficiency = "%prof%"
+        END
+    END
+END
+
+//Clab patchers.
+DEFINE_PATCH_FUNCTION make_clab_replacements STR_VAR array = "" BEGIN
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+
+    FOR (i = 0 ; i < rows ; ++i) BEGIN
+        FOR (j = 1 ; j < cols ; ++j) BEGIN
+            READ_2DA_ENTRY i j cols value
+
+            //Guarantee it is not a string of *'s.
+            PATCH_IF NOT (("%value%" STRING_MATCHES_REGEXP "^\**$") = 0) BEGIN
+                //Deconstruct into prefix + ability.
+                LPF deconstruct_ability STR_VAR
+                    ability = "%value%"
+                RET prefix resource END
+
+                //Sanitize.
+                PATCH_IF NOT (("%prefix%" STRING_EQUAL_CASE "AP") OR ("%prefix%" STRING_EQUAL_CASE "GA")) BEGIN
+                    PATCH_FAIL "make_clab_replacements: malformed ability '%value%'."
+                END
+
+                LPF get_array_element STR_VAR
+                    array = "%array%"
+                    key = "%resource%"
+                RET ability = value END
+
+                PATCH_IF NOT ("%ability%" STRING_EQUAL_CASE "*") BEGIN
+                    SET_2DA_ENTRY i j cols "%prefix%_%ability%"
+                END
+            END
+        END
+    END
+END
+

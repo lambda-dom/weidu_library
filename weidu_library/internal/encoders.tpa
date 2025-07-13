@@ -1,0 +1,426 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/ids.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/items.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/opcodes.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/projectiles.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
+
+
+//Generic encoders.
+DEFINE_DIMORPHIC_FUNCTION encode_identity STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+//Numeric.
+DEFINE_DIMORPHIC_FUNCTION encode_percentage STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_percentage: value '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 <= value) AND (value <= 100)) BEGIN
+        FAIL "encode_percentage: value '%value%' must be in the [0, 100] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_positive STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_positive: value '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT (0 <= value) BEGIN
+        FAIL "encode_positive: value '%value%' must be positive."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+//Text.
+DEFINE_DIMORPHIC_FUNCTION encode_tra_ref STR_VAR value = "" RET return BEGIN
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_tra_ref: value '%value%' is not an integer value."
+    END
+
+    OUTER_SET return = RESOLVE_STR_REF ((AT value))
+END
+
+//Opcodes.
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_type STR_VAR value = "" RET return BEGIN
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+
+    LAF get_opcode_type_id STR_VAR
+        value = "%value%"
+    RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_opcode_type: invalid opcode type '%value%'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_target STR_VAR value = "" RET return BEGIN
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+
+    LAF get_opcode_target_id STR_VAR
+        value = "%value%"
+    RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_opcode_target: invalid opcode target '%value%'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_timing STR_VAR value = "" RET return BEGIN
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+
+    LAF get_opcode_timing_id STR_VAR
+        value = "%value%"
+    RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_opcode_timing: invalid opcode timing mode '%value%'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_resist_dispel STR_VAR value = "" RET return BEGIN
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+
+    LAF get_opcode_resist_dispel_id STR_VAR
+        value = "%value%"
+    RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_opcode_resist_dispel: invalid opcode dispel/resist mode '%value%'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_save_bonus STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_save_bonus: save bonus '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 - 20 <= value) AND (value <= 20)) BEGIN
+        FAIL "encode_save_bonus: save bonus '%value%' must be in the [-20, 20] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+
+//Projectiles.
+DEFINE_DIMORPHIC_FUNCTION encode_missile_res STR_VAR value = "" RET return BEGIN
+    LAF get_missile_res STR_VAR missile = "%value%" RET return = resource END
+
+    //Sanitize.
+    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "encode_missile_res: missile '%value%' is not a valid missile label."
+    END
+END
+
+
+//Spells.
+DEFINE_ACTION_FUNCTION encode_spell_res STR_VAR value = "" RET return BEGIN
+    LAF get_spell_res STR_VAR spell = "%value%" RET return = resource END
+
+    //Sanitize.
+    ACTION_IF "%return%" STRING_EQUAL_CASE "*" BEGIN
+        FAIL "encode_spell_res: spell '%value%' not a valid spell symbol."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_spell_type STR_VAR value = "" RET return BEGIN
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+
+    LAF get_spell_type_id STR_VAR
+        value = "%value%"
+    RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_spell_type: spell type '%value%' is not valid."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_school STR_VAR value = "" RET return BEGIN
+    LAF get_school_id STR_VAR school = "%value%" RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_school: invalid magic school '%value%'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_sectype STR_VAR value = "" RET return BEGIN
+    LAF get_sectype_id STR_VAR sectype = "%value%" RET return = id END
+
+    //Correct index to account for 2DA spurious line.
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_sectype: invalid sectype '%value%'."
+    END
+END
+
+//Spells.
+DEFINE_DIMORPHIC_FUNCTION encode_spell_flags STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT regexp "^\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)$"
+
+    //Extract values via regexp matching and stuff them in array.
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY bit_values BEGIN END
+    OUTER_INNER_PATCH "%value%" BEGIN
+        REPLACE_EVALUATE "%regexp%" BEGIN
+            //Sanitize.
+            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "%MATCH0%") THEN BEGIN
+                PATCH_FAIL "encode_spell_flags: string '%value%' does not have 8 '0', '1' or '*' characters."
+            END
+
+            TEXT_SPRINT $bit_values("break_invis") "%MATCH1%"
+            TEXT_SPRINT $bit_values("hostile") "%MATCH2%"
+            TEXT_SPRINT $bit_values("outdoors") "%MATCH3%"
+            TEXT_SPRINT $bit_values("ignore_dead") "%MATCH4%"
+            TEXT_SPRINT $bit_values("ignore_wild") "%MATCH5%"
+            TEXT_SPRINT $bit_values("non_combat") "%MATCH6%"
+            TEXT_SPRINT $bit_values("target_invisible") "%MATCH7%"
+            TEXT_SPRINT $bit_values("cast_silenced") "%MATCH8%"
+        END ~~
+    END
+
+    //Loop.
+    OUTER_SET return = 0
+    ACTION_PHP_EACH "spell_flags" AS field => index BEGIN
+        OUTER_TEXT_SPRINT bit $bit_values("%field%")
+        ACTION_IF NOT ("%bit%" STRING_EQUAL_CASE "*") BEGIN
+            //Implicit number conversion.
+            OUTER_SET bit_value = bit
+            ACTION_IF NOT (0 = bit_value) BEGIN
+                OUTER_SET return = return BOR (1 << index)
+            END
+        END
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_spell_level STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_spell_level: level '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 <= value) AND (value <= 50)) BEGIN
+        FAIL "encode_spell_level: level '%value%' must be in the [0, 10] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+//Items.
+DEFINE_DIMORPHIC_FUNCTION encode_item_type STR_VAR value = "" RET return BEGIN
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+
+    LAF get_item_type_id STR_VAR
+        value = "%value%"
+    RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_item_type: item type '%value%' is not valid."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_item_flags STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT regexp "^\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)$"
+
+    //Extract values via regexp matching and stuff them in array.
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY bit_values BEGIN END
+    OUTER_INNER_PATCH "%value%" BEGIN
+        REPLACE_EVALUATE "%regexp%" BEGIN
+            //Sanitize.
+            PATCH_IF NOT ("%value%" STRING_EQUAL "%MATCH0%") BEGIN
+                PATCH_FAIL "encode_item_flags: string '%value%' does not have 10 '0', '1' or '*' characters."
+            END
+
+            TEXT_SPRINT $bit_values("two_handed") "%MATCH1%"
+            TEXT_SPRINT $bit_values("cursed") "%MATCH2%"
+            TEXT_SPRINT $bit_values("magical") "%MATCH3%"
+            TEXT_SPRINT $bit_values("left_handed") "%MATCH4%"
+            TEXT_SPRINT $bit_values("silver") "%MATCH5%"
+            TEXT_SPRINT $bit_values("cold_iron") "%MATCH6%"
+            TEXT_SPRINT $bit_values("off_handed") "%MATCH7%"
+            TEXT_SPRINT $bit_values("forbid_off_hand") "%MATCH8%"
+            TEXT_SPRINT $bit_values("undispellable") "%MATCH9%"
+            TEXT_SPRINT $bit_values("toggle_critical") "%MATCH10%"
+        END ~~
+    END
+
+    //Loop.
+    OUTER_SET return = 0
+    ACTION_PHP_EACH "item_flags" AS field => index BEGIN
+        OUTER_TEXT_SPRINT bit $bit_values("%field%")
+        ACTION_IF NOT ("%bit%" STRING_EQUAL_CASE "*") BEGIN
+            //Implicit number conversion.
+            OUTER_SET bit_value = bit
+            ACTION_IF NOT (0 = bit_value) BEGIN
+                OUTER_SET return = return BOR (1 << index)
+            END
+        END
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_proficiency STR_VAR value = "" RET return BEGIN
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+
+    LAF get_proficiency_id STR_VAR
+        proficiency = "%value%"
+    RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_proficiency: item proficiency '%value%' is not valid."
+    END
+END
+
+//Creatures.
+DEFINE_DIMORPHIC_FUNCTION encode_cre_level STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_cre_level: level '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 <= value) AND (value <= 50)) BEGIN
+        FAIL "encode_cre_level: level '%value%' must be in the [0, 50] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_stat STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_cre_stat: creature stat '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((3 <= value) AND (value <= 25)) BEGIN
+        FAIL "encode_cre_stat: creature stat '%value%' must be in the [3, 25] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_ac STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_cre_ac: creature armor class '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 - 20 <= value) AND (value <= 20)) BEGIN
+        FAIL "encode_cre_ac: creature armor class '%value%' must be in the [-20, 20] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_thac0 STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_cre_thac0: creature thac0 '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 <= value) AND (value <= 25)) BEGIN
+        FAIL "encode_cre_thac0: creature thac0 '%value%' must be in the [0, 25] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_apr STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_cre_apr: apr '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((1 <= value) AND (value <= 10)) BEGIN
+        FAIL "encode_cre_apr: apr '%value%' must be in the [1, 10] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_resistance STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_cre_resistance: value '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 <= value) AND (value <= 100)) BEGIN
+        FAIL "encode_cre_resistance: value '%value%' must be in the [0, 100] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_ea STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    LAF get_id_from_ids STR_VAR value = "%value%" ids = "ea" RET return = id END
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_cre_ea: '%value%' is not present in 'ea.ids'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_general STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    LAF get_id_from_ids STR_VAR value = "%value%" ids = "general" RET return = id END
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_cre_general: '%value%' is not present in 'general.ids'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_race STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    LAF get_id_from_ids STR_VAR value = "%value%" ids = "race" RET return = id END
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_cre_race: '%value%' is not present in 'race.ids'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_class STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    LAF get_id_from_ids STR_VAR value = "%value%" ids = "class" RET return = id END
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_cre_class: '%value%' is not present in 'class.ids'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_specific STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    LAF get_id_from_ids STR_VAR value = "%value%" ids = "specific" RET return = id END
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_cre_specific: '%value%' is not present in 'specific.ids'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_gender STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    LAF get_id_from_ids STR_VAR value = "%value%" ids = "gender" RET return = id END
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_cre_gender: '%value%' is not present in 'gender.ids'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_align STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    LAF get_id_from_ids STR_VAR value = "%value%" ids = "align" RET return = id END
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_cre_align: '%value%' is not present in 'align.ids'."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_cre_kit STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    LAF get_id_from_ids STR_VAR value = "%value%" ids = "kit" RET return = id END
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_cre_kit: '%value%' is not present in 'kit.ids'."
+    END
+END

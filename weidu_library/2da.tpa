@@ -1,0 +1,97 @@
+//Linear searches.
+DEFINE_PATCH_FUNCTION find_column_index STR_VAR key = "" RET index BEGIN
+    COUNT_2DA_COLS cols
+
+    //Avoid trivial cases to simplify code.
+    PATCH_IF (cols <= 2) BEGIN
+        PATCH_FAIL "find_column_index: table has two columns or less."
+    END
+
+    row = 0
+    //Correct row to search, as signature row has 2 columns.
+    PATCH_IF (cols = 3) BEGIN
+        row = 1
+    END
+
+    index = 0 - 1
+    //Loop through row of names to search for key.
+    FOR (i = 0; (i < cols - 1) AND (index < 0); ++i) BEGIN
+        READ_2DA_ENTRY row i (cols - 1) value
+        PATCH_IF ("%key%" STRING_EQUAL_CASE "%value%") BEGIN
+            //Correct index to account that we searched through names row.
+            index = i + 1
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION find_row_index INT_VAR col = 0 start = 0 STR_VAR key = "" RET index BEGIN
+    //Sanity bounds check.
+    COUNT_2DA_COLS cols
+    PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
+        PATCH_FAIL "find_row_index: column index '%col%' out of bounds."
+    END
+
+    COUNT_2DA_ROWS cols row_count
+    //Sanitize start.
+    PATCH_IF NOT ((0 <= start) AND (start < row_count)) BEGIN
+        PATCH_FAIL "find_row_index: argument start: '%start%' out of bounds."
+    END
+
+    //Read table.
+    index = 0 - 1
+    FOR (i = start ; (i < row_count) AND (index < 0) ; ++i) BEGIN
+        READ_2DA_ENTRY i col cols value
+        PATCH_IF ("%key%" STRING_EQUAL_CASE "%value%") BEGIN
+            //Set index => break out of the loop.
+            index = i
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION find_row_index_from_end INT_VAR col = 0 end = (0 - 1) STR_VAR key = "" RET index BEGIN
+    //Sanity bounds check.
+    COUNT_2DA_COLS cols
+    PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
+        PATCH_FAIL "find_row_index_from_end: column index '%col%' out of bounds."
+    END
+
+    COUNT_2DA_ROWS cols row_count
+    //Normalize end and sanitize.
+    PATCH_IF (0 - 1 = end) BEGIN
+        end = row_count - 1
+    END
+
+    PATCH_IF NOT ((0 <= end) AND (end < row_count)) BEGIN
+        PATCH_FAIL "find_row_index_from_end: row '%end%' out of bounds."
+    END
+
+    //Read table.
+    index = 0 - 1
+    FOR (i = end ; (i >= 0) AND (index < 0) ; --i) BEGIN
+        READ_2DA_ENTRY i col cols value
+        PATCH_IF ("%key%" STRING_EQUAL_CASE "%value%") BEGIN
+            //Set index => break out of the loop.
+            index = i
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION find_all_rows INT_VAR col = 0 STR_VAR key = "" RET_ARRAY indexes BEGIN
+    //Sanity bounds check.
+    COUNT_2DA_COLS cols
+    PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
+        PATCH_FAIL "find_all_rows: column index '%col%' out of bounds."
+    END
+
+    DEFINE_ARRAY indexes BEGIN END
+    j = 0
+    //Loop.
+    COUNT_2DA_ROWS cols row_count
+    FOR (i = 0; i < row_count; ++i) BEGIN
+        READ_2DA_ENTRY i col cols value
+        PATCH_IF ("%key%" STRING_EQUAL_CASE "%value%") BEGIN
+            TEXT_SPRINT $indexes("%j%") "%i%"
+            j += 1
+        END
+    END
+END

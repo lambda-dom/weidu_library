@@ -1,0 +1,155 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/generic.tpa"
+
+
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION get_projectile_size RET size BEGIN
+    OUTER_SET size = 768
+END
+
+
+//Constants.
+//Tables.
+LAF load_offsets_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/projectiles/offsets.2da"
+RET_ARRAY projectile_offsets = table END
+
+
+//Readers and writers.
+DEFINE_PATCH_FUNCTION get_projectile_field STR_VAR field = "" RET value BEGIN
+    LPF get_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "projectile_offsets"
+    RET value END
+END
+
+DEFINE_PATCH_FUNCTION set_projectile_field STR_VAR field = "" value = "" BEGIN
+    LPF set_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "projectile_offsets"
+        value = "%value%"
+    END
+END
+
+
+//Getters.
+DEFINE_DIMORPHIC_FUNCTION get_projectile_id STR_VAR projectile = "" RET id BEGIN
+    OUTER_SET id = IDS_OF_SYMBOL ("projectl" "%projectile%")
+    ACTION_IF NOT (0 - 1 = id) BEGIN
+        //Correct id.
+        OUTER_SET id += 1
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_projectile_res INT_VAR id = 0 RET resource BEGIN
+    OUTER_PATCH ~~ BEGIN
+        //Correct projectile value: the original value is what is read from a .spl or .itm.
+        PATCH_IF (id > 0) BEGIN
+            id -= 1
+        END
+        LOOKUP_IDS_SYMBOL_OF_INT resource "projectl" id
+    END
+
+    //Avoid casing shenanigans.
+    ACTION_TO_LOWER resource
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_missile_id STR_VAR missile = "" RET id BEGIN
+    OUTER_SET id = IDS_OF_SYMBOL ("missile" "%missile%")
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_missile_res STR_VAR missile = "" RET resource BEGIN
+    OUTER_TEXT_SPRINT resource "*"
+    LAF get_missile_id STR_VAR missile = "%missile%" RET id = id END
+
+    ACTION_IF NOT (0 - 1 = id) BEGIN
+        LAF get_projectile_res INT_VAR id = id RET resource END
+    END
+END
+
+//Projectile functions.
+DEFINE_ACTION_FUNCTION add_projectile STR_VAR projectile = "" label = "*" dir = "*" RET id BEGIN
+    //Set resources dir.
+    ACTION_IF ("%dir%" STRING_EQUAL_CASE "*") BEGIN
+        LAF get_component_resources_dir RET dir = dir END
+        OUTER_TEXT_SPRINT dir "%dir%/pro"
+    END
+
+    //Existence checks.
+    OUTER_SET pro = IDS_OF_SYMBOL ("projectl" "%projectile%")
+    ACTION_IF NOT (0 - 1 = pro) BEGIN
+        FAIL "add_projectile: projectile '%projectile%' already exists in 'projectl.ids'."
+    END
+
+    //Add projectile.
+    ADD_PROJECTILE "%dir%/%projectile%.pro"
+
+    //Add label.
+    ACTION_IF NOT ("%label%" STRING_EQUAL_CASE "*") BEGIN
+        COPY_EXISTING "missile.ids" "override"
+            LPF replace_missile_label STR_VAR new = "%label%" old = "%projectile%" END
+    END
+
+    //Get projectile id.
+    OUTER_SET id = EVAL "%projectile%"
+END
+
+//Patches for missile.ids.
+DEFINE_PATCH_FUNCTION replace_missile_label STR_VAR old = "" new = "" BEGIN
+    //Existence check.
+    id = IDS_OF_SYMBOL ("missile" "%new%")
+    PATCH_IF NOT (0 - 1 = id) BEGIN
+        PATCH_FAIL "replace_missile_label: label '%new%' with projectile id '%id%' already present in 'missile.ids'."
+    END
+
+    //'missile.ids' is borked (e. g. entries with spaces) so have to duplicate search logic.
+    row = 0 -1
+    COUNT_2DA_ROWS 2 rows
+    FOR (i = rows - 1 ; (i >= 0) AND (row < 0) ; --i) BEGIN
+        READ_2DA_ENTRY i 1 2 value
+        PATCH_IF ("%old%" STRING_EQUAL_CASE "%value%") BEGIN
+            row = i
+        END
+    END
+
+    //Sanitize.
+    PATCH_IF (0 - 1 = row) BEGIN
+        PATCH_FAIL "replace_missile_label: label '%old%' not found in 'missile.ids'."
+    END
+
+    //Replace old with new.
+    SET_2DA_ENTRY row 1 2 "%new%"
+END
+
+//Patches for clearair.2da.
+DEFINE_PATCH_FUNCTION append_clearair STR_VAR projectile = "" label = "" BEGIN
+    //Existence check.
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%projectile%.pro") BEGIN
+        PATCH_FAIL "append_clearair: projectile '%projectile%.pro' does not exist in game."
+    END
+
+    //Ensure label is unique.
+    LPF find_row_index STR_VAR key = "%label%" RET index END
+    PATCH_IF NOT (index = 0 - 1) BEGIN
+        PATCH_FAIL "append_clearair: label '%label%' is already present in the table."
+    END
+
+    //Get *un-corrected* projectile number.
+    id = IDS_OF_SYMBOL ("projectl" "%projectile%")
+
+    //Ensure projectile is unique. In most cases this is redundant as label = projectile.
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "%id%" RET index END
+    PATCH_IF NOT (index = 0 - 1) BEGIN
+        PATCH_FAIL "append_clearair: projectile '%projectile%' with id '%pro%' is already present in the table."
+    END
+
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+    INSERT_2DA_ROW rows cols "%label% %id%"
+END

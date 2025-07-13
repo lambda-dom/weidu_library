@@ -1,0 +1,9 @@
+spells              0
+breath              1
+poison              2
+wands               3
+petrify             4
+ignore_primary      10
+ignore_secondary    11
+bypass_mi           24
+ignore_difficulty   25

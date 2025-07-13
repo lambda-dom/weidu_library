@@ -1,0 +1,90 @@
+//Readers.
+DEFINE_PATCH_FUNCTION read_byte INT_VAR offset = 0 RET value BEGIN
+    READ_BYTE offset value
+END
+
+DEFINE_PATCH_FUNCTION read_short INT_VAR offset = 0 RET value BEGIN
+    READ_SHORT offset value
+END
+
+DEFINE_PATCH_FUNCTION read_short_signed INT_VAR offset = 0 RET value BEGIN
+    READ_SSHORT offset value
+END
+
+DEFINE_PATCH_FUNCTION read_long INT_VAR offset = 0 RET value BEGIN
+    READ_LONG offset value
+END
+
+DEFINE_PATCH_FUNCTION read_long_signed INT_VAR offset = 0 RET value BEGIN
+    READ_SLONG offset value
+END
+
+DEFINE_PATCH_FUNCTION read_resource INT_VAR offset = 0 RET value BEGIN
+    READ_ASCII offset value (8) NULL
+END
+
+DEFINE_PATCH_FUNCTION read_ascii32 INT_VAR offset = 0 RET value BEGIN
+    READ_ASCII offset value (32) NULL
+END
+
+//Writers.
+DEFINE_PATCH_FUNCTION write_byte INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT (IS_AN_INT "%value%") BEGIN
+        PATCH_FAIL "write_byte: value '%value%' is not an integer numeric value."
+    END
+    PATCH_IF NOT ((0 <= value) AND (value <= 0xff)) BEGIN
+        PATCH_FAIL "write_byte: value '%value%' is not in the unsigned 8-bit byte range."
+    END
+    WRITE_BYTE offset value
+END
+
+DEFINE_PATCH_FUNCTION write_short INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT (IS_AN_INT "%value%") BEGIN
+        PATCH_FAIL "write_short: value '%value%' is not an integer numeric value."
+    END
+    PATCH_IF NOT ((0 <= value) AND (value <= 0xffff)) BEGIN
+        PATCH_FAIL "write_short: value '%value%' is not in the unsigned 16-bit short range."
+    END
+    WRITE_SHORT offset value
+END
+
+DEFINE_PATCH_FUNCTION write_short_signed INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT (IS_AN_INT "%value%") BEGIN
+        PATCH_FAIL "write_short: value '%value%' is not an integer numeric value."
+    END
+    PATCH_IF NOT ((0 - 32768<= value) AND (value <= 32767)) BEGIN
+        PATCH_FAIL "write_short: value '%value%' is not in the signed 16-bit range."
+    END
+    WRITE_SHORT offset value
+END
+
+DEFINE_PATCH_FUNCTION write_long INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT (IS_AN_INT "%value%") BEGIN
+        PATCH_FAIL "write_long: value '%value%' is not an integer numeric value."
+    END
+    PATCH_IF NOT (0 <= value) BEGIN
+        PATCH_FAIL "write_long: value '%value%' must be positive."
+    END
+    WRITE_LONG offset value
+END
+
+DEFINE_PATCH_FUNCTION write_long_signed INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT (IS_AN_INT "%value%") BEGIN
+        PATCH_FAIL "write_long: value '%value%' is not an integer numeric value."
+    END
+    WRITE_LONG offset value
+END
+
+DEFINE_PATCH_FUNCTION write_resource INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT ((STRING_LENGTH "%value%") <= 8) BEGIN
+        PATCH_FAIL "write_resource: resource reference '%value%' is more than 8 characters long."
+    END
+    WRITE_EVALUATED_ASCII offset "%value%" #8
+END
+
+DEFINE_PATCH_FUNCTION write_ascii32 INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT ((STRING_LENGTH "%value%") <= 32) BEGIN
+        PATCH_FAIL "write_resource: resource reference '%value%' is more than 32 characters long."
+    END
+    WRITE_EVALUATED_ASCII offset "%value%" #32
+END

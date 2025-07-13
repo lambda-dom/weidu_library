@@ -1,0 +1,279 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/generic.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/lists.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/opcodes.tpa"
+
+
+//Constants.
+//Tables.
+LAF load_offsets_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/items/offsets.2da"
+RET_ARRAY item_offsets = table END
+
+LAF load_offsets_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/items/header_offsets.2da"
+RET_ARRAY item_header_offsets = table END
+
+//Arrays.
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/types.2da"
+RET_ARRAY item_types = array END
+
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/flags.2da"
+RET_ARRAY item_flags = array END
+
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/proficiencies.2da"
+RET_ARRAY item_proficiencies = array END
+
+
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION get_item_size RET size BEGIN
+    OUTER_SET size = 0x72
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_item_header_size RET size BEGIN
+    OUTER_SET size = 0x38
+END
+
+//Basic reading functions.
+DEFINE_PATCH_FUNCTION get_item_header_count RET count BEGIN
+    READ_SHORT 0x68 count
+END
+
+DEFINE_PATCH_FUNCTION get_item_headers_offset RET offset BEGIN
+    READ_LONG 0x64 offset
+END
+
+DEFINE_PATCH_FUNCTION get_item_opcodes_offset RET offset BEGIN
+    READ_LONG 0x6a offset
+END
+
+DEFINE_PATCH_FUNCTION get_equipped_opcode_count RET count BEGIN
+    READ_SHORT 0x70 count
+END
+
+//Equipped opcode functions.
+DEFINE_PATCH_FUNCTION get_equipped_opcode_offset INT_VAR index = 0 RET offset BEGIN
+    LPF get_opcode_size RET opcode_size = size END
+    LPF get_equipped_opcode_count RET opcode_count = count END
+    offset = 0 - 1
+
+    PATCH_IF (0 <= index) AND (index < opcode_count) BEGIN
+        LPF get_item_opcodes_offset RET op_start = offset END
+        //Read index into equipped opcodes block: ought to be zero.
+        READ_SHORT 0x6e op_index
+        offset = op_start + (op_index + index) * opcode_size
+    END
+END
+
+//Item header functions.
+DEFINE_PATCH_FUNCTION get_item_header_offset INT_VAR header = 0 RET offset BEGIN
+    LPF get_item_header_size RET item_header_size = size END
+    LPF get_item_header_count RET headers_count = count END
+    LPF get_item_headers_offset RET headers_offset = offset END
+    offset = 0 - 1
+
+    PATCH_IF (0 <= header ) AND (header < headers_count) BEGIN
+        offset = headers_offset + (header * item_header_size)
+    END
+END
+
+//Item header opcode functions.
+DEFINE_PATCH_FUNCTION get_item_header_opcode_count INT_VAR header = 0 RET count BEGIN
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+    count = 0 - 1
+
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        READ_SHORT (header_offset + 0x1e) count
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_item_header_opcode_block_offset INT_VAR header = 0 RET offset BEGIN
+    LPF get_opcode_size RET opcode_size = size END
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+    offset = 0 - 1
+
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        LPF get_item_opcodes_offset RET op_start = offset END
+        //Read from opcode index field.
+        READ_SHORT (header_offset + 0x20) op_index
+        offset = op_start + op_index * opcode_size
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_item_header_opcode_offset INT_VAR header = 0 index = 0 RET offset BEGIN
+    LPF get_opcode_size RET opcode_size = size END
+    LPF get_item_header_offset INT_VAR header = header RET header_offset = offset END
+    offset = 0 - 1
+
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        LPF get_item_header_opcode_count INT_VAR header = header RET op_count = count END
+        PATCH_IF (0 <= index) AND (index < op_count) BEGIN
+            LPF get_item_opcodes_offset RET op_start = offset END
+            //Read from opcode index field.
+            READ_SHORT (header_offset + 0x20) op_index
+            offset = op_start + (op_index + index) * opcode_size
+        END
+    END
+END
+
+//Readers and writers.
+DEFINE_PATCH_FUNCTION get_item_field STR_VAR field = "" RET value BEGIN
+    LPF get_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "item_offsets"
+    RET value END
+END
+
+DEFINE_PATCH_FUNCTION set_item_field STR_VAR field = "" value = "" BEGIN
+    LPF set_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "item_offsets"
+        value = "%value%"
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_item_header_field INT_VAR header = 0 STR_VAR field = "" RET value BEGIN
+    LPF get_item_header_offset INT_VAR
+        header = header
+    RET offset END
+
+    //Sanitize.
+    PATCH_IF (0 - 1 = offset) BEGIN
+        PATCH_FAIL "get_item_header_field: header '%header%' out of bounds."
+    END
+
+    LPF get_field_at INT_VAR
+        offset = offset
+    STR_VAR
+        field = "%field%"
+        offsets = "item_header_offsets"
+    RET value END
+END
+
+DEFINE_PATCH_FUNCTION set_item_header_field INT_VAR header = 0 STR_VAR field = "" value = "" BEGIN
+    LPF get_item_header_offset INT_VAR
+        header = header
+    RET offset END
+
+    //Sanitize.
+    PATCH_IF (0 - 1 = offset) BEGIN
+        PATCH_FAIL "set_item_header_field: header '%header%' out of bounds."
+    END
+
+    LPF set_field_at INT_VAR
+        offset = offset
+    STR_VAR
+        field = "%field%"
+        offsets = "item_header_offsets"
+        value = "%value%"
+    END
+END
+
+//Getters.
+DEFINE_DIMORPHIC_FUNCTION get_item_type_id STR_VAR value = "" RET id BEGIN
+    LAF get_array_element STR_VAR
+        array = "item_types"
+        key = "%value%"
+    RET type = value END
+
+    OUTER_SET id = 0 - 1
+    ACTION_IF NOT ("%type%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_SET id = type
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_proficiency_id STR_VAR proficiency = "" RET id BEGIN
+    LAF get_array_element STR_VAR
+        array = "item_proficiencies"
+        key = "%proficiency%"
+    RET prof = value END
+
+    OUTER_SET id = 0 - 1
+    ACTION_IF NOT ("%prof%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_SET id = prof
+    END
+END
+
+//Patches for itemexcl.2da.
+DEFINE_PATCH_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item = "" BEGIN
+    //Existence check.
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%item%.itm") BEGIN
+        PATCH_FAIL "set_item_exclusion: resource '%item%.itm' does not exist in game."
+    END
+
+    LPF find_row_index STR_VAR key = "%item%" RET row = index END
+    PATCH_IF NOT (row = 0 - 1) BEGIN
+        //Set value.
+        SET_2DA_ENTRY row 1 2 exclusion
+    END ELSE BEGIN
+        //Insert row.
+        COUNT_2DA_ROWS 2 rows
+        INSERT_2DA_ROW rows 2 "%item% %exclusion%"
+    END
+END
+
+//Patches for tooltip.2da.
+DEFINE_PATCH_FUNCTION set_ability_tooltip INT_VAR
+    ability1 = 0 - 1
+    ability2 = 0 - 1
+    ability3 = 0 - 1
+STR_VAR
+    item = ""
+BEGIN
+    //Existence checks.
+    PATCH_IF NOT (FILE_EXISTS_IN_GAME "%item%.itm") BEGIN
+        PATCH_FAIL "set_ability_tooltip: item '%item%.itm' does not exist in-game."
+    END
+
+    COUNT_2DA_COLS cols
+    //Find index of item.
+    LPF find_row_index STR_VAR key = "%item%" RET row = index END
+    
+    //Insert new row if not found.
+    PATCH_IF (row = 0 - 1) BEGIN
+        //Only insert row if at least one argument is different from -1.
+        PATCH_IF (NOT (ability1 = 0 - 1)) OR (NOT (ability2 = 0 - 1)) OR (NOT (ability3 = 0 - 1)) BEGIN
+            //Set index to last row.
+            COUNT_2DA_ROWS cols row
+
+            //Compose row.
+            LPF repeat_string INT_VAR
+                times = (cols - 1)
+            STR_VAR
+                value = "-1"
+            RET_ARRAY strings = list END
+            LPF join_strings STR_VAR strings = "strings" RET string END
+            
+            //Append row.
+            INSERT_2DA_ROW row cols "%item% %string%"
+        END
+    END
+
+    //Patch in refs.
+    PATCH_IF NOT (0 - 1 = ability1) BEGIN
+        //Resolve tra reference and write it.
+        ref = RESOLVE_STR_REF ((AT ability1))
+        SET_2DA_ENTRY row 1 cols "%ref%"
+    END
+
+    PATCH_IF NOT (0 - 1 = ability2) BEGIN
+        //Resolve tra reference and write it.
+        ref = RESOLVE_STR_REF ((AT ability2))
+        SET_2DA_ENTRY row 2 cols "%ref%"
+    END
+
+    PATCH_IF NOT (0 - 1 = ability3) BEGIN
+        //Resolve tra reference and write it.
+        ref = RESOLVE_STR_REF ((AT ability3))
+        SET_2DA_ENTRY row 3 cols "%ref%"
+    END
+END

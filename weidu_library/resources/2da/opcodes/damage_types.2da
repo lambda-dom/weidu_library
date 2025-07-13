@@ -1,0 +1,13 @@
+crush       0
+acid        1
+cold        2
+electricity 4
+fire        8
+pierce      16
+poison      32
+magic       64
+missile     128
+slash       256
+magic_fire  512
+magic_cold  1024
+stun        2048
