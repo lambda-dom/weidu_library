@@ -1,0 +1,10 @@
+none            0
+self            1
+projectile      2
+party           3
+everyone        4
+except_party    5
+caster_group    6
+target_group    7
+except_caster   8
+caster          9

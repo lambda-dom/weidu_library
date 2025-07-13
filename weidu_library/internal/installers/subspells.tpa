@@ -1,0 +1,95 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+//Needed for spell defaults.
+INCLUDE "%WEIDU_LIBRARY_DIR%/internal/installers/spells.tpa"
+
+
+DEFINE_ACTION_FUNCTION clone_spell STR_VAR
+    resource = "*"
+    dir = "*"
+    destination = ""
+    ext = "*"
+    patch = "*"
+    fields = ""
+BEGIN
+    //Ignore argument and set dir where subspells to clone are located.
+    OUTER_TEXT_SPRINT dir "%WEIDU_LIBRARY_DIR%/resources/spl/subspells"
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "clone_spell: directory '%dir%' of spells to clone does not exist."
+    END
+
+    //Set tra.
+    OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/languages/%LANGUAGE%/subspells/subspells.tra"
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "clone_spell: tra '%tra%' of clone descriptions does not exist."
+    END
+
+    //Subspells table.
+    LAF load_table STR_VAR
+        file = "%WEIDU_LIBRARY_DIR%/resources/2da/subspells/subspells.2da"
+        fields = "subspell:arg1:arg2:arg3:patcher"
+    RET_ARRAY subspells = table END
+
+    //Subspell patches.
+    INCLUDE "%WEIDU_LIBRARY_DIR%/internal/installers/subspells/patches.tpa"
+
+    WITH_TRA "%tra%" BEGIN
+        //Inject names from fields.
+        OUTER_TEXT_SPRINT subspell $"%fields%"("subspell")
+        OUTER_TEXT_SPRINT arg1 $"%fields%"("arg1")
+        OUTER_TEXT_SPRINT arg2 $"%fields%"("arg2")
+        OUTER_TEXT_SPRINT arg3 $"%fields%"("arg3")
+
+        //Find spell to clone.
+        LAF find_table_row STR_VAR
+            table = "subspells"
+            field = "subspell"
+            key = "%subspell%"
+        RET index = index END
+
+        ACTION_IF (0 - 1 = index) BEGIN
+            FAIL "clone_spell: subspell '%subspell%' not in the subspells table."
+        END
+
+        LAF get_row_from_table INT_VAR
+            row = index
+        STR_VAR
+            table = "subspells"
+        RET_ARRAY subspell_row = array END
+
+        //Inject names.
+        OUTER_TEXT_SPRINT patcher $"subspell_row"("patcher")
+
+        //Set source and sanitize.
+        OUTER_TEXT_SPRINT source "%dir%/%subspell%.spl"
+        ACTION_IF NOT (FILE_EXISTS "%source%") BEGIN
+            FAIL "clone_spell: resource '%source%' for subspell '%subspell%' to clone not found."
+        END
+
+        //Copy.
+        COPY "%source%" "override/%destination%.spl"
+            //Correct self-references.
+            LPF ALTER_EFFECT INT_VAR
+                silent = 1
+            STR_VAR
+                match_resource = "self#res"
+                resource = "%destination%"
+            END
+
+            //Call table patch.
+            PATCH_IF NOT ("%patcher%" STRING_EQUAL_CASE "*") BEGIN
+                LPF "%patcher%" STR_VAR arg1 = "%arg1%" arg2 = "%arg2%" arg3 = "%arg3%" END
+            END
+
+            //Patch-in fields.
+            LPF write_spell_fields STR_VAR array = "remainder" END
+            
+            //Call user patch.
+            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                LPF "%patch%" STR_VAR
+                    destination = "%destination%"
+                END
+            END
+    END
+END

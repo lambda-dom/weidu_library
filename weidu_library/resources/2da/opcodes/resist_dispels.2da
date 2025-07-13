@@ -1,0 +1,4 @@
+natural             0
+dispel_not_ignore   1
+not_dispel_ignore   2
+dispel_ignore       3

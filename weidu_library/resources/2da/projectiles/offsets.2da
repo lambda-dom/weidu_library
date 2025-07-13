@@ -1,0 +1,19 @@
+2DA V1.0
+*
+                    offset  reader          writer
+type                0x0008  read_short      write_short
+speed               0x000a  read_short      write_short
+sparkle_flags       0x000c  read_long       write_long
+fire_sound          0x0010  read_resource   write_resource
+impact_sound        0x0018  read_resource   write_resource
+source_animation    0x0020  read_resource   write_resource
+particle_color      0x0028  read_short      write_short
+ee_flags            0x002c  read_long       write_long
+projectile_flags    0x0100  read_long       write_long
+travel_animation    0x0104  read_resource   write_resource
+area_flags          0x0200  read_long       write_long
+trigger_radius      0x0204  read_short      write_short
+explosion_size      0x0206  read_short      write_short
+explosion_sound     0x0208  read_resource   write_resource
+explosion_delay     0x0210  read_short      write_short
+trigger_count       0x0216  read_byte       write_byte

@@ -1,0 +1,8 @@
+break_invis         9
+hostile             10
+outdoors            13
+ignore_dead         14
+ignore_wild         15
+non_combat          16
+target_invisible    24
+cast_silenced       25

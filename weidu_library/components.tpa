@@ -1,0 +1,89 @@
+//Installers.
+DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT = "" BEGIN
+    //Clear on entry.
+    CLEAR_ARRAYS
+    CLEAR_CODES
+    CLEAR_INLINED
+    CLEAR_IDS_MAP
+
+    //Check variable set.
+    ACTION_IF NOT (VARIABLE_IS_SET WEIDU_LIBRARY_DIR) BEGIN
+        FAIL "install_component: variable 'WEIDU_LIBRARY_DIR' not set."
+    END
+
+    //Check component name validity.
+    ACTION_IF NOT (("%COMPONENT%" STRING_MATCHES_REGEXP "[a-z][a-z0-9_-]+") = 0) THEN BEGIN
+        FAIL "install_component: string '%COMPONENT%' is not a valid component name: cannot have spaces, must be lower-cased, etc."
+    END
+
+    //Main component file.
+    OUTER_TEXT_SPRINT main "%MOD_FOLDER%/components/%COMPONENT%/main.tpa"
+    ACTION_IF NOT (FILE_EXISTS "%main%") BEGIN
+        FAIL "install_component: main component file '%main%' does not exist."
+    END
+
+    //Main tra file.
+    OUTER_TEXT_SPRINT tra "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%/main.tra"
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "install_component: main component tra file '%tra%' does not exist."
+    END
+
+    WITH_TRA "%tra%" BEGIN
+        WITH_SCOPE BEGIN
+            INCLUDE "%main%"
+        END
+    END
+END
+
+//Component functions.
+DEFINE_DIMORPHIC_FUNCTION get_component_root RET dir BEGIN
+    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/components/%COMPONENT%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_component_main RET file BEGIN
+    OUTER_TEXT_SPRINT file "%MOD_FOLDER%/components/%COMPONENT%/main.tpa"
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_component_resources_dir RET dir BEGIN
+    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/components/%COMPONENT%/resources"
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_component_tra_dir RET dir BEGIN
+    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_component_tra_main RET file BEGIN
+    OUTER_TEXT_SPRINT file "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%/main.tra"
+END
+
+
+//Action functions.
+DEFINE_ACTION_FUNCTION install_subcomponent STR_VAR subcomponent = "" tra = "*" BEGIN
+    //Clear on entry.
+    CLEAR_ARRAYS
+    CLEAR_CODES
+    CLEAR_INLINED
+    CLEAR_IDS_MAP
+
+    //Set tra file.
+    ACTION_IF ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/resources/tra/empty.tra"
+    END
+    
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%subcomponent%") BEGIN
+        FAIL "install_subcomponent: subcomponent file '%subcomponent%' does not exist."
+    END
+
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "install_subcomponent: tra file '%tra%' does not exist."
+    END
+
+    //Re-include components library to be able to chain calls.
+    INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
+
+    //Load subcomponent.
+    WITH_TRA "%tra%" BEGIN
+        INCLUDE "%subcomponent%"
+    END
+END

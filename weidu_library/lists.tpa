@@ -1,0 +1,75 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/strings.tpa"
+
+
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION get_list_count STR_VAR list = "" RET count BEGIN
+    OUTER_SET count = 0
+    ACTION_PHP_EACH "%list%" AS _ => _ BEGIN
+        OUTER_SET count += 1
+    END
+END
+
+//Builders.
+DEFINE_DIMORPHIC_FUNCTION repeat_string INT_VAR times = 1 STR_VAR value = "" RET_ARRAY list BEGIN
+    //Sanitize argument.
+    ACTION_IF (times < 0) BEGIN
+        FAIL "repeat_string: argument '%times%' must be positive."
+    END
+
+    //Construct list.
+    ACTION_DEFINE_ARRAY list BEGIN END
+    OUTER_FOR (i = 0; i < times; ++i) BEGIN
+        OUTER_TEXT_SPRINT $"list"("%i%") "%value%"
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION list_from_string STR_VAR string = "" separator = ":" RET count RET_ARRAY list BEGIN
+    //Sanitize separator.
+    OUTER_TEXT_SPRINT regexp "%separator%"
+    ACTION_IF NOT (1 = STRING_LENGTH "%regexp%") BEGIN
+        FAIL "list_from_string: separator '%separator%' must be 1-character long."
+    END
+
+    ACTION_DEFINE_ARRAY list BEGIN END
+    OUTER_SET count = 0
+    OUTER_TEXT_SPRINT tail "%string%"
+
+    //Loop.
+    OUTER_WHILE (0 < (STRING_LENGTH "%tail%")) BEGIN
+        //Find separator.
+        OUTER_SET index = INDEX ("%regexp%" "%tail%")
+        ACTION_IF NOT (0 - 1 = index) BEGIN
+            //Split string.
+            OUTER_SNPRINT index elem "%tail%"
+            OUTER_SNPRINT 0 - ((STRING_LENGTH "%tail%") - index - 1) tail "%tail%"
+            //Strip whitespace and add it to list.
+            LAF strip STR_VAR value = "%elem%" RET elem = string END
+            OUTER_TEXT_SPRINT $"list"("%count%") "%elem%"
+            OUTER_SET count += 1
+        END ELSE BEGIN
+            //Strip whitespace and add it to list.
+            LAF strip STR_VAR value = "%tail%" RET tail = string END
+            OUTER_TEXT_SPRINT $"list"("%count%") "%tail%"
+            OUTER_SET count += 1
+            //Clear it.
+            OUTER_TEXT_SPRINT tail ""
+        END
+    END
+END
+
+//Folds.
+DEFINE_DIMORPHIC_FUNCTION join_strings STR_VAR strings = "" separator = " " RET string BEGIN
+    LAF get_list_count STR_VAR list = "%strings%" RET count END
+
+    //Construct string.
+    ACTION_IF (count = 0) BEGIN
+        OUTER_TEXT_SPRINT string ""
+    END ELSE BEGIN
+        OUTER_TEXT_SPRINT string $"%strings%"("0")
+        OUTER_FOR (i = 1 ; i < count ; ++i) BEGIN
+            OUTER_TEXT_SPRINT rvalue $"%strings%"("%i%")
+            OUTER_TEXT_SPRINT string "%string%%separator%%rvalue%"
+        END
+    END
+END

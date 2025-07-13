@@ -1,0 +1,19 @@
+2DA V1.0
+*
+                extension   template            module              writer              handler                fields
+table           2da         tables              tables.tpa          copy_table          *                      *
+icon            bam         icons               resources.tpa       copy_resource       *                      *
+script          baf         scripts             scripts.tpa         compile_script      *                      *
+dialog          d           dialogs             dialogs.tpa         compile_dialog      *                      *
+creature        cre         creatures           creatures.tpa       copy_creature       *                      name:power:first_class:second_class:str:str_bonus:dex:con:int:wis:chr:hps:ac:thac0:apr:saves_spell:saves_breath:saves_death:saves_wand:saves_polymorph:resist_magic:resist_fire:resist_cold:resist_electricity:resist_acid:resist_slash:resist_crush:resist_pierce:resist_missile:ea:general:race:class:specific:gender:align
+copy_effect     eff         copy_effects        resources.tpa       copy_resource       *                      *
+create_effect   eff         create_effects      create_effects.tpa  create_effect       *                      opcode:target:parameter1:parameter2:parameter3:parameter4:power:timing:duration:probability1:probability2:dicenumber:dicesize:savingthrow:savebonus:resist_dispel:special:resource:resource2:resource3:projectile:school:sectype
+patch_item      itm         items               items.tpa           patch_item          item_post_processing   name:description:id_name:id_description:type:proficiency:flags:inventory_icon:ground_icon:description_icon:price:stack:lore:weight:enchantment:exclusion:ability1:ability2:ability3
+item            itm         items               items.tpa           copy_item           item_post_processing   name:description:id_name:id_description:type:proficiency:flags:inventory_icon:ground_icon:description_icon:price:stack:lore:weight:enchantment:exclusion:ability1:ability2:ability3
+add_projectile  pro         add_projectiles     projectiles.tpa     copy_add_projectile *                      label:clearair
+copy_projectile pro         copy_projectiles    resources.tpa       copy_resource       *                      *
+add_symbol      spl         add_symbols         symbols.tpa         add_symbol          *                      type:level
+spell           spl         spells              spells.tpa          copy_spell          *                      name:description:type:level:flags:school:sectype:book_icon:ability_icon:projectile
+subspell        spl         subspells           subspells.tpa       clone_spell         *                      subspell:name:description:arg1:arg2:arg3:school:sectype
+animation       vvc         animations          animations.tpa      copy_animation      *                      animation
+sound           wav         sounds              resources.tpa       copy_resource       *                      *

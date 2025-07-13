@@ -1,0 +1,29 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
+
+
+//Generic resource writer.
+DEFINE_ACTION_FUNCTION compile_script STR_VAR
+    resource = ""
+    dir = ""
+    destination = "*"
+    ext = "*"
+    patch = "*"
+    fields = "*"
+BEGIN
+    //Source and destination.
+    OUTER_TEXT_SPRINT source "%dir%/%resource%.baf"
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%source%") BEGIN
+        FAIL "compile_script: source '%source%' of resource '%resource%' does not exist."
+    END
+
+    //Compile script.
+    COMPILE "%source%"
+        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+            LPF "%patch%" STR_VAR
+                destination = "%destination%"
+            END
+        END
+END

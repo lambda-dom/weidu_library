@@ -1,0 +1,4 @@
+2DA V1.0
+*
+            install name    descr   id_name id_desc type    prof    flags       inventory_icon  ground_icon description_icon    price   stack   lore    weight  enchant exclusion  ability1 ability2    ability3    patch   override    destination
+resource    1       *       *       *       *       *       *       0000000000  *               *           *                   0       1       0       0       0       0          -1       -1          -1          *       0           *

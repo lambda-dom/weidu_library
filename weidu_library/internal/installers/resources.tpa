@@ -1,0 +1,30 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
+
+
+//Generic resource writer.
+DEFINE_ACTION_FUNCTION copy_resource STR_VAR
+    resource = ""
+    dir = ""
+    destination = ""
+    ext = ""
+    patch = "*"
+    fields = "*"
+BEGIN
+    //Source and destination.
+    OUTER_TEXT_SPRINT source "%dir%/%resource%.%ext%"
+    OUTER_TEXT_SPRINT dest "%destination%.%ext%"
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%source%") BEGIN
+        FAIL "copy_resource: source '%source%' of resource '%resource%' does not exist."
+    END
+
+    //Copy file.
+    COPY "%source%" "override/%dest%"
+        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+            LPF "%patch%" STR_VAR
+                destination = "%destination%"
+            END
+        END
+END

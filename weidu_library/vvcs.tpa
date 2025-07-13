@@ -1,0 +1,37 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/generic.tpa"
+
+
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION get_vvc_size RET size BEGIN
+    FAIL "get_vvc_size: not imlemented yet."
+END
+
+
+//Constants.
+//Tables.
+LAF load_offsets_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/vvcs/offsets.2da"
+RET_ARRAY vvc_offsets = table END
+
+
+//Readers and writers.
+DEFINE_PATCH_FUNCTION get_vvc_field STR_VAR field = "" RET value BEGIN
+    LPF get_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "vvc_offsets"
+    RET value END
+END
+
+DEFINE_PATCH_FUNCTION set_vvc_field STR_VAR field = "" value = "" BEGIN
+    LPF set_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "vvc_offsets"
+        value = "%value%"
+    END
+END

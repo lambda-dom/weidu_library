@@ -1,0 +1,46 @@
+//Stripping functions.
+DEFINE_DIMORPHIC_FUNCTION strip_left STR_VAR value = "" RET string BEGIN
+    OUTER_TEXT_SPRINT regexp "[^ %TAB%]"
+    OUTER_TEXT_SPRINT string "%value%"
+
+    OUTER_SET index = INDEX (CASE_INSENSITIVE EVALUATE_REGEXP "%regexp%" "%value%")
+    ACTION_IF NOT (0 - 1 = index) BEGIN
+        OUTER_SNPRINT 0 - ((STRING_LENGTH "%value%") - index) string "%value%"
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION strip_right STR_VAR value = "" RET string BEGIN
+    OUTER_TEXT_SPRINT regexp "[^ %TAB%]"
+    OUTER_TEXT_SPRINT string "%value%"
+
+    OUTER_SET index = RINDEX (CASE_INSENSITIVE EVALUATE_REGEXP "%regexp%" "%value%")
+    ACTION_IF NOT (0 - 1 = index) BEGIN
+        OUTER_SNPRINT (index + 1) string "%value%"
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION strip STR_VAR value = "" RET string BEGIN
+    LAF strip_left STR_VAR value = "%value%" RET value = string END
+    LAF strip_right STR_VAR value = "%value%" RET string END
+END
+
+//Listing.
+DEFINE_DIMORPHIC_FUNCTION get_chars STR_VAR value = "" RET count RET_ARRAY list BEGIN
+    ACTION_DEFINE_ARRAY list BEGIN END
+
+    OUTER_PATCH "%value%" BEGIN
+        //Initialize.
+        count = STRING_LENGTH "%value%"
+        TEXT_SPRINT buffer "_"
+        TEXT_SPRINT char ""
+
+        //Loop through the string.
+        FOR (i = 0; i < count; ++i) BEGIN
+            READ_BYTE i c
+            INNER_PATCH_SAVE char "%buffer%" BEGIN
+                WRITE_BYTE 0 c
+            END
+            TEXT_SPRINT $list("%i%") "%char%"
+        END
+    END
+END

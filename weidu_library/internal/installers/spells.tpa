@@ -1,0 +1,228 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Tables.
+LAF load_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/school_defaults.2da"
+    fields = "school:animation:priest:wizard:opposite"
+RET_ARRAY defaults = table END
+
+//Arrays
+LAF array_from_table STR_VAR
+    table = "defaults"
+    key = "school"
+    value = "animation"
+RET_ARRAY animations = array END
+
+LAF array_from_table STR_VAR
+    table = "defaults"
+    key = "school"
+    value = "priest"
+RET_ARRAY sounds_priest = array END
+
+LAF array_from_table STR_VAR
+    table = "defaults"
+    key = "school"
+    value = "priest"
+RET_ARRAY sounds_wizard = array END
+
+LAF array_from_table STR_VAR
+    table = "defaults"
+    key = "school"
+    value = "opposite"
+RET_ARRAY opposites = array END
+
+
+//Auxiliary encoders.
+DEFINE_PATCH_FUNCTION encode_ability_icon STR_VAR value = "" RET return BEGIN
+    //Compute reference.
+    LPF encode_bam_ref STR_VAR
+        value = "%value%"
+    RET return END
+    
+    //Write to ability headers.
+    LPF get_spell_header_count RET headers_count = count END
+    FOR (i = 0; i < headers_count; ++i) BEGIN
+        LPF set_spell_header_field INT_VAR
+            header = i
+        STR_VAR
+            field = "icon"
+            value = "%return%"
+        END
+    END
+
+    //Return nothing.
+    TEXT_SPRINT return "*"
+END
+
+DEFINE_PATCH_FUNCTION encode_projectile_header STR_VAR value = "" RET return BEGIN
+    //Get projectile.
+    LPF encode_projectile_ref STR_VAR
+        value = "%value%"
+    RET id = return END
+
+    //Write out projectile numbers.
+    LPF get_spell_header_count RET headers_count = count END
+    FOR (i = 0; i < headers_count; ++i) BEGIN
+        LPF get_spell_header_offset INT_VAR
+            header = i
+        RET header_offset = offset END
+
+        LPF set_spell_header_field INT_VAR
+            offset = header_offset
+        STR_VAR
+            field = "projectile"
+            value = "%id%"
+        END
+    END
+
+    //Return nothing.
+    TEXT_SPRINT return "*"
+END
+
+DEFINE_PATCH_FUNCTION encode_spell_flags_mask STR_VAR value = "" RET return BEGIN
+    LPF encode_spell_flags STR_VAR value = "%value%" RET lhand = return END
+    LPF get_spell_field STR_VAR field = "flags" RET rhand = value END
+    value = lhand BOR rhand
+    LPF set_spell_field STR_VAR field = "flags" value = "%value%" END
+    TEXT_SPRINT return "*"
+END
+
+//Auxiliary patchers.
+DEFINE_PATCH_FUNCTION write_spell_defaults STR_VAR fields = "" BEGIN
+    //Extract arguments.
+    TEXT_SPRINT school $"%fields%"("school")
+    TEXT_SPRINT type $"%fields%"("type")
+
+    PATCH_IF NOT ("%school%" STRING_EQUAL_CASE "*") BEGIN
+        //Normalize.
+        TO_LOWER school
+        TO_LOWER type
+
+        //Set animation if known school.
+        LPF get_array_element STR_VAR
+            array = "animations"
+            key = "%school%"
+        RET animation = value END
+        
+        PATCH_IF NOT ("%animation%" STRING_EQUAL_CASE "*") BEGIN
+            LPF set_spell_field STR_VAR
+                field = "animation"
+                value = "%animation%"
+            END
+        END
+
+        //Set sound if known school and type priest or wizard.
+        PATCH_IF ("%type%" STRING_EQUAL_CASE "priest") OR ("%type%" STRING_EQUAL_CASE "wizard") BEGIN
+            LPF get_array_element STR_VAR
+                array = "sounds_%type%"
+                key = "%school%"
+            RET sound = value END
+
+            PATCH_IF NOT ("%sound%" STRING_EQUAL_CASE "*") BEGIN
+                LPF set_spell_field STR_VAR
+                    field = "sound"
+                    value = "%sound%"
+                END
+            END
+        END
+
+        //Set opposition school if known school and type wizard.
+        PATCH_IF ("%type%" STRING_EQUAL_CASE "wizard") BEGIN
+            LPF get_array_element STR_VAR
+                array = "opposites"
+                key = "%school%"
+            RET bit_index = value END
+
+            LPF get_spell_field STR_VAR
+                field = "exclusion"
+            RET exclusion = value END
+
+            exclude_flags = exclusion BOR (1 << bit_index)
+
+            LPF set_spell_field STR_VAR
+                field = "exclusion"
+                value = "%exclude_flags%"
+            END
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION write_spell_fields STR_VAR fields = "" BEGIN
+    DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
+        "name"          => "encode_tra_ref"
+        "description"   => "encode_tra_ref"
+        "type"          => "encode_spell_type"
+        "level"         => "encode_spell_level"
+        "flags"         => "encode_spell_flags_mask"
+        "school"        => "encode_school"
+        "sectype"       => "encode_sectype"
+        "book_icon"     => "encode_bam_ref"
+        "ability_icon"  => "encode_ability_icon"
+        "projectile"    => "encode_projectile_header"
+    END
+
+    PHP_EACH "%fields%" AS field => value BEGIN
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            //Get encoder.
+            LPF get_array_element STR_VAR
+                array = "encoders"
+                key = "%field%"
+            RET encoder = value END
+
+            //Do nothing on unknown fields.
+            PATCH_IF NOT ("%encoder%" STRING_EQUAL_CASE "*") BEGIN
+                //Write value.
+                LPF "%encoder%" STR_VAR value = "%value%" RET return END
+                PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                    LPF set_spell_field STR_VAR
+                        field = "%field%"
+                        value = "%return%"
+                    END
+                END
+            END
+        END
+    END
+END
+
+DEFINE_ACTION_FUNCTION copy_spell STR_VAR
+    resource = ""
+    dir = ""
+    destination = ""
+    ext = "*"
+    patch = "*"
+    fields = ""
+BEGIN
+    //Source and destination.
+    OUTER_TEXT_SPRINT source "%dir%/%resource%.spl"
+    OUTER_TEXT_SPRINT dest "%destination%.spl"
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%source%") BEGIN
+        FAIL "copy_spell: source '%source%' of resource '%resource%' does not exist."
+    END
+
+    COPY "%source%" "override/%destination%.spl"
+        //Correct self-references.
+        LPF ALTER_EFFECT INT_VAR
+            silent = 1
+        STR_VAR
+            match_resource = "self#res"
+            resource = "%destination%"
+        END
+
+        LPF write_spell_defaults STR_VAR fields = "%fields%" END
+        LPF write_spell_fields STR_VAR fields = "%fields%" END
+
+        //Final patch.
+        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+            LPF "%patch%" STR_VAR
+                destination = "%destination%"
+            END
+        END
+END

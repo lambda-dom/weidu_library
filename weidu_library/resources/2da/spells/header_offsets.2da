@@ -1,0 +1,12 @@
+2DA V1.0
+*
+            offset  reader          writer
+type        0x00    read_byte       write_byte
+flags       0x01    read_byte       write_byte
+location    0x02    read_short      write_short
+icon        0x04    read_resource   write_resource
+target      0x0c    read_byte       write_byte
+range       0x0e    read_short      write_short
+min_level   0x10    read_short      write_short
+speed       0x12    read_short      write_short
+projectile  0x26    read_short      write_short

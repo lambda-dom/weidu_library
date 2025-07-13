@@ -1,0 +1,108 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/creatures.tpa"
+
+
+DEFINE_PATCH_FUNCTION write_cre_fields STR_VAR array = "" BEGIN
+    DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
+        "name"                  => "encode_tra_ref"
+        "power"                 => "encode_cre_level"
+        "first_class"           => "encode_cre_level"
+        "second_class"          => "encode_cre_level"
+        "str"                   => "encode_cre_stat"
+        "dex"                   => "encode_cre_stat"
+        "con"                   => "encode_cre_stat"
+        "int"                   => "encode_cre_stat"
+        "wis"                   => "encode_cre_stat"
+        "chr"                   => "encode_cre_stat"
+        "str_bonus"             => "encode_percentage"
+        "hps"                   => "encode_positive"
+        "ac"                    => "encode_cre_ac"
+        "thac0"                 => "encode_cre_thac0"
+        "apr"                   => "encode_cre_apr"
+        "saves_spell"           => "encode_save_bonus"
+        "saves_breath"          => "encode_save_bonus"
+        "saves_death"           => "encode_save_bonus"
+        "saves_wand"            => "encode_save_bonus"
+        "saves_polymorph"       => "encode_save_bonus"
+        "resist_magic"          => "encode_cre_resistance"
+        "resist_fire"           => "encode_cre_resistance"
+        "resist_cold"           => "encode_cre_resistance"
+        "resist_electricity"    => "encode_cre_resistance"
+        "resist_acid"           => "encode_cre_resistance"
+        "resist_slash"          => "encode_cre_resistance"
+        "resist_crush"          => "encode_cre_resistance"
+        "resist_pierce"         => "encode_cre_resistance"
+        "resist_missile"        => "encode_cre_resistance"
+        "ea"                    => "encode_cre_ea"
+        "general"               => "encode_cre_general"
+        "race"                  => "encode_cre_race"
+        "class"                 => "encode_cre_class"
+        "specific"              => "encode_cre_specific"
+        "gender"                => "encode_cre_gender"
+        "align"                 => "encode_cre_align"
+    END
+
+    PHP_EACH "%array%" AS field => value BEGIN
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            //Get converter.
+            LPF get_array_element STR_VAR
+                array = "encoders"
+                key = "%field%"
+            RET encoder = value END
+
+            //Do nothing with unrecognized fields.
+            PATCH_IF NOT ("%encoder%" STRING_EQUAL_CASE "*") BEGIN
+                //Convert value and side-effect writings.
+                LPF "%encoder%" STR_VAR value = "%value%" RET return END
+
+                PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                    LPF set_cre_field STR_VAR field = "%field%" value = "%return%" END
+
+                    //Set defaults.
+                    PATCH_IF "%field%" STRING_EQUAL_CASE "name" BEGIN
+                        LPF set_cre_field STR_VAR field = "tooltip" value = "%return%" END
+                    END
+
+                    PATCH_IF "%field%" STRING_EQUAL_CASE "hps" BEGIN
+                        LPF set_cre_field STR_VAR field = "max_hps" value = "%return%" END
+                    END
+
+                    PATCH_IF "%field%" STRING_EQUAL_CASE "ac" BEGIN
+                        LPF set_cre_field STR_VAR field = "ac_effective" value = "%return%" END
+                    END
+                END
+            END
+        END
+    END
+END
+
+DEFINE_ACTION_FUNCTION copy_creature STR_VAR
+    resource = ""
+    dir = ""
+    destination = ""
+    ext = "*"
+    patch = "*"
+    fields = ""
+BEGIN
+    //Source.
+    OUTER_TEXT_SPRINT source "%dir%/%resource%.cre"
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%source%") BEGIN
+        FAIL "copy_creature: source '%source%' of resource '%resource%' does not exist."
+    END
+
+    //Copy file.
+    COPY "%source%" "override/%destination%.cre"
+        PATCH_WITH_SCOPE BEGIN
+            LPF write_cre_fields STR_VAR array = "%fields%" END
+
+            //Final patch.
+            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                LPF "%patch%" STR_VAR
+                    destination = "%destination%"
+                END
+            END
+        END
+END

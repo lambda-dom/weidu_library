@@ -1,0 +1,216 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/items.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+
+
+//Extra encoders.
+DEFINE_PATCH_FUNCTION encode_item_inventory_icon STR_VAR value = "" RET return BEGIN
+    LPF encode_bam_ref STR_VAR value = "%value%" RET return END
+    //Write icon to melee and ranged headers.
+    LPF get_item_header_count RET headers_count = count END
+    FOR (i = 0; i < headers_count; ++i) BEGIN
+        LPF get_item_header_field INT_VAR header = i STR_VAR field = "type" RET type = value END
+        PATCH_IF (type = 1) OR (type = 2) BEGIN
+            LPF set_item_header_field INT_VAR header = i STR_VAR field = "icon" value = "%return%" END
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION encode_item_flags_mask STR_VAR value = "" RET return BEGIN
+    LPF encode_item_flags STR_VAR value = "%value%" RET lhand = return END
+    LPF get_item_field STR_VAR field = "flags" RET rhand = value END
+    value = lhand BOR rhand
+    LPF set_item_field STR_VAR field = "flags" value = "%value%" END
+    TEXT_SPRINT return "*"
+END
+
+//Patchers.
+DEFINE_PATCH_FUNCTION write_item_fields STR_VAR array = "" BEGIN
+    DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
+        "name"              => "encode_tra_ref"
+        "description"       => "encode_tra_ref"
+        "id_name"           => "encode_tra_ref"
+        "id_description"    => "encode_tra_ref"
+        "type"              => "encode_item_type"
+        "proficiency"       => "encode_proficiency"
+        "flags"             => "encode_item_flags_mask"
+        "inventory_icon"    => "encode_item_inventory_icon"
+        "ground_icon"       => "encode_bam_ref"
+        "description_icon"  => "encode_bam_ref"
+        "price"             => "encode_positive"
+        "stack"             => "encode_positive"
+        "lore"              => "encode_positive"
+        "weight"            => "encode_positive"
+        "enchantment"       => "encode_positive"
+    END
+
+    PHP_EACH "%array%" AS field => value BEGIN
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            //Get converter.
+            LPF get_array_element STR_VAR
+                array = "encoders"
+                key = "%field%"
+            RET encoder = value END
+
+            //Do nothing with unrecognized fields.
+            PATCH_IF NOT ("%encoder%" STRING_EQUAL_CASE "*") BEGIN
+                //Convert value and side-effect writings.
+                LPF "%encoder%" STR_VAR value = "%value%" RET return END
+
+                PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                    LPF set_item_field STR_VAR field = "%field%" value = "%return%" END
+                END
+            END
+        END
+    END
+END
+
+DEFINE_ACTION_FUNCTION copy_item STR_VAR
+    resource = ""
+    dir = ""
+    destination = ""
+    ext = "*"
+    patch = "*"
+    fields = ""
+BEGIN
+    //Source and destination.
+    OUTER_TEXT_SPRINT source "%dir%/%resource%.itm"
+    OUTER_TEXT_SPRINT dest "%destination%.itm"
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%source%") BEGIN
+        FAIL "write_resource: source '%source%' of resource '%resource%' does not exist."
+    END
+
+    //Copy file.
+    COPY "%source%" "override/%dest%"
+        PATCH_WITH_SCOPE BEGIN
+            LPF write_item_fields STR_VAR array = "%fields%" END
+
+            //Final patch.
+            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                LPF "%patch%" STR_VAR
+                    destination = "%destination%"
+                END
+            END
+        END
+END
+
+DEFINE_ACTION_FUNCTION patch_item STR_VAR
+    resource = ""
+    dir = "*"
+    destination = ""
+    ext = "*"
+    patch = "*"
+    fields = ""
+BEGIN
+    //Source and destination.
+    OUTER_TEXT_SPRINT dest "%destination%.itm"
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%dest%") BEGIN
+        FAIL "patch_item: source '%dest%' for '%resource%' does not exist in game."
+    END
+
+    //Copy file.
+    COPY_EXISTING "%destination%.itm" "override"
+        PATCH_WITH_SCOPE BEGIN
+            LPF write_item_fields STR_VAR array = "%fields%" END
+
+            //Final patch.
+            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                LPF "%patch%" STR_VAR
+                    destination = "%destination%"
+                END
+            END
+        END
+END
+
+//Post processor.
+DEFINE_ACTION_FUNCTION item_post_processing STR_VAR table = "" BEGIN
+    //Patch exclusion flags.
+    WITH_SCOPE BEGIN
+        COPY_EXISTING "itemexcl.2da" "override"
+            //Loop.
+            LPF get_table_row_count STR_VAR table = "%table%" RET row_count = count END
+            FOR (i = 0; i < row_count; ++i) BEGIN
+                LPF get_row_from_table INT_VAR row = i STR_VAR
+                    table = "resources"
+                RET_ARRAY
+                    row = array
+                END
+
+                PATCH_WITH_SCOPE BEGIN
+                    //Inject names in local scope.
+                    TEXT_SPRINT exclusion $"row"("exclusion")
+                    TEXT_SPRINT destination $"row"("destination")
+
+                    PATCH_IF NOT ("%exclusion%" STRING_EQUAL_CASE "*") BEGIN
+                        //Compute destination.
+                        LPF get_resource_ref STR_VAR
+                            ref = "%destination%"
+                        RET destination = resource END
+
+                        //Write out.
+                        LPF set_item_exclusion INT_VAR
+                            exclusion = exclusion
+                        STR_VAR
+                            item = "%destination%"
+                        END
+                    END
+                END
+            END
+        PRETTY_PRINT_2DA
+        BUT_ONLY
+    END
+
+    //Patch in ability tooltips.
+    WITH_SCOPE BEGIN
+        COPY_EXISTING "tooltip.2da" "override"
+            //Loop.
+            LPF get_table_row_count STR_VAR table = "%table%" RET row_count = count END
+            FOR (i = 0; i < row_count; ++i) BEGIN
+                LPF get_row_from_table INT_VAR row = i STR_VAR
+                    table = "resources"
+                RET_ARRAY
+                    row = array
+                END
+
+                PATCH_WITH_SCOPE BEGIN
+                    //Inject names in local scope.
+                    TEXT_SPRINT resource $"row"("resource")
+                    TEXT_SPRINT destination $"row"("destination")
+                    TEXT_SPRINT ability1 $"row"("ability1")
+                    TEXT_SPRINT ability2 $"row"("ability2")
+                    TEXT_SPRINT ability3 $"row"("ability3")
+
+                    //Compute destination.
+                    LPF get_resource_ref STR_VAR
+                        ref = "%destination%"
+                    RET destination = resource END
+
+                    //Sanitize
+                    PATCH_IF NOT (IS_AN_INT ability1) BEGIN
+                        PATCH_FAIL "item_post_processing: '%ability1%' of '%resource%' is not an integer."
+                    END
+
+                    PATCH_IF NOT (IS_AN_INT ability2) BEGIN
+                        PATCH_FAIL "item_post_processing: '%ability2%' of '%resource%' is not an integer."
+                    END
+
+                    PATCH_IF NOT (IS_AN_INT ability3) BEGIN
+                        PATCH_FAIL "item_post_processing: '%ability1%' of '%resource%' is not an integer."
+                    END
+
+                    LPF set_ability_tooltip INT_VAR
+                        ability1 = ability1
+                        ability2 = ability2
+                        ability3 = ability3
+                    STR_VAR item = "%destination%" END
+                END
+            END
+        PRETTY_PRINT_2DA
+        BUT_ONLY
+    END
+END

@@ -1,0 +1,14 @@
+2DA V1.0
+*
+            offset  reader          writer
+name        0x08    read_long       write_long
+sound       0x10    read_resource   write_resource
+flags       0x18    read_long       write_long
+type        0x1c    read_short      write_short
+exclusion   0x1e    read_long       write_long
+animation   0x22    read_short      write_short
+school      0x25    read_byte       write_byte
+sectype     0x27    read_byte       write_byte
+level       0x34    read_long       write_long
+book_icon   0x3a    read_resource   write_resource
+description 0x50    read_long       write_long

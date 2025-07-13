@@ -1,0 +1,222 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/generic.tpa"
+
+
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION get_spell_size RET size BEGIN
+    OUTER_SET size = 0x72
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_spell_header_size RET size BEGIN
+    OUTER_SET size = 0x28
+END
+
+//Constants.
+//Tables.
+LAF load_offsets_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/offsets.2da"
+RET_ARRAY spell_offsets = table END
+
+LAF load_offsets_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/header_offsets.2da"
+RET_ARRAY spell_header_offsets = table END
+
+//Arrays.
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/types.2da"
+RET_ARRAY spell_types = array END
+
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/flags.2da"
+RET_ARRAY spell_flags = array END
+
+
+//Basic reading functions.
+DEFINE_PATCH_FUNCTION get_spell_header_count RET count BEGIN
+    READ_SHORT 0x68 count
+END
+
+DEFINE_PATCH_FUNCTION get_spell_headers_offset RET offset BEGIN
+    READ_LONG 0x64 offset
+END
+
+DEFINE_PATCH_FUNCTION get_spell_opcodes_offset RET offset BEGIN
+    READ_LONG 0x6a offset
+END
+
+DEFINE_PATCH_FUNCTION get_casting_opcode_count RET count BEGIN
+    READ_SHORT 0x70 count
+END
+
+//Getters.
+DEFINE_DIMORPHIC_FUNCTION get_spell_res STR_VAR spell = "" RET resource BEGIN
+    //Protect against garbage.
+    OUTER_SET id = IDS_OF_SYMBOL ("spell" "%spell%")
+
+    OUTER_TEXT_SPRINT resource "*"
+    ACTION_IF NOT (0 - 1 = id) BEGIN
+        LAF RES_NUM_OF_SPELL_NAME STR_VAR spell_name = "%spell%" RET resource = spell_res END
+    END
+
+    //Avoid casing problems.
+    ACTION_TO_LOWER resource
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_spell_type_id STR_VAR value = "" RET id BEGIN
+    LAF get_array_element STR_VAR
+        array = "spell_types"
+        key = "%value%"
+    RET type = value END
+
+    OUTER_SET id = 0 - 1
+    ACTION_IF NOT ("%type%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_SET id = type
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_school_id STR_VAR school = "" RET id BEGIN
+    //Get school.
+    COPY_EXISTING - "mschool.2da" "override"
+        LPF find_row_index STR_VAR key = "%school%" RET id = index END
+    
+    //Correct index to account for 2DA spurious line.
+    ACTION_IF NOT (0 - 1 = id) BEGIN
+        OUTER_SET id -= 1
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_sectype_id STR_VAR sectype = "" RET id BEGIN
+    //Get sectype.
+    COPY_EXISTING - "msectype.2da" "override"
+        LPF find_row_index STR_VAR key = "%sectype%" RET id = index END
+    
+    //Correct index to account for 2DA spurious line.
+    ACTION_IF NOT (0 - 1 = id) BEGIN
+        OUTER_SET id -= 1
+    END
+END
+
+//Casting opcode functions.
+DEFINE_PATCH_FUNCTION get_casting_opcode_offset INT_VAR index = 0 RET offset BEGIN
+    LPF get_opcode_size RET opcode_size = size END
+    offset = 0 - 1
+
+    LPF get_casting_opcode_count RET opcode_count = count END
+    PATCH_IF (0 <= index) AND (index < opcode_count) BEGIN
+        LPF get_spell_opcodes_offset RET op_start = offset END
+        //Read index into equipped opcodes block: should be zero.
+        READ_SHORT 0x6e op_index
+        offset = op_start + (op_index + index) * opcode_size
+    END
+END
+
+//Spell header functions.
+DEFINE_PATCH_FUNCTION get_spell_header_offset INT_VAR header = 0 RET offset BEGIN
+    LPF get_spell_header_size RET spell_header_size = size END
+    LPF get_spell_header_count RET headers_count = count END
+    LPF get_spell_headers_offset RET headers_offset = offset END
+    offset = 0 - 1
+
+    PATCH_IF (0 <= header ) AND (header < headers_count) BEGIN
+        offset = headers_offset + (header * spell_header_size)
+    END
+END
+
+//Spell header opcode functions.
+DEFINE_PATCH_FUNCTION get_spell_header_opcode_count INT_VAR header = 0 RET count BEGIN
+    LPF get_spell_header_offset INT_VAR header = header RET header_offset = offset END
+    count = 0 - 1
+
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        //Read from opcode count field.
+        READ_SHORT (header_offset + 0x1e) count
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_spell_header_opcode_block_offset INT_VAR header = 0 RET offset BEGIN
+    LPF get_opcode_size RET opcode_size = size END
+    LPF get_spell_header_offset INT_VAR header = header RET header_offset = offset END
+    offset = 0 - 1
+
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        LPF get_spell_opcodes_offset RET op_start = offset END
+        //Read from opcode index field.
+        READ_SHORT (header_offset + 0x20) op_index
+        offset = op_start + op_index * opcode_size
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_spell_header_opcode_offset INT_VAR header = 0 index = 0 RET offset BEGIN
+    LPF get_opcode_size RET opcode_size = size END
+    LPF get_spell_header_offset INT_VAR header = header RET header_offset = offset END
+    offset = 0 - 1
+
+    PATCH_IF NOT (header_offset = 0 - 1) BEGIN
+        LPF get_spell_header_opcode_count INT_VAR header = header RET op_count = count END
+        PATCH_IF (0 <= index) AND (index < op_count) BEGIN
+            LPF get_spell_opcodes_offset RET op_start = offset END
+            //Read from opcode index field.
+            READ_SHORT (header_offset + 0x20) op_index
+            offset = op_start + (op_index + index) * opcode_size
+        END
+    END
+END
+
+//Readers and writers.
+DEFINE_PATCH_FUNCTION get_spell_field STR_VAR field = "" RET value BEGIN
+    LPF get_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "spell_offsets"
+    RET value END
+END
+
+DEFINE_PATCH_FUNCTION set_spell_field STR_VAR field = "" value = "" BEGIN
+    LPF set_field_at INT_VAR
+        offset = 0
+    STR_VAR
+        field = "%field%"
+        offsets = "spell_offsets"
+        value = "%value%"
+    END
+END
+
+DEFINE_PATCH_FUNCTION get_spell_header_field INT_VAR header = 0 STR_VAR field = "" RET value BEGIN
+    LPF get_spell_header_offset INT_VAR
+        header = header
+    RET offset END
+
+    //Sanitize.
+    PATCH_IF (0 - 1 = offset) BEGIN
+        PATCH_FAIL "get_spell_header_field: header '%header%' out of bounds."
+    END
+
+    LPF get_field_at INT_VAR
+        offset = offset
+    STR_VAR
+        field = "%field%"
+        offsets = "spell_header_offsets"
+    RET value END
+END
+
+DEFINE_PATCH_FUNCTION set_spell_header_field INT_VAR header = 0 STR_VAR field = "" value = "" BEGIN
+    LPF get_spell_header_offset INT_VAR
+        header = header
+    RET offset END
+
+    //Sanitize.
+    PATCH_IF (0 - 1 = offset) BEGIN
+        PATCH_FAIL "set_spell_header_field: header '%header%' out of bounds."
+    END
+
+    LPF set_field_at INT_VAR
+        offset = offset
+    STR_VAR
+        field = "%field%"
+        offsets = "spell_header_offsets"
+        value = "%value%"
+    END
+END
