@@ -5,6 +5,17 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
 
 
 //Spell patchers.
+DEFINE_PATCH_FUNCTION add_display_string INT_VAR tra_ref = 0 insert_point = 0 - 1 BEGIN
+    tlk_ref = RESOLVE_STR_REF ((AT tra_ref))
+    LPF ADD_SPELL_EFFECT INT_VAR
+        opcode = 139                        //Display string.
+        parameter1 = tlk_ref
+        timing = 1                          //Instantaneous.
+        target = 2                          //Other.
+        insert_point = insert_point
+    END
+END
+
 DEFINE_PATCH_FUNCTION clone_to_display_string INT_VAR
     check_headers = 1
     check_globals = 0
@@ -31,17 +42,6 @@ BEGIN
     STR_VAR
         resource = ""                       //Clean.
         insert = "%insert%"
-    END
-END
-
-DEFINE_PATCH_FUNCTION add_display_string INT_VAR tra_ref = 0 insert_point = 0 - 1 BEGIN
-    tlk_ref = RESOLVE_STR_REF ((AT tra_ref))
-    LPF ADD_SPELL_EFFECT INT_VAR
-        opcode = 139                        //Display string.
-        parameter1 = tlk_ref
-        timing = 1                          //Instantaneous.
-        target = 2                          //Other.
-        insert_point = insert_point
     END
 END
 
