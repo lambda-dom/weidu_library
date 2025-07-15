@@ -215,24 +215,24 @@ DEFINE_PATCH_FUNCTION delete_hla STR_VAR hla = "" BEGIN
     //Check if listed hla is a pre-requisite.
     LPF find_row_index INT_VAR col = 7 STR_VAR key = "%hla%" RET is_prereq = index END
     PATCH_IF NOT (is_prereq = 0 - 1) BEGIN
-        PATCH_FAIL "delete_hla: hla '%hla%' is a pre-requisite for other abilities."
+        PATCH_FAIL "delete_hla: hla '%hla%' is a pre-requisite for other hlas."
     END
 
     //Find hla row.
     LPF find_row_index INT_VAR col = 1 STR_VAR key = "%hla%" RET row = index END
-    PATCH_IF NOT (row = 0 - 1) BEGIN
-        COUNT_2DA_COLS cols
-        COUNT_2DA_ROWS cols rows
-
-        //Remove row.
-        REMOVE_2DA_ROW row cols
-
-        //Re-index rows.
-        FOR (i = row; i < rows - 1; ++i) BEGIN
-            SET_2DA_ENTRY i 0 cols (i + 1)
-        END
-    END ELSE BEGIN
+    PATCH_IF (row = 0 - 1) BEGIN
         PATCH_FAIL "delete_hla: hla '%hla%' not listed in table."
+    END
+
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+
+    //Remove row.
+    REMOVE_2DA_ROW row cols
+
+    //Re-index rows.
+    FOR (i = row; i < rows - 1; ++i) BEGIN
+        SET_2DA_ENTRY i 0 cols (i + 1)
     END
 END
 
