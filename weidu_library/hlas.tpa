@@ -232,7 +232,7 @@ DEFINE_PATCH_FUNCTION delete_hla STR_VAR hla = "" BEGIN
             SET_2DA_ENTRY i 0 cols (i + 1)
         END
     END ELSE BEGIN
-        PATCH_WARN "delete_hla: hla '%hla%' not listed in table."
+        PATCH_FAIL "delete_hla: hla '%hla%' not listed in table."
     END
 END
 
