@@ -68,7 +68,7 @@ Adds an `hla` to the HLA table file. If `hla` is already present, the function P
 
 `delete_hla STR_VAR hla`
 
-Deletes an `hla` from the hla table file. If the `hla` to delete is not in the table, the function PATCH_WARN's. If `hla` is a pre-requisite of some other hla, the function PATCH_FAIL's. Note that `hla` must have the form: prefix, underscore, resource name.
+Deletes an `hla` from the hla table file. If the `hla` to delete is not in the table, the function PATCH_FAIL's. If `hla` is a pre-requisite of some other hla, the function PATCH_FAIL's. Note that `hla` must have the form: prefix, underscore, resource name.
 
 note(s):
 * technically, this function only removes the first instance of the `hla`; but if there are two rows with the same hla, the table is malformed.
