@@ -9,6 +9,7 @@ High-level libraries:
 * [Installers](./libraries/installers.md): library to install various kinds of resources.
 * [Kits](./libraries/kits.md): library to patch classes and kits.
 * [HLAs](./libraries/hlas.md): library to patch hla tables.
+* [Patchers](./libraries/patchers.md): library of patchers of all kinds that have found no better place.
 
 Support libraries: libraries providing basic functionality supporting everything else.
 
@@ -31,4 +32,3 @@ Internal libraries: internal libraries, usually low-level, that are not part of 
 
 * [Binary](./libraries/internal/binary.md): library of binary readers and writers.
 * [Encoders](./libraries/internal/encoders.md): library of encoders.
-* [Patchers](./libraries/internal/patchers.md): library of patchers of all kinds.

@@ -5,6 +5,17 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
 
 
 //Spell patchers.
+DEFINE_PATCH_FUNCTION add_display_string INT_VAR tra_ref = 0 insert_point = 0 - 1 BEGIN
+    tlk_ref = RESOLVE_STR_REF ((AT tra_ref))
+    LPF ADD_SPELL_EFFECT INT_VAR
+        opcode = 139                        //Display string.
+        parameter1 = tlk_ref
+        timing = 1                          //Instantaneous.
+        target = 2                          //Other.
+        insert_point = insert_point
+    END
+END
+
 DEFINE_PATCH_FUNCTION clone_to_display_string INT_VAR
     check_headers = 1
     check_globals = 0
@@ -32,44 +43,6 @@ BEGIN
         resource = ""                       //Clean.
         insert = "%insert%"
     END
-END
-
-DEFINE_PATCH_FUNCTION add_display_string INT_VAR tra_ref = 0 insert_point = 0 - 1 BEGIN
-    tlk_ref = RESOLVE_STR_REF ((AT tra_ref))
-    LPF ADD_SPELL_EFFECT INT_VAR
-        opcode = 139                        //Display string.
-        parameter1 = tlk_ref
-        timing = 1                          //Instantaneous.
-        target = 2                          //Other.
-        insert_point = insert_point
-    END
-END
-
-DEFINE_ACTION_FUNCTION patch_spell_duration INT_VAR turns = 2 STR_VAR spell = "" BEGIN
-    LAF get_spell_res STR_VAR
-        spell = "%spell%"
-    RET res = resource END
-
-    ACTION_IF ("%res%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "patch_spell_duration: spell '%spell%' not found in 'spell.ids'"
-    END
-
-    COPY_EXISTING "%res%.spl" "override"
-        //Alter duration.
-        LPF ALTER_SPELL_EFFECT INT_VAR
-            check_globals = 0
-            duration = turns * 60
-        END
-
-        //Patch description.
-        LPF get_spell_field STR_VAR field = "description" RET tlk = value END
-        GET_STRREF tlk description
-        INNER_PATCH_SAVE new "%description%" BEGIN
-            REPLACE_TEXTUALLY "^Duration: [1-9][0-9]* \(turn\|round\)\(s\)?" "Duration: %turns% turns"
-        END
-        ref = RESOLVE_STR_REF ("%new%")
-        LPF set_spell_field STR_VAR field = "description" value = "%ref%" END
-    BUT_ONLY
 END
 
 //Creature patchers.
