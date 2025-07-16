@@ -16,35 +16,6 @@ DEFINE_PATCH_FUNCTION add_display_string INT_VAR tra_ref = 0 insert_point = 0 - 
     END
 END
 
-DEFINE_PATCH_FUNCTION clone_to_display_string INT_VAR
-    check_headers = 1
-    check_globals = 0
-    header = 0 - 1
-    match_opcode = 142
-    tra_ref = 0
-STR_VAR
-    insert = "below"
-BEGIN
-    //Insert text.
-    ref = RESOLVE_STR_REF ((AT tra_ref))
-    LPF CLONE_EFFECT INT_VAR
-        check_globals = check_globals
-        check_headers = check_headers
-        header = header
-        verbose = 1
-        match_opcode = match_opcode
-        opcode = 139                        //Display string.
-        parameter1 = ref
-        parameter2 = 0                      //Clean.
-        timing = 1                          //Instantaneous.
-        duration = 0
-        special = 0                         //Clean.
-    STR_VAR
-        resource = ""                       //Clean.
-        insert = "%insert%"
-    END
-END
-
 //Creature patchers.
 DEFINE_PATCH_FUNCTION creature_add_item STR_VAR
     reference = ""
