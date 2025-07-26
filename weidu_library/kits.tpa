@@ -71,6 +71,19 @@ DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = ""
     PRETTY_PRINT_2DA
     BUT_ONLY
 
+    COPY_EXISTING "clastext.2da" "override"
+        //Find row.
+        LPF find_row_index STR_VAR key = "%kit%" RET row = index END
+        PATCH_IF NOT (row = 0 - 1) BEGIN
+            //Set description.
+            COUNT_2DA_COLS cols
+            SET_2DA_ENTRY row 4 cols "%kit_descr%"
+        END ELSE BEGIN
+            PATCH_FAIL "set_kit_description: kit '%kit%' not found in 'clastext.2da'."
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+
     //Gui editing.
     COPY_EXISTING "enginest.2da" "overriding"
         //Find row.

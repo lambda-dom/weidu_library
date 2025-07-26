@@ -33,7 +33,7 @@ note(s):
 
 `set_kit_description INT_VAR descr STR_VAR kit`
 
-Set the new description of a kit in the .2da files `kitlist.2da` and `enginest.2da`. `descr` is a tra reference. Function FAIL's if kit not found in the relevant tables.
+Set the new description of a kit in the .2da files `kitlist.2da`, `clastext.2da` and `enginest.2da`. `descr` is a tra reference. Function FAIL's if kit not found in the relevant tables.
 
 note(s):
 * this function has the side-effect of (potentially) adding the text of the tra reference to the tlk file.
