@@ -33,102 +33,94 @@ DEFINE_DIMORPHIC_FUNCTION get_kit_clab STR_VAR kit = "" RET clab BEGIN
 END
 
 
-//Descriptions.
-DEFINE_DIMORPHIC_FUNCTION set_class_description INT_VAR descr = 0 STR_VAR class = "" BEGIN
-    OUTER_SET class_descr = RESOLVE_STR_REF ((AT descr))
+//Auxiliary description functions.
+DEFINE_ACTION_FUNCTION set_clastext_description INT_VAR tlk = 0 STR_VAR class = "" BEGIN
     COPY_EXISTING "clastext.2da" "override"
         //Find row.
         LPF find_row_index STR_VAR key = "%class%" RET row = index END
 
         PATCH_IF (row = 0 - 1) BEGIN
-            PATCH_FAIL "set_class_description: class '%class%' not found in 'clastext.2da'."
+            PATCH_FAIL "set_clastext_description: class '%class%' not found in 'clastext.2da'."
         END
 
         //Set description.
         COUNT_2DA_COLS cols
-        SET_2DA_ENTRY row 4 cols class_descr
+        SET_2DA_ENTRY row 4 cols tlk
     PRETTY_PRINT_2DA
-    BUT_ONLY
-
-    //Gui editing.
-    COPY_EXISTING "enginest.2da" "overriding"
-        TEXT_SPRINT class_name "%class%"
-        TO_UPPER class_name
-
-        //Find row.
-        LPF find_row_index STR_VAR
-            key = "STRREF_GUI_HELP_%class_name%"
-        RET row = index END
-
-        PATCH_IF (row = 0 - 1) BEGIN
-            PATCH_FAIL "set_class_description: string 'STRREF_GUI_HELP_%class_name%' for '%class%' not found in 'enginest.2da'."
-        END
-
-        //Set description.
-        COUNT_2DA_COLS cols
-        SET_2DA_ENTRY row 1 cols class_descr
     BUT_ONLY
 END
 
-DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = "" BEGIN
-    OUTER_SET kit_descr = RESOLVE_STR_REF ((AT descr))
+DEFINE_ACTION_FUNCTION set_kitlist_description INT_VAR tlk = 0 STR_VAR kit = "" BEGIN
     COPY_EXISTING "kitlist.2da" "override"
         //Find row.
         LPF find_row_index INT_VAR col = 1 STR_VAR key = "%kit%" RET row = index END
 
         PATCH_IF (row = 0 - 1) BEGIN
-            PATCH_FAIL "set_kit_description: kit '%kit%' not found in 'kitlist.2da'."
+            PATCH_FAIL "set_kitlist_description: kit '%kit%' not found in 'kitlist.2da'."
         END
 
         //Set description.
         COUNT_2DA_COLS cols
-        SET_2DA_ENTRY row 4 cols kit_descr
+        SET_2DA_ENTRY row 4 cols tlk
     PRETTY_PRINT_2DA
-    BUT_ONLY
-
-    COPY_EXISTING "clastext.2da" "override"
-        LPF get_array_element STR_VAR
-            array = "kit_classes"
-            key = "%kit%"
-            default = "%kit%"
-        RET kit_name = value END
-
-        //Find row.
-        LPF find_row_index STR_VAR key = "%kit_name%" RET row = index END
-
-        PATCH_IF (row = 0 - 1) BEGIN
-            PATCH_FAIL "set_kit_description: kit name '%kit_name%' for '%kit%' not found in 'clastext.2da'."
-        END
-
-        //Set description.
-        COUNT_2DA_COLS cols
-        SET_2DA_ENTRY row 4 cols kit_descr
-    PRETTY_PRINT_2DA
-    BUT_ONLY
-
-    //Gui editing.
-    COPY_EXISTING "enginest.2da" "overriding"
-        LPF get_array_element STR_VAR
-            array = "kit_names"
-            key = "%kit%"
-            default = "%kit%"
-        RET kit_name = value END
-        TO_UPPER kit_name
-
-        //Find row.
-        LPF find_row_index STR_VAR
-            key = "STRREF_GUI_HELP_KIT_%kit_name%"
-        RET row = index END
-
-        PATCH_IF (row = 0 - 1) BEGIN
-            PATCH_FAIL "set_kit_description: string 'STRREF_GUI_HELP_KIT_%kit_name%' for '%kit%' not found in 'enginest.2da'."
-        END
-
-        //Set description.
-        COUNT_2DA_COLS cols
-        SET_2DA_ENTRY row 1 cols kit_descr
     BUT_ONLY
 END
+
+DEFINE_ACTION_FUNCTION set_enginest_description INT_VAR tlk = 0 STR_VAR kit = "" BEGIN
+    OUTER_TEXT_SPRINT string "STRREF_GUI_HELP_%kit%"
+    ACTION_TO_UPPER string
+
+    COPY_EXISTING "enginest.2da" "override"
+        //Set description.
+        COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols row_count
+        found = 0
+        FOR (i = 0 ; (i < row_count) AND (found != 1) ; ++i) BEGIN
+            READ_2DA_ENTRY i 0 cols value
+            PATCH_IF ("%string%" STRING_EQUAL_CASE "%value%") BEGIN
+                SET_2DA_ENTRY i 1 cols tlk
+                found = 1
+            END
+        END
+
+        PATCH_IF (found = 0) BEGIN
+            PATCH_FAIL "set_enginest_description: string '%string%' for '%kit%' not found in 'enginest.2da'."
+        END
+    BUT_ONLY
+END
+
+
+//Descriptions.
+DEFINE_DIMORPHIC_FUNCTION set_class_description INT_VAR descr = 0 STR_VAR class = "" BEGIN
+    OUTER_SET class_descr = RESOLVE_STR_REF ((AT descr))
+
+    LAF set_clastext_description INT_VAR tlk = class_descr STR_VAR class = "%class%" END
+    LAF set_enginest_description INT_VAR tlk = class_descr STR_VAR kit = "%class%" END
+END
+
+DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = "" BEGIN
+    OUTER_SET kit_descr = RESOLVE_STR_REF ((AT descr))
+
+    LAF get_array_element STR_VAR
+        array = "kit_classes"
+        key = "%kit%"
+        default = "%kit%"
+    RET kit_name = value END
+
+    LAF set_clastext_description INT_VAR tlk = kit_descr STR_VAR class = "%kit_name%" END
+    LAF set_kitlist_description INT_VAR tlk = kit_descr STR_VAR kit = "%kit%" END
+
+    //Gui editing.
+    LAF get_array_element STR_VAR
+        array = "kit_names"
+        key = "%kit%"
+        default = "%kit%"
+    RET kit_name = value END
+    ACTION_TO_UPPER kit_name
+
+    LAF set_enginest_description INT_VAR tlk = kit_descr STR_VAR kit = "KIT_%kit_name%" END
+END
+
 
 //Proficiencies.
 DEFINE_PATCH_FUNCTION get_proficiency STR_VAR kit = "" proficiency = "" RET level BEGIN
