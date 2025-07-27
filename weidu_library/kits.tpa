@@ -4,6 +4,13 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/hlas.tpa"
 
 
+//Arrays.
+//Translation strings for gui help.
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/kits/kit_names.2da"
+RET_ARRAY kit_names = array END
+
+
 //Basic functions.
 DEFINE_DIMORPHIC_FUNCTION get_kit_clab STR_VAR kit = "" RET clab BEGIN
     COPY_EXISTING - "kitlist.2da" "override"
@@ -22,37 +29,41 @@ DEFINE_DIMORPHIC_FUNCTION get_kit_clab STR_VAR kit = "" RET clab BEGIN
         END
 END
 
+
 //Descriptions.
 DEFINE_DIMORPHIC_FUNCTION set_class_description INT_VAR descr = 0 STR_VAR class = "" BEGIN
     OUTER_SET class_descr = RESOLVE_STR_REF ((AT descr))
     COPY_EXISTING "clastext.2da" "override"
         //Find row.
         LPF find_row_index STR_VAR key = "%class%" RET row = index END
-        PATCH_IF NOT (row = 0 - 1) BEGIN
-            //Set description.
-            COUNT_2DA_COLS cols
-            SET_2DA_ENTRY row 4 cols "%class_descr%"
-        END ELSE BEGIN
+
+        PATCH_IF (row = 0 - 1) BEGIN
             PATCH_FAIL "set_class_description: class '%class%' not found in 'clastext.2da'."
         END
+
+        //Set description.
+        COUNT_2DA_COLS cols
+        SET_2DA_ENTRY row 4 cols class_descr
     PRETTY_PRINT_2DA
     BUT_ONLY
 
     //Gui editing.
     COPY_EXISTING "enginest.2da" "overriding"
+        TEXT_SPRINT class_name "%class%"
+        TO_UPPER class_name
+
         //Find row.
         LPF find_row_index STR_VAR
-            key = "STRREF_GUI_HELP_%kit%"
+            key = "STRREF_GUI_HELP_%class_name%"
         RET row = index END
 
         PATCH_IF (row = 0 - 1) BEGIN
-            PATCH_FAIL "set_class_description: help string for '%class%' not found in 'enginest.2da'."
+            PATCH_FAIL "set_class_description: string 'STRREF_GUI_HELP_%class_name%' for '%class%' not found in 'enginest.2da'."
         END
 
         //Set description.
         COUNT_2DA_COLS cols
-        SET_2DA_ENTRY row 1 cols "%class_descr%"
-    PRETTY_PRINT_2DA
+        SET_2DA_ENTRY row 1 cols class_descr
     BUT_ONLY
 END
 
@@ -61,44 +72,52 @@ DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = ""
     COPY_EXISTING "kitlist.2da" "override"
         //Find row.
         LPF find_row_index INT_VAR col = 1 STR_VAR key = "%kit%" RET row = index END
-        PATCH_IF NOT (row = 0 - 1) BEGIN
-            //Set description.
-            COUNT_2DA_COLS cols
-            SET_2DA_ENTRY row 4 cols "%kit_descr%"
-        END ELSE BEGIN
+
+        PATCH_IF (row = 0 - 1) BEGIN
             PATCH_FAIL "set_kit_description: kit '%kit%' not found in 'kitlist.2da'."
         END
+
+        //Set description.
+        COUNT_2DA_COLS cols
+        SET_2DA_ENTRY row 4 cols kit_descr
     PRETTY_PRINT_2DA
     BUT_ONLY
 
     COPY_EXISTING "clastext.2da" "override"
         //Find row.
         LPF find_row_index STR_VAR key = "%kit%" RET row = index END
-        PATCH_IF NOT (row = 0 - 1) BEGIN
-            //Set description.
-            COUNT_2DA_COLS cols
-            SET_2DA_ENTRY row 4 cols "%kit_descr%"
-        END ELSE BEGIN
+
+        PATCH_IF (row = 0 - 1) BEGIN
             PATCH_FAIL "set_kit_description: kit '%kit%' not found in 'clastext.2da'."
         END
+
+        //Set description.
+        COUNT_2DA_COLS cols
+        SET_2DA_ENTRY row 4 cols kit_descr
     PRETTY_PRINT_2DA
     BUT_ONLY
 
     //Gui editing.
     COPY_EXISTING "enginest.2da" "overriding"
+        LPF get_array_element STR_VAR
+            array = "kit_names"
+            key = "%kit%"
+            default = "%kit%"
+        RET kit_name = value END
+        TO_UPPER kit_name
+
         //Find row.
         LPF find_row_index STR_VAR
-            key = "STRREF_GUI_HELP_KIT_%kit%"
+            key = "STRREF_GUI_HELP_KIT_%kit_name%"
         RET row = index END
 
         PATCH_IF (row = 0 - 1) BEGIN
-            PATCH_FAIL "set_kit_description: help string for '%kit%' not found in 'enginest.2da'."
+            PATCH_FAIL "set_kit_description: string 'STRREF_GUI_HELP_KIT_%kit_name%' for '%kit%' not found in 'enginest.2da'."
         END
 
         //Set description.
         COUNT_2DA_COLS cols
-        SET_2DA_ENTRY row 1 cols "%kit_descr%"
-    PRETTY_PRINT_2DA
+        SET_2DA_ENTRY row 1 cols kit_descr
     BUT_ONLY
 END
 
