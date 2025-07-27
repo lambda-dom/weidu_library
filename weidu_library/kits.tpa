@@ -5,10 +5,13 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/hlas.tpa"
 
 
 //Arrays.
-//Translation strings for gui help.
 LAF load_array STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/kits/kit_names.2da"
 RET_ARRAY kit_names = array END
+
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/kits/kit_classes.2da"
+RET_ARRAY kit_classes = array END
 
 
 //Basic functions.
@@ -84,11 +87,17 @@ DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = ""
     BUT_ONLY
 
     COPY_EXISTING "clastext.2da" "override"
+        LPF get_array_element STR_VAR
+            array = "kit_classes"
+            key = "%kit%"
+            default = "%kit%"
+        RET kit_name = value END
+
         //Find row.
-        LPF find_row_index STR_VAR key = "%kit%" RET row = index END
+        LPF find_row_index STR_VAR key = "%kit_name%" RET row = index END
 
         PATCH_IF (row = 0 - 1) BEGIN
-            PATCH_FAIL "set_kit_description: kit '%kit%' not found in 'clastext.2da'."
+            PATCH_FAIL "set_kit_description: kit name '%kit_name%' for '%kit%' not found in 'clastext.2da'."
         END
 
         //Set description.
