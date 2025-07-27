@@ -32,3 +32,9 @@ note(s):
 `find_all_rows INT_VAR col = 0 STR_VAR key RET_ARRAY indexes`
 
 Return an array of all row indices with `col` entry matching `key`.
+
+# B. Patches.
+
+`append_row STR_VAR key default = "*"`
+
+Append a row to the 2da file with first column `key` and all the others `default`.
