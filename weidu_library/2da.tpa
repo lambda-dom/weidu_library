@@ -1,3 +1,7 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/lists.tpa"
+
+
 //Linear searches.
 DEFINE_PATCH_FUNCTION find_column_index STR_VAR key = "" RET index BEGIN
     COUNT_2DA_COLS cols
@@ -94,4 +98,18 @@ DEFINE_PATCH_FUNCTION find_all_rows INT_VAR col = 0 STR_VAR key = "" RET_ARRAY i
             j += 1
         END
     END
+END
+
+DEFINE_PATCH_FUNCTION append_row STR_VAR key = "" default = "*" BEGIN
+    COUNT_2DA_COLS cols
+
+    LPF repeat_string INT_VAR
+        times = (cols - 1)
+    STR_VAR
+        value = "%default%"
+    RET_ARRAY defaults = list END
+    LPF join_strings STR_VAR strings = "defaults" RET defaults_row = string END
+
+    COUNT_2DA_ROWS cols row_count
+    INSERT_2DA_ROW row_count cols "%key% %defaults_row%"
 END
