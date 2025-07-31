@@ -1,0 +1,6 @@
+2DA V1.0
+*
+                        parameter1  parameter2      resource
+immunity_opcode         *           #opc:polymorph  *
+immunity_spell          #lit:0      *               #spl:WIZARD_POLYMORPH_OTHER
+immunity_spell          #lit:0      *               #spl:WIZARD_POLYMORPH_SELF

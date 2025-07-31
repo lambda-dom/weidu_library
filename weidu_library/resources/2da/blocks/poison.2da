@@ -1,0 +1,12 @@
+2DA V1.0
+*
+                        parameter1  parameter2  resource
+immunity_opcode         *           #opc:poison *
+poison_resistance       #lit:100    #lit:0      *
+immunity_icon           *           #lit:6      *
+immunity_display_string #lit:14662  *           *
+immunity_spell          #lit:0      *           #spl:WIZARD_STINKING_CLOUD
+immunity_spell          #lit:0      *           #spl:WIZARD_CLOUDKILL
+immunity_spell          #lit:0      *           #spl:CLERIC_POISON
+immunity_spell          #lit:0      *           #spl:GOLEM_GASCLOUD
+display_icon            *           #lit:30     *

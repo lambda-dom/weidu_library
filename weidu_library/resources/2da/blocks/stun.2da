@@ -1,0 +1,8 @@
+2DA V1.0
+*
+                            parameter1  parameter2      resource
+immunity_opcode             *           #opc:stun       *
+immunity_opcode             *           #opc:stun_90    *
+immunity_icon               *           #lit:55         *
+immunity_display_string     #lit:1280   *               *
+immunity_display_string     #lit:14043  *               *

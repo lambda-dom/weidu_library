@@ -1,0 +1,9 @@
+2DA V1.0
+*
+                        parameter1  parameter2  resource
+immunity_opcode         *           #opc:web    *
+immunity_icon           *           #lit:129    *
+immunity_spell          #lit:0      *           #spl:WIZARD_WEB
+immunity_spell          #lit:0      *           #spl:VORTEX_WEB
+immunity_spell          #lit:0      *           #spl:FIGURINE_SPIDER_WEB
+immunity_spell          #lit:0      *           #lit:spdr201

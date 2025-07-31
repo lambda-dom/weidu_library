@@ -35,6 +35,9 @@ LPF "%function%" STR_VAR value = "%value%" RET return
 
 Note the signature of the called function: one argument named `value` and the return value named `return` -- the signature of an encoder. The available formats are detailed in the formats section.
 
+note(s):
+* even though the return value is named `resource`, this function can return values other than resource (references).
+
 # B. Formats.
 
 The following functions are the available encoders. There is usually no need to call them directly, rather call them indirectly with a resource ref via `get_resource_ref`.
@@ -78,6 +81,14 @@ Returns the symbolic spell reference suffixed with the character. For example, e
 
 ```
 #suf:<one alphanumeric character>:<spell symbolic reference>
+```
+
+`encode_opcode_type STR_VAR value RET return`
+
+Returns the numeric id of an opcode type. Function FAIL's if `value` not present in [Opcodes table](../../resources/2da/opcodes/types.2da). Format is:
+
+```
+#opc:<opcode type>
 ```
 
 # C. Encoders.
