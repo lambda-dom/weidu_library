@@ -1,7 +1,7 @@
 2DA V1.0
 *
                         parameter1  parameter2          resource
-immunity_opcode         *           #opc:Level_Drain    *
+immunity_opcode         *           #opc:level_drain    *
 immunity_icon           *           #lit:53             *
 immunity_display_string #lit:41495  *                   *
 immunity_display_string #lit:40968  *                   *

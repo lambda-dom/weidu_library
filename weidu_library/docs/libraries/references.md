@@ -83,6 +83,14 @@ Returns the symbolic spell reference suffixed with the character. For example, e
 #suf:<one alphanumeric character>:<spell symbolic reference>
 ```
 
+`encode_opcode_type STR_VAR value RET return`
+
+Returns the numeric id of an opcode type. Function FAIL's if `value` not present in [Opcodes table](../../resources/2da/opcodes/types.2da). Format is:
+
+```
+#opc:<opcode type>
+```
+
 # C. Encoders.
 
 `encode_resource_ref STR_VAR value RET return`

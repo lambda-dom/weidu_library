@@ -1,8 +1,8 @@
 2DA V1.0
 *
                             parameter1  parameter2          resource
-immunity_opcode             *           #opc:Paralyze       *
-immunity_opcode             *           #opc:Hold           *
+immunity_opcode             *           #opc:paralyze       *
+immunity_opcode             *           #opc:hold           *
 immunity_icon               *           #lit:13             *
 immunity_display_string     #lit:14102  *                   *
 immunity_display_string     #lit:14650  *                   *

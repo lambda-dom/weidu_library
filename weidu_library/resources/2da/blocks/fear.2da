@@ -1,8 +1,8 @@
 2DA V1.0
 *
                             parameter1  parameter2          resource
-immunity_opcode             *           #opc:Horror         *
-immunity_opcode             *           #opc:MoraleBreak    *
+immunity_opcode             *           #opc:horror         *
+immunity_opcode             *           #opc:morale_break   *
 immunity_Icon               *           #lit:36             *
 immunity_display_string     #lit:14007  *                   *
 immunity_display_string     #lit:17427  *                   *
