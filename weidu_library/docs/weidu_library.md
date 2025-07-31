@@ -6,6 +6,7 @@ Top-level libraries:
 
 High-level libraries:
 
+* [Blocks](./libraries/blocks.md): patch in standardized blocks of opcodes.
 * [Installers](./libraries/installers.md): library to install various kinds of resources.
 * [Kits](./libraries/kits.md): library to patch classes and kits.
 * [HLAs](./libraries/hlas.md): library to patch hla tables.

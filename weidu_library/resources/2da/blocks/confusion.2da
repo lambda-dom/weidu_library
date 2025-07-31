@@ -1,0 +1,11 @@
+2DA V1.0
+*
+                            parameter1  parameter2      resource
+Immunity_Opcode             *           #opc:Confusion  *
+Immunity_Icon               *           #lit:2          *
+Immunity_Icon               *           #lit:3          *
+Immunity_Icon               *           #lit:47         *
+Immunity_Display_String     #lit:14782  *               *
+Immunity_Display_String     #lit:14791  *               *
+Immunity_Animation          *           *               #lit:spconfus
+Immunity_Animation          *           *               #lit:spflayer

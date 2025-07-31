@@ -35,6 +35,9 @@ LPF "%function%" STR_VAR value = "%value%" RET return
 
 Note the signature of the called function: one argument named `value` and the return value named `return` -- the signature of an encoder. The available formats are detailed in the formats section.
 
+note(s):
+* even though the return value is named `resource`, this function can return values other than resource (references).
+
 # B. Formats.
 
 The following functions are the available encoders. There is usually no need to call them directly, rather call them indirectly with a resource ref via `get_resource_ref`.
