@@ -17,7 +17,7 @@ Getter for `msectype.2da`: get the `id` of the `sectype` , -1 if `sectype` not v
 Get the `id` of the `sectype` , -1 if `sectype` not valid. This is both a patch and action function.
 
 note(s):
-* Each call to this function requires opening `msectype.2da` and perform a linear search. If you can batch the calls, use `patch_get_sectype_id STR_VAR sectype RET id` instead
+* Each call to this function requires opening `msectype.2da` and perform a linear search. If the calls can be batched, use `patch_get_sectype_id STR_VAR sectype RET id` instead.
 
 # B. Sectype addition.
 
