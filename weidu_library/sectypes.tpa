@@ -40,7 +40,7 @@ DEFINE_DIMORPHIC_FUNCTION add_sectypes STR_VAR table = "" tra = "*" BEGIN
     //LOad table.
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "sectype:install:removale"
+        fields = "sectype:install:removal"
     RET_ARRAY sectypes = table END
 
     LAF get_table_row_count STR_VAR table = "sectypes" RET row_count = count END
