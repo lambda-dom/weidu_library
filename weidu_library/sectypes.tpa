@@ -1,0 +1,93 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Patch functions.
+DEFINE_PATCH_FUNCTION patch_get_sectype_id STR_VAR sectype = "" RET id BEGIN
+    //Get sectype.
+    LPF find_row_index STR_VAR key = "%sectype%" RET id = index END
+    
+    //Correct index to account for 2DA spurious line.
+    PATCH_IF NOT (0 - 1 = id) BEGIN
+        id -= 1
+    END
+END
+
+//Action functions.
+DEFINE_DIMORPHIC_FUNCTION get_sectype_id STR_VAR sectype = "" RET id BEGIN
+    COPY_EXISTING - "msectype.2da" "override"
+        LPF patch_get_sectype_id STR_VAR sectype = "%sectype%" RET id END
+END
+
+//Add sectype.
+DEFINE_DIMORPHIC_FUNCTION add_sectype INT_VAR tra_ref = 0 STR_VAR sectype = "" RET id BEGIN
+    ADD_SECTYPE "%sectype%" tra_ref
+    OUTER_SET id = EVAL "%sectype%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION add_sectypes STR_VAR table = "" tra = "*" BEGIN
+    //Normalize tra.
+    ACTION_IF ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/resources/tra/empty.tra"
+    END
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "add_sectypes: tra file '%tra%' does not exist."
+    END
+
+    //LOad table.
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "sectype:install:removale"
+    RET_ARRAY sectypes = table END
+
+    LAF get_table_row_count STR_VAR table = "sectypes" RET row_count = count END
+
+    //First loop: check sectypes are *not* in.
+    COPY_EXISTING - "msectype.2da" "override"
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "sectypes"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT sectype $"row"("sectype")
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT removal $"row"("removal")
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    LPF patch_get_sectype_id STR_VAR sectype = "%sectype%" RET sectype_id = id END
+                    PATCH_IF NOT (sectype_id = 0 - 1) BEGIN
+                        PATCH_FAIL "add_sectypes: sectype '%sectype%' in row '%i%' already exists."
+                    END
+                END
+            END
+        END
+    
+    //Second loop: actually add sectypes.
+    WITH_TRA "%tra%" BEGIN
+        OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+            LAF get_row_from_table INT_VAR row = i STR_VAR
+                table = "sectypes"
+            RET_ARRAY
+                row = array
+            END
+
+            WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                OUTER_TEXT_SPRINT sectype $"row"("sectype")
+                OUTER_TEXT_SPRINT install $"row"("install")
+                OUTER_TEXT_SPRINT removal $"row"("removal")
+
+                ACTION_IF NOT (install = 0) BEGIN
+                    LAF add_sectype INT_VAR tra_ref = removal STR_VAR sectype = "%sectype%" END
+                END
+            END
+        END
+    END
+END

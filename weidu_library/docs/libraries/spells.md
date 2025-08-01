@@ -117,10 +117,3 @@ Get the `id` of the magic `school`, -1 if `school` not valid.
 
 note(s):
 * In the current implementation, each call to this function requires opening `mschool.2da` and perform a linear search.
-
-`get_sectype_id STR_VAR sectype RET id`
-
-Get the `id` of the `sectype` , -1 if `sectype` not valid.
-
-note(s):
-* In the current implementation, each call to this function requires opening `msectype.2da` and perform a linear search.
