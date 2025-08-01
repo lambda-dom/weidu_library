@@ -90,4 +90,8 @@ DEFINE_DIMORPHIC_FUNCTION add_sectypes STR_VAR table = "" tra = "*" BEGIN
             END
         END
     END
+
+    //Pretty print.
+    COPY_EXISTING "msectype.2da" "override"
+    PRETTY_PRINT_2DA
 END
