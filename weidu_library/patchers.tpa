@@ -16,6 +16,31 @@ DEFINE_PATCH_FUNCTION add_display_string INT_VAR tra_ref = 0 insert_point = 0 - 
     END
 END
 
+DEFINE_PATCH_FUNCTION patch_resource_reference INT_VAR
+    header = 0 - 1
+    match_opcode = 0
+STR_VAR
+    match_resource = ""
+    resource = ""
+    ext = "spl"
+    references = ""
+BEGIN
+    LPF get_table_ref STR_VAR
+        value = "%resource%"
+        array = "%references%"
+        ext = "%ext%"
+    RET res = resource END
+
+    LPF ALTER_EFFECT INT_VAR
+        verbose = 1
+        header = header
+        match_opcode = match_opcode
+    STR_VAR
+        match_resource = "%match_resource%"
+        resource = "%res%"
+    END
+END
+
 //Creature patchers.
 DEFINE_PATCH_FUNCTION creature_add_item STR_VAR
     reference = ""
