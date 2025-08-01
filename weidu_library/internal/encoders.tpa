@@ -3,6 +3,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/ids.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/items.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/opcodes.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/projectiles.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/sectypes.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
 
 

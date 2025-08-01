@@ -87,17 +87,6 @@ DEFINE_DIMORPHIC_FUNCTION get_school_id STR_VAR school = "" RET id BEGIN
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION get_sectype_id STR_VAR sectype = "" RET id BEGIN
-    //Get sectype.
-    COPY_EXISTING - "msectype.2da" "override"
-        LPF find_row_index STR_VAR key = "%sectype%" RET id = index END
-    
-    //Correct index to account for 2DA spurious line.
-    ACTION_IF NOT (0 - 1 = id) BEGIN
-        OUTER_SET id -= 1
-    END
-END
-
 //Casting opcode functions.
 DEFINE_PATCH_FUNCTION get_casting_opcode_offset INT_VAR index = 0 RET offset BEGIN
     LPF get_opcode_size RET opcode_size = size END

@@ -25,6 +25,7 @@ Support libraries: libraries providing basic functionality supporting everything
 * [Opcodes](./libraries/opcodes.md): opcode patching.
 * [Projectiles](./libraries/projectiles.md): handle projectile .pro files.
 * [References](./libraries/references.md): inline resource references, especially in installer tables.
+* [Sectypes](./libraries/sectypes.md): add and edit sectypes.
 * [Spells](./libraries/spells.md): handle spell .spl files.
 * [Strings](./libraries/strings.md): string manipulation functions.
 * [Tables](./libraries/tables.md): construct and manipulate tables.
