@@ -52,6 +52,9 @@ note(s):
 
 Return the missile `id` associated to label `missile` in `missile.ids`. Function returns `-1` if `missile` not in `missile.ids`.
 
+note(s):
+* subtract `-1` to get the projectile id.
+
 `get_missile_res STR_VAR missile RET resource`
 
 Return the projectile `resource` associated to the `missile` label. Return `*` if `missile` not in `missile.ids`.
