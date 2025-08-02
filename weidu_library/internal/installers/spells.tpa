@@ -69,15 +69,55 @@ DEFINE_PATCH_FUNCTION encode_projectile_header STR_VAR value = "" RET return BEG
     //Write out projectile numbers.
     LPF get_spell_header_count RET headers_count = count END
     FOR (i = 0; i < headers_count; ++i) BEGIN
-        LPF get_spell_header_offset INT_VAR
-            header = i
-        RET header_offset = offset END
-
         LPF set_spell_header_field INT_VAR
-            offset = header_offset
+            header = i
         STR_VAR
             field = "projectile"
             value = "%id%"
+        END
+    END
+
+    //Return nothing.
+    TEXT_SPRINT return "*"
+END
+
+DEFINE_PATCH_FUNCTION encode_spell_range STR_VAR value = "" RET return BEGIN
+    PATCH_IF NOT (IS_AN_INT value) BEGIN
+        PATCH_FAIL "encode_spell_range: value '%value%' is not an integer."
+        PATCH_IF NOT (value >= 0) BEGIN
+            PATCH_FAIL "encode_spell_range: value '%value%' is not positive."
+        END
+    END
+
+    LPF get_spell_header_count RET headers_count = count END
+    FOR (i = 0; i < headers_count; ++i) BEGIN
+        LPF set_spell_header_field INT_VAR
+            header = i
+        STR_VAR
+            field = "range"
+            value = "%value%"
+        END
+    END
+
+    //Return nothing.
+    TEXT_SPRINT return "*"
+END
+
+DEFINE_PATCH_FUNCTION encode_spell_speed STR_VAR value = "" RET return BEGIN
+    PATCH_IF NOT (IS_AN_INT value) BEGIN
+        PATCH_FAIL "encode_spell_speed: value '%value%' is not an integer."
+        PATCH_IF NOT (value >= 0) BEGIN
+            PATCH_FAIL "encode_spell_speed: value '%value%' is not positive."
+        END
+    END
+
+    LPF get_spell_header_count RET headers_count = count END
+    FOR (i = 0; i < headers_count; ++i) BEGIN
+        LPF set_spell_header_field INT_VAR
+            header = i
+        STR_VAR
+            field = "speed"
+            value = "%value%"
         END
     END
 
@@ -165,6 +205,8 @@ DEFINE_PATCH_FUNCTION write_spell_fields STR_VAR fields = "" BEGIN
         "book_icon"     => "encode_bam_ref"
         "ability_icon"  => "encode_ability_icon"
         "projectile"    => "encode_projectile_header"
+        "range"         => "encode_spell_range"
+        "speed"         => "encode_spell_speed"
     END
 
     PHP_EACH "%fields%" AS field => value BEGIN
