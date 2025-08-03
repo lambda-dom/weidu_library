@@ -4,4 +4,5 @@
 immunity_opcode         *           #opc:entangle   *
 immunity_icon           *           #lit:144        *
 immunity_spell          #lit:0      *               #spl:CLERIC_ENTANGLE
+immunity_spell          #lit:0      *               #spl:BLACK_DRAGON_PLANT
 immunity_spell          #lit:0      *               #lit:spwm111
