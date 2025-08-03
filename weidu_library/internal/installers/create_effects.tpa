@@ -1,6 +1,7 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/effects.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/sectypes.tpa"
 
 
 //Effect creator.
@@ -38,7 +39,7 @@ BEGIN
             "special"       => "encode_identity"
             "projectile"    => "encode_projectile_ref"
             "school"        => "encode_school"
-            "sectype"       => "encode_sectype"
+            "sectype"       => "encode_spell_sectype"
         END
 
         //Write defaults.

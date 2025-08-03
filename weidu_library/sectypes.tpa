@@ -14,11 +14,20 @@ DEFINE_PATCH_FUNCTION patch_get_sectype_id STR_VAR sectype = "" RET id BEGIN
     END
 END
 
-//Action functions.
+//Getter functions.
 DEFINE_DIMORPHIC_FUNCTION get_sectype_id STR_VAR sectype = "" RET id BEGIN
     COPY_EXISTING - "msectype.2da" "override"
         LPF patch_get_sectype_id STR_VAR sectype = "%sectype%" RET id END
 END
+
+DEFINE_DIMORPHIC_FUNCTION encode_spell_sectype STR_VAR value = "" RET return BEGIN
+    LAF get_sectype_id STR_VAR sectype = "%value%" RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_spell_sectype: invalid sectype '%value%'."
+    END
+END
+
 
 //Add sectype.
 DEFINE_DIMORPHIC_FUNCTION add_sectype INT_VAR tra_ref = 0 STR_VAR sectype = "" RET id BEGIN
