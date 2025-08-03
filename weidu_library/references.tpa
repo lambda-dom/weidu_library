@@ -75,6 +75,7 @@ DEFINE_DIMORPHIC_FUNCTION get_resource_ref STR_VAR ref = "" RET resource BEGIN
         "lbl" => "encode_missile_res"
         "suf" => "encode_spell_suffix"
         "opc" => "encode_opcode_type"
+        "sct" => "encode_spell_sectype"
     END
 
     OUTER_TEXT_SPRINT regexp "^#\([a-zA-Z0-9][a-zA-Z0-9_-]*\):\(.+\)$"

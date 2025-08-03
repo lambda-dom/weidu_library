@@ -19,6 +19,10 @@ Get the `id` of the `sectype` , -1 if `sectype` not valid. This is both a patch 
 note(s):
 * Each call to this function requires opening `msectype.2da` and perform a linear search. If the calls can be batched, use `patch_get_sectype_id STR_VAR sectype RET id` instead.
 
+`encode_spell_sectype STR_VAR value RET return`
+
+Encoder version of `get_sectype_id`.
+
 # B. Sectype addition.
 
 note(s):

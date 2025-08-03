@@ -57,8 +57,6 @@ Encoder version of `get_spell_res`.
 
 `encode_school STR_VAR value RET return`
 
-`encode_sectype STR_VAR value RET return`
-
 `encode_spell_flags STR_VAR value RET return`
 
 Convert spell flags encoded as a string of binary values to an integer to be written to a spell's main block.

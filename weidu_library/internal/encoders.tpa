@@ -157,15 +157,6 @@ DEFINE_DIMORPHIC_FUNCTION encode_school STR_VAR value = "" RET return BEGIN
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION encode_sectype STR_VAR value = "" RET return BEGIN
-    LAF get_sectype_id STR_VAR sectype = "%value%" RET return = id END
-
-    //Correct index to account for 2DA spurious line.
-    ACTION_IF (0 - 1 = return) BEGIN
-        FAIL "encode_sectype: invalid sectype '%value%'."
-    END
-END
-
 //Spells.
 DEFINE_DIMORPHIC_FUNCTION encode_spell_flags STR_VAR value = "" RET return BEGIN
     OUTER_TEXT_SPRINT regexp "^\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)\([01\*]\)$"
