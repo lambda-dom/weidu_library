@@ -151,7 +151,7 @@ DEFINE_PATCH_FUNCTION write_spell_defaults STR_VAR fields = "" BEGIN
             key = "%school%"
         RET animation = value END
         
-        PATCH_IF NOT ("%animation%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_IF NOT (0 - 1 = animation) BEGIN
             LPF set_spell_field STR_VAR
                 field = "animation"
                 value = "%animation%"
@@ -180,15 +180,17 @@ DEFINE_PATCH_FUNCTION write_spell_defaults STR_VAR fields = "" BEGIN
                 key = "%school%"
             RET bit_index = value END
 
-            LPF get_spell_field STR_VAR
-                field = "exclusion"
-            RET exclusion = value END
+            PATCH_IF NOT (0 - 1 = bit_index) BEGIN
+                LPF get_spell_field STR_VAR
+                    field = "exclusion"
+                RET exclusion = value END
 
-            exclude_flags = exclusion BOR (1 << bit_index)
+                exclude_flags = exclusion BOR (1 << bit_index)
 
-            LPF set_spell_field STR_VAR
-                field = "exclusion"
-                value = "%exclude_flags%"
+                LPF set_spell_field STR_VAR
+                    field = "exclusion"
+                    value = "%exclude_flags%"
+                END
             END
         END
     END

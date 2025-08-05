@@ -1,6 +1,7 @@
 2DA V1.0
 *
                 animation   priest      wizard      opposite
+none            -1          *           *           -1
 necromancer     9           cas_p07     cas_m07     10
 transmuter      10          cas_p08     cas_m08     6
 enchanter       11          cas_p05     cas_m05     11
