@@ -4,5 +4,5 @@
 immunity_opcode             *           #opc:blindness  *
 immunity_icon               *           #lit:8          *
 immunity_display_string     #lit:1474   *               *
-immunity_spell              0           *               #spl:WIZARD_OBSCURING_MIST
-immunity_spell              0           *               #spl:CLERIC_OBSCURING_MIST
+immunity_spell              #lit:0      *               #spl:WIZARD_OBSCURING_MIST
+immunity_spell              #lit:0      *               #spl:CLERIC_OBSCURING_MIST
