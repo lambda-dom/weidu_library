@@ -113,3 +113,36 @@ DEFINE_PATCH_FUNCTION append_row STR_VAR key = "" default = "*" BEGIN
     COUNT_2DA_ROWS cols row_count
     INSERT_2DA_ROW row_count cols "%key% %defaults_row%"
 END
+
+DEFINE_PATCH_FUNCTION patch_table_entries STR_VAR patcher = "" BEGIN
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols row_count
+    FOR (i = 0; i < row_count; ++i) BEGIN
+        FOR (j = 0; j < cols; ++j) BEGIN
+            READ_2DA_ENTRY i j cols value
+
+            LPF "%patcher%" STR_VAR value = "%value%" RET return END
+            PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                SET_2DA_ENTRY i j cols "%return%"
+            END
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION patch_table_column INT_VAR col = 1 STR_VAR patcher = "" BEGIN
+    COUNT_2DA_COLS cols
+    //Sanitize.
+    PATCH_IF NOT ((0 <= col) AND (col < cols)) BEGIN
+        PATCH_FAIL "patch_table_column: column index '%col%' out of bounds."
+    END
+
+    COUNT_2DA_ROWS cols row_count
+    FOR (i = 0; i < row_count; ++i) BEGIN
+        READ_2DA_ENTRY i col cols value
+
+        LPF "%patcher%" STR_VAR value = "%value%" RET return END
+        PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+            SET_2DA_ENTRY i col cols "%return%"
+        END
+    END
+END
