@@ -112,6 +112,12 @@ DEFINE_PATCH_FUNCTION append_item_block_with_table STR_VAR table = "" BEGIN
     //Loop.
     LPF get_table_row_count STR_VAR table = "opcodes_table" RET row_count = count END
     FOR (i = 0; i < row_count; ++i) BEGIN
+        LPF get_row_from_table INT_VAR row = i STR_VAR
+            table = "opcodes_table"
+        RET_ARRAY
+            row = array
+        END
+
         PATCH_WITH_SCOPE BEGIN
             //Inject names in local scope.
             TEXT_SPRINT opcode $"row"("opcode")
