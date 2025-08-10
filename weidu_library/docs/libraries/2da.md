@@ -33,8 +33,18 @@ note(s):
 
 Return an array of all row indices with `col` entry matching `key`.
 
-# B. Patches.
+# B. Patchers.
 
 `append_row STR_VAR key default = "*"`
 
 Append a row to the 2da file with first column `key` and all the others `default`.
+
+# C. Higher-order patchers.
+
+`patch_table_entries STR_VAR patcher`
+
+Patch a table's entries with a `patcher` function. `patcher` must have the signature of an encoder `STR_VAR value RET return`. The `value` argument is the table entry, that is then set to the `return` value. If the `return` value is `*` the entry is left alone.
+
+`patch_table_column INT_VAR col = 1 STR_VAR patcher`
+
+Higher-order patcher like `patch_table_entries` but only patching a single column.
