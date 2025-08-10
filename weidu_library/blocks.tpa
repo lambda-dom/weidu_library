@@ -97,6 +97,71 @@ BEGIN
     END
 END
 
+DEFINE_PATCH_FUNCTION append_item_block_with_table STR_VAR table = "" BEGIN
+    //Existence check.
+    PATCH_IF NOT (FILE_EXISTS "%table%") BEGIN
+        PATCH_FAIL "append_item_block_with_table: table '%table%' does not exist."
+    END
+
+    //Load table.
+    LPF load_table STR_VAR
+        file = "%table%"
+        fields = "opcode:parameter1:parameter2:resource"
+    RET_ARRAY opcodes_table = table END
+
+    //Loop.
+    LPF get_table_row_count STR_VAR table = "opcodes_table" RET row_count = count END
+    FOR (i = 0; i < row_count; ++i) BEGIN
+        PATCH_WITH_SCOPE BEGIN
+            //Inject names in local scope.
+            TEXT_SPRINT opcode $"row"("opcode")
+            TEXT_SPRINT parameter1 $"row"("parameter1")
+            TEXT_SPRINT parameter2 $"row"("parameter2")
+            TEXT_SPRINT resource $"row"("resource")
+
+            //Apply encoders.
+            LPF encode_opcode_type STR_VAR value = "%opcode%" RET opcode = return END
+
+            PATCH_IF NOT ("%parameter1%" STRING_EQUAL_CASE "*") BEGIN
+                LPF encode_resource_ref STR_VAR value = "%parameter1%" RET parameter1 = return END
+                PATCH_IF NOT (IS_AN_INT parameter1) BEGIN
+                    PATCH_FAIL "append_item_block_with_table: 'parameter1' value of row '%i%' is not an encoded integer."
+                END
+            END ELSE BEGIN
+                parameter1 = 0
+            END
+
+            PATCH_IF NOT ("%parameter2%" STRING_EQUAL_CASE "*") BEGIN
+                LPF encode_resource_ref STR_VAR value = "%parameter2%" RET parameter2 = return END
+                PATCH_IF NOT (IS_AN_INT parameter1) BEGIN
+                    PATCH_FAIL "append_item_block_with_table: 'parameter2' value of row '%i%' is not an encoded integer."
+                END
+            END ELSE BEGIN
+                parameter2 = 0
+            END
+            
+            PATCH_IF NOT ("%resource%" STRING_EQUAL_CASE "*") BEGIN
+                LPF encode_resource_ref STR_VAR value = "%resource%" RET resource = return END
+            END ELSE BEGIN
+                TEXT_SPRINT resource ""
+            END
+
+            //Clone.
+            LPF ADD_ITEM_EQEFFECT INT_VAR
+                verbose = 1
+                opcode = opcode
+                parameter1 = parameter1
+                parameter2 = parameter2
+                target = 1                  //Self.
+                timing = 2                  //Equipped.
+                insert_point = 0 - 1        //Append.
+            STR_VAR
+                resource = "%resource%"
+            END
+        END
+    END
+END
+
 DEFINE_PATCH_FUNCTION patch_block INT_VAR
     match_opcode = 0
     globals = 0
@@ -112,5 +177,11 @@ BEGIN
     STR_VAR
         table = "%WEIDU_LIBRARY_DIR%/resources/2da/blocks/%block%.2da"
         match_resource = "%match_resource%"
+    END
+END
+
+DEFINE_PATCH_FUNCTION append_item_block STR_VAR block = "" BEGIN
+    LPF append_item_block_with_table STR_VAR
+        table = "%WEIDU_LIBRARY_DIR%/resources/2da/blocks/%block%.2da"
     END
 END

@@ -16,7 +16,11 @@ STR_VAR
     match_resource = "*"
 ```
 
-Patch in a `block` of opcodes using `match_opcode` as a match for the anchor and extra fields (saves, dispel, etc.). `table` is the full path to a .2da table in the format of [Template Block Table](../../resources/2da/blocks/templates/blocks.2da) containing the info on the opcodes to add.
+Patch in a block of opcodes from `table` using `match_opcode` as a match for the anchor and extra fields (saves, dispel, etc.). `table` is the full path to a .2da table in the format of [Template Block Table](../../resources/2da/blocks/templates/blocks.2da) containing the info on the opcodes to add.
+
+`append_item_block_with_table STR_VAR table`
+
+Append a block of opcodes from `table` as equipped opcodes in an item. `table` is the full path to a .2da table in the format of [Template Block Table](../../resources/2da/blocks/templates/blocks.2da) containing the info on the opcodes to add.
 
 ```weidu
 patch_block INT_VAR
@@ -38,5 +42,15 @@ LPF patch_block_with_table INT_VAR
 STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/blocks/%block%.2da"
     match_resource = "%match_resource%"
+END
+```
+
+`append_item_block STR_VAR block`
+
+A call to `append_item_block_with_table` using the pre-defined blocks in the `resources/2da/blocks` dir. More specifically, it is just the call:
+
+```weidu
+LPF append_item_block_with_table STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/blocks/%block%.2da"
 END
 ```
