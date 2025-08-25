@@ -34,7 +34,7 @@ STR_VAR
     table
 ```
 
-Append a block of opcodes from `table` as opcodes in a spell header; other opcode fields are passed as arguments to the function. `table` is the full path to a .2da table in the format of [Template Block Table](../../resources/2da/blocks/templates/blocks.2da) containing the info on the opcodes to add.
+Append a block of opcodes from `table` as opcodes in a spell header; other opcode fields are passed as arguments to the function, with the same conventions as the `ADD_SPELL_EFFECT` WeiDU macro. `table` is the full path to a .2da table in the format of [Template Block Table](../../resources/2da/blocks/templates/blocks.2da) containing the info on the opcodes to add.
 
 ```weidu
 patch_block INT_VAR
