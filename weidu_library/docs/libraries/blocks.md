@@ -23,6 +23,20 @@ Patch in a block of opcodes from `table` using `match_opcode` as a match for the
 Append a block of opcodes from `table` as equipped opcodes in an item. `table` is the full path to a .2da table in the format of [Template Block Table](../../resources/2da/blocks/templates/blocks.2da) containing the info on the opcodes to add.
 
 ```weidu
+append_spell_block_with_table INT_VAR
+    target = 2
+    timing = 0
+    duration = 0
+    resist_dispel = 0
+    savingthrow = 0
+    savebonus = 0
+STR_VAR
+    table
+```
+
+Append a block of opcodes from `table` as opcodes in a spell header; other opcode fields are passed as arguments to the function. `table` is the full path to a .2da table in the format of [Template Block Table](../../resources/2da/blocks/templates/blocks.2da) containing the info on the opcodes to add.
+
+```weidu
 patch_block INT_VAR
     match_opcode
     globals = 0
@@ -53,4 +67,16 @@ A call to `append_item_block_with_table` using the pre-defined blocks in the `re
 LPF append_item_block_with_table STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/blocks/%block%.2da"
 END
+```
+
+```weidu
+append_spell_block
+    target = 2
+    timing = 0
+    duration = 0
+    resist_dispel = 0
+    savingthrow = 0
+    savebonus = 0
+STR_VAR
+    block
 ```
