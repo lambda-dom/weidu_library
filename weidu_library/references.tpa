@@ -132,3 +132,12 @@ DEFINE_DIMORPHIC_FUNCTION encode_projectile_ref STR_VAR value = "" RET return BE
         FAIL "encode_projectile_ref: resource '%resource%' for ref '%value%' does not exist in game."
     END
 END
+
+DEFINE_DIMORPHIC_FUNCTION encode_script_ref STR_VAR value = "" RET return BEGIN
+    LAF get_resource_ref STR_VAR ref = "%value%" RET return = resource END
+
+    //Sanitize.
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.bcs") BEGIN
+        FAIL "encode_script_ref: script '%return%.bcs' does not exist in game."
+    END
+END

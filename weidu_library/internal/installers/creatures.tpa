@@ -1,6 +1,7 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/creatures.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
 
 
 DEFINE_PATCH_FUNCTION write_cre_fields STR_VAR array = "" BEGIN
@@ -9,13 +10,14 @@ DEFINE_PATCH_FUNCTION write_cre_fields STR_VAR array = "" BEGIN
         "power"                 => "encode_cre_level"
         "first_class"           => "encode_cre_level"
         "second_class"          => "encode_cre_level"
+        "third_class"           => "encode_cre_level"
         "str"                   => "encode_cre_stat"
+        "str_bonus"             => "encode_percentage"
         "dex"                   => "encode_cre_stat"
         "con"                   => "encode_cre_stat"
         "int"                   => "encode_cre_stat"
         "wis"                   => "encode_cre_stat"
         "chr"                   => "encode_cre_stat"
-        "str_bonus"             => "encode_percentage"
         "hps"                   => "encode_positive"
         "ac"                    => "encode_cre_ac"
         "thac0"                 => "encode_cre_thac0"
@@ -41,6 +43,8 @@ DEFINE_PATCH_FUNCTION write_cre_fields STR_VAR array = "" BEGIN
         "specific"              => "encode_cre_specific"
         "gender"                => "encode_cre_gender"
         "align"                 => "encode_cre_align"
+        "script_default"        => "encode_script_ref"
+        "script_override"       => "encode_script_ref"
     END
 
     PHP_EACH "%array%" AS field => value BEGIN
