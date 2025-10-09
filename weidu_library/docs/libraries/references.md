@@ -100,3 +100,7 @@ Encoder version of `get_resource_ref`.
 `encode_bam_ref STR_VAR value RET return`
 
 `encode_projectile_ref STR_VAR value RET return`
+
+`encode_script_ref STR_VAR value RET return`
+
+These encoders parse a resource reference for a resopurce of the apprpriate type, do an extra existence check and return the value.
