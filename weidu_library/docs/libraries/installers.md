@@ -29,14 +29,6 @@ Return the file extension of resources of `type`.
 
 Return the list of `fields` as a `:`-separated string for the installer table of resources of type `type`.
 
-# B. 1. Calling sequence.
-
-`get_installer_writer STR_VAR type RET writer`
-
-`get_installer_patcher STR_VAR type RET patcher`
-
-`get_installer_handler STR_VAR type RET handler`
-
 # C. Installer.
 
 note(s):
@@ -46,7 +38,15 @@ note(s):
 
 Installer for resources of `type` with resource information in `table` (full path). `patches` is an optional file to be `INCLUDED` containing patching functions referenced by name in `table`; any such patching function will be called with no arguments. Finally, `tra` is an optional tra file and `dir` is an optional directory wehere the resources are located, defaulting to a standard location depending on `type` (e. g. `%MOD_FOLDER%/resources/%ext%`, where `ext` is the resource extension associated to `type`).
 
-For each `type` of resource there is a template example for the structure of the .2da table located in `%WEIDU_LIBRARY_DIR%/resources/2da/installers/templates`.
+For each `type` of resource there is a template example for the structure of the .2da table located in `%WEIDU_LIBRARY_DIR%/resources/2da/installers/templates`. All these tables share the first two and the last three fields, with a (mostly) common meaning to them: `resource` is a symbolic name for the resource to be installed, usually just the file basename. `install` is a flag to selectively enable or disable installing for debugging purposes. `patch` is a resource patcher, a function with signature `STR_VAR destination = "*"` that *must* be in scope, and `destination` is a (computed) resource reference that will serve as the destination file basename. Finally, `override` is a debugging flag that controls what to do if a same-named resource already exists: if `0` then overriding is not allowed and if the resource already the function FAIL's, if `1` overriding is allowed. On the other hand if the `override` is `2` then the overriden resource *must* already exist otherwise the function FAIL's.
+
+## C. 1. `install_resources` calling sequence.
+
+`get_installer_writer STR_VAR type RET writer`
+
+`get_installer_patcher STR_VAR type RET patcher`
+
+`get_installer_handler STR_VAR type RET handler`
 
 # D. Managing references.
 
