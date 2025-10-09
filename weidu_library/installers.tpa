@@ -181,10 +181,23 @@ BEGIN
                         RET destination = resource END
                     END
 
-                    //Existence check.
-                    ACTION_IF (0 = override) AND (NOT ("%destination%" STRING_EQUAL_CASE "*")) BEGIN
-                        ACTION_IF (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
+                    //Existence debug checks.
+                    ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
+                        //Sanitize.
+                        ACTION_IF NOT (IS_AN_INT override) BEGIN
+                            FAIL "install_resources: '%override%' is not an integer."
+                        END
+
+                        ACTION_IF NOT ((0 <= override) AND (override <= 2)) BEGIN
+                            FAIL "install_resources: '%override%' not an integer in the [0, 2] range."
+                        END
+
+                        ACTION_IF (0 = override) AND (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
                             FAIL "install_resources: destination '%destination%.%ext%' for '%resource%' already exists in game."
+                        END
+
+                        ACTION_IF (2 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%")) BEGIN
+                            FAIL "install_resources: destination '%destination%.%ext%' for '%resource%' declared to exist but does not."
                         END
                     END
 
