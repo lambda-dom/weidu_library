@@ -10,6 +10,7 @@ High-level libraries:
 * [Installers](./libraries/installers.md): library to install various kinds of resources.
 * [Kits](./libraries/kits.md): library to patch classes and kits.
 * [HLAs](./libraries/hlas.md): library to patch hla tables.
+* [Spell symbols](./libraries/spell_symbols.md): library to interact with spell symbolic names as present in `spell.ids`.
 * [Patchers](./libraries/patchers.md): library of patchers of all kinds that have found no better place.
 
 Support libraries: libraries providing basic functionality supporting everything else.

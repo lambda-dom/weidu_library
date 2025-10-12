@@ -1,0 +1,108 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Arrays.
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/add_types.2da"
+RET_ARRAY add_types = array END
+
+
+//Action functions.
+DEFINE_ACTION_FUNCTION add_spell_symbol INT_VAR
+    level = 0
+STR_VAR
+    name = ""
+    type = ""
+    resource = ""
+    patch = "*"
+BEGIN
+    //Sanitize.
+    ACTION_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
+        FAIL "add_spell_symbol: '%level%' must be in the [0-9] range."
+    END
+
+    LAF get_array_element STR_VAR
+        array = "add_types"
+        key = "%type%"
+    RET id = value END
+    ACTION_IF (0 - 1 = id) BEGIN
+        FAIL "add_spell_symbol: '%type%' is not a valid spell type."
+    END
+
+    LAF get_spell_res STR_VAR spell = "%name%" RET exists = resource END
+    ACTION_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "add_spell_symbol: symbol '%name%' already exists in 'spell.ids'."
+    END
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS "%resource%.spl") BEGIN
+        FAIL "add_spell_symbol: spell resource '%resource%.spl' not found."
+    END
+
+    ADD_SPELL "%resource%.spl" id level "%name%"
+        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+            LPF "%patch%" END
+        END
+END
+
+DEFINE_ACTION_FUNCTION add_spell_symbols STR_VAR table = "" patches = "*" BEGIN
+    OUTER_TEXT_SPRINT blank "%WEIDU_LIBRARY%/resources/spl/blank.spl"
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS "%blank%") BEGIN
+        FAIL "add_spell_symbols: blank spell '%blank%' not found. "
+    END
+
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        //Sanitize.
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "install_resources: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "name:install:type:level:patch"
+    RET_ARRAY resources = table END
+
+    LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+    OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+        LAF get_row_from_table INT_VAR row = i STR_VAR
+            table = "resources"
+        RET_ARRAY
+            row = array
+        END
+
+        WITH_SCOPE BEGIN
+            //Inject names in local scope.
+            OUTER_TEXT_SPRINT name $"row"("name")
+            OUTER_TEXT_SPRINT install $"row"("install")
+            OUTER_TEXT_SPRINT type $"row"("type")
+            OUTER_TEXT_SPRINT level $"row"("level")
+            OUTER_TEXT_SPRINT patch $"row"("patch")
+
+            ACTION_IF NOT (install = 0) BEGIN
+                //Sanitize.
+                ACTION_IF NOT (IS_AN_INT level) BEGIN
+                    FAIL "add_spell_symbols: level '%level%' of row '%i%' is not an integer."
+                END
+
+                LAF add_spell_symbol INT_VAR
+                    level = level
+                STR_VAR
+                    name = "%name%"
+                    type = "%type%"
+                    resource = "%blank%"
+                    patch = "%patch%"
+                END
+            END
+        END
+    END
+END
