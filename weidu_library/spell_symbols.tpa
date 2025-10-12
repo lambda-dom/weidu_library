@@ -52,7 +52,7 @@ END
 DEFINE_ACTION_FUNCTION change_spell_symbol INT_VAR level = 0 STR_VAR name = "" type = "" BEGIN
     //Sanitize.
     ACTION_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
-        FAIL "change_spell_symbol: '%level%' must be in the [0-9] range."
+        FAIL "change_spell_symbol: '%level%' must be an integer in the [0-9] range."
     END
 
     LAF get_array_element STR_VAR
@@ -69,8 +69,8 @@ DEFINE_ACTION_FUNCTION change_spell_symbol INT_VAR level = 0 STR_VAR name = "" t
     END
 
     //Existence check.
-    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%name%.spl") BEGIN
-        FAIL ""
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%resource%.spl") BEGIN
+        FAIL "change_spell_symbol: resource '%resource%.spl' for '%name%' does not exist in game." 
     END
 
     //Make original resource available and add it under new name.
