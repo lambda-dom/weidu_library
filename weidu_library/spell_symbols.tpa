@@ -200,7 +200,7 @@ DEFINE_ACTION_FUNCTION replace_spell_symbols STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "old:install:new"
+        fields = "new:install:old"
     RET_ARRAY resources = table END
 
     COPY_EXISTING "spell.ids" "override"
@@ -214,9 +214,9 @@ DEFINE_ACTION_FUNCTION replace_spell_symbols STR_VAR table = "" BEGIN
 
             PATCH_WITH_SCOPE BEGIN
                 //Inject names in local scope.
-                TEXT_SPRINT old $"row"("old")
-                TEXT_SPRINT install $"row"("install")
                 TEXT_SPRINT new $"row"("new")
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT old $"row"("old")
 
                 PATCH_IF NOT (install = 0) BEGIN
                     LPF replace_spell_symbol STR_VAR
