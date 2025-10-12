@@ -52,7 +52,7 @@ END
 DEFINE_ACTION_FUNCTION change_spell_symbol INT_VAR level = 0 STR_VAR name = "" type = "" BEGIN
     //Sanitize.
     ACTION_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
-        FAIL "change_spell_symbol: '%level%' must be in the [0-9] range."
+        FAIL "change_spell_symbol: '%level%' must be an integer in the [0-9] range."
     END
 
     LAF get_array_element STR_VAR
@@ -69,8 +69,8 @@ DEFINE_ACTION_FUNCTION change_spell_symbol INT_VAR level = 0 STR_VAR name = "" t
     END
 
     //Existence check.
-    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%name%.spl") BEGIN
-        FAIL ""
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%resource%.spl") BEGIN
+        FAIL "change_spell_symbol: resource '%resource%.spl' for '%name%' does not exist in game." 
     END
 
     //Make original resource available and add it under new name.
@@ -87,7 +87,7 @@ DEFINE_PATCH_FUNCTION replace_spell_symbol STR_VAR new = "" old = "" BEGIN
         PATCH_FAIL "change_spell_symbol: symbol '%old%' does not exist in 'spell.ids'."
     END
 
-    LPF get_spell_res STR_VAR spell = "%new%" RET resource END
+    LPF get_spell_res STR_VAR spell = "%new%" RET exists = resource END
     PATCH_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_FAIL "change_spell_symbol: symbol '%new%' already exists in 'spell.ids'."
     END
@@ -99,11 +99,11 @@ END
 
 //Table interface.
 DEFINE_ACTION_FUNCTION add_spell_symbols STR_VAR table = "" patches = "*" BEGIN
-    OUTER_TEXT_SPRINT blank "%WEIDU_LIBRARY%/resources/spl/blank.spl"
+    OUTER_TEXT_SPRINT blank "%WEIDU_LIBRARY_DIR%/resources/spl/blank"
 
     //Existence check.
-    ACTION_IF NOT (FILE_EXISTS "%blank%") BEGIN
-        FAIL "add_spell_symbols: blank spell '%blank%' not found. "
+    ACTION_IF NOT (FILE_EXISTS "%blank%.spl") BEGIN
+        FAIL "add_spell_symbols: blank spell '%blank%.spl' not found. "
     END
 
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
@@ -200,7 +200,7 @@ DEFINE_ACTION_FUNCTION replace_spell_symbols STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "old:install:new"
+        fields = "new:install:old"
     RET_ARRAY resources = table END
 
     COPY_EXISTING "spell.ids" "override"
@@ -214,9 +214,9 @@ DEFINE_ACTION_FUNCTION replace_spell_symbols STR_VAR table = "" BEGIN
 
             PATCH_WITH_SCOPE BEGIN
                 //Inject names in local scope.
-                TEXT_SPRINT old $"row"("old")
-                TEXT_SPRINT install $"row"("install")
                 TEXT_SPRINT new $"row"("new")
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT old $"row"("old")
 
                 PATCH_IF NOT (install = 0) BEGIN
                     LPF replace_spell_symbol STR_VAR
