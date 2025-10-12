@@ -17,13 +17,13 @@ A wrapper around the WeiDU `ADD_SPELL` action macro. The function FAIL's if `nam
 
 `change_spell_symbol INT_VAR level STR_VAR name type`
 
-Changes the spell symbol `name` to `type` and `level`. This is implemented as a call to `ADD_SPELL` where `name` must already exist in `spell.ids`, so it adds a new slot to `spell.ids` unless `type` and `level` are the same (in which case the call is a no-op). The original spell resource is untouched.
+Changes the spell symbol `name` to `type` and `level`. This is implemented as a call to `ADD_SPELL` where `name` must already exist in `spell.ids`, so it adds a new slot to `spell.ids` unless `type` and `level` are the same, in which case the call is a no-op. The original spell resource is untouched.
 
 ## A. 1. Table interface.
 
 `add_spell_symbols STR_VAR table patches = "*"`
 
-Add new spell symbols to `spell.ids` using a table that must have the format of [Add spell symbols table](../../resources/2da/templates/add_symbols.2da). `patches` is an optional file to be `INCLUDED` containing patching functions referenced by name in `table`; any such patching function will be called with no arguments.
+Add new spell symbols to `spell.ids` using a table that must have the format of [Add spell symbols table](../../resources/2da/templates/add_symbols.2da). The resource used is a generic blank spell; it is assumed that it is patched or overriden later on the install. `patches` is an optional file to be `INCLUDED` containing patching functions referenced by name in `table`; any such patching function will be called with no arguments.
 
 `change_spell_symbols STR_VAR table`
 
