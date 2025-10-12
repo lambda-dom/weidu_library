@@ -1,4 +1,5 @@
 //Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
@@ -75,6 +76,24 @@ DEFINE_ACTION_FUNCTION change_spell_symbol INT_VAR level = 0 STR_VAR name = "" t
     //Make original resource available and add it under new name.
     COPY_EXISTING "%resource%.spl" "override/%resource%.spl"
     ADD_SPELL "override/%resource%.spl" id level "%name%"
+END
+
+
+//Patchers for spell.ids.
+DEFINE_PATCH_FUNCTION replace_spell_symbol STR_VAR new = "" old = "" BEGIN
+    //Sanitize.
+    LPF get_spell_res STR_VAR spell = "%old%" RET exists = resource END
+    PATCH_IF ("%exists%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_FAIL "change_spell_symbol: symbol '%old%' does not exist in 'spell.ids'."
+    END
+
+    LPF get_spell_res STR_VAR spell = "%new%" RET resource END
+    PATCH_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
+        PATCH_FAIL "change_spell_symbol: symbol '%new%' already exists in 'spell.ids'."
+    END
+
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "%old%" RET row = index END
+    SET_2DA_ENTRY row 1 2 "%new%"
 END
 
 
@@ -175,4 +194,37 @@ DEFINE_ACTION_FUNCTION change_spell_symbols STR_VAR table = "" BEGIN
             END
         END
     END
+END
+
+DEFINE_ACTION_FUNCTION replace_spell_symbols STR_VAR table = "" BEGIN
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "old:install:new"
+    RET_ARRAY resources = table END
+
+    COPY_EXISTING "spell.ids" "override"
+        LPF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT old $"row"("old")
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT new $"row"("new")
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    LPF replace_spell_symbol STR_VAR
+                        old = "%old%"
+                        new = "%new%"
+                    END
+                END
+            END
+        END
+    BUT_ONLY
 END

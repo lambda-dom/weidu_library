@@ -32,5 +32,17 @@ Change spell symbols in `spell.ids` using a table that must have the format of [
 # B. `spell.ids` patchers.
 
 note(s):
-* All functions in this section are patching functions for `spell.ids`.
+* Unless explicitly said otherwise, all functions in this section are patching functions for `spell.ids`.
 
+`replace_spell_symbol STR_VAR new old`
+
+Replaces spell symbol `old` with `new`. The function FAIL's if either `old` is not present in `spell.ids` or `new` is. The underlying spell resource is left untouched.
+
+note(s):
+* this function makes the `old` spell symbol unavailable so any code that relies on its existence will fail.
+
+## B. 1. Table interface.
+
+`replace_spell_symbols STR_VAR table`
+
+Action function that replaces spell symbols in `spell.ids` using a table with the format of [Replace spell symbols table](../../resources/2da/templates/replace_symbols.2da).
