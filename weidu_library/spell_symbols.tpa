@@ -99,11 +99,11 @@ END
 
 //Table interface.
 DEFINE_ACTION_FUNCTION add_spell_symbols STR_VAR table = "" patches = "*" BEGIN
-    OUTER_TEXT_SPRINT blank "%WEIDU_LIBRARY%/resources/spl/blank.spl"
+    OUTER_TEXT_SPRINT blank "%WEIDU_LIBRARY_DIR%/resources/spl/blank"
 
     //Existence check.
-    ACTION_IF NOT (FILE_EXISTS "%blank%") BEGIN
-        FAIL "add_spell_symbols: blank spell '%blank%' not found. "
+    ACTION_IF NOT (FILE_EXISTS "%blank%.spl") BEGIN
+        FAIL "add_spell_symbols: blank spell '%blank%.spl' not found. "
     END
 
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
