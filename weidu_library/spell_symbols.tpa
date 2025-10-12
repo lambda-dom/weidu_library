@@ -87,7 +87,7 @@ DEFINE_PATCH_FUNCTION replace_spell_symbol STR_VAR new = "" old = "" BEGIN
         PATCH_FAIL "change_spell_symbol: symbol '%old%' does not exist in 'spell.ids'."
     END
 
-    LPF get_spell_res STR_VAR spell = "%new%" RET resource END
+    LPF get_spell_res STR_VAR spell = "%new%" RET exists = resource END
     PATCH_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_FAIL "change_spell_symbol: symbol '%new%' already exists in 'spell.ids'."
     END
