@@ -31,7 +31,7 @@ END
 
 //Add sectype.
 DEFINE_DIMORPHIC_FUNCTION add_sectype INT_VAR tra_ref = 0 STR_VAR sectype = "" RET id BEGIN
-    ADD_SECTYPE "%sectype%" tra_ref
+    ADD_SECTYPE "%sectype%" (AT tra_ref)
     OUTER_SET id = EVAL "%sectype%"
 END
 
