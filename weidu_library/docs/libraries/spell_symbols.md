@@ -41,8 +41,16 @@ Replaces spell symbol `old` with `new`. The function FAIL's if either `old` is n
 note(s):
 * this function makes the `old` spell symbol unavailable so any code that relies on its existence will fail.
 
+`replace_spell_symbol_hole INT_VAR level id STR_VAR name type`
+
+Replace a hole in `spell.ids` (unassigned slot) with the spell symbol `name`.
+
 ## B. 1. Table interface.
 
 `replace_spell_symbols STR_VAR table`
 
 Action function that replaces spell symbols in `spell.ids` using a table with the format of [Replace spell symbols table](../../resources/2da/templates/replace_symbols.2da).
+
+`replace_spell_symbol_holes STR_VAR table`
+
+Action function that replaces spell symbol holes in `spell.ids` (unassigned slots) using a table with the format of [Replace spell symbol holes table](../../resources/2da/templates/replace_symbol_holes.2da).
