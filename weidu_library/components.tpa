@@ -19,7 +19,7 @@ DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT = "" dir = "*" BEGIN
     //Main component file.
     OUTER_TEXT_SPRINT COMPONENT_DIR "%MOD_FOLDER%/components/%COMPONENT%"
     ACTION_IF NOT ("*" STRING_EQUAL_CASE "%dir%") BEGIN
-        OUTER_TEXT_SPRINT COMPONENT_DIR "%MOD_FOLDER%/components/%root%"
+        OUTER_TEXT_SPRINT COMPONENT_DIR "%MOD_FOLDER%/components/%dir%"
     END
 
     OUTER_TEXT_SPRINT main "%MOD_FOLDER%/components/%COMPONENT%/main.tpa"
