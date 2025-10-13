@@ -80,20 +80,43 @@ END
 
 
 //Patchers for spell.ids.
-DEFINE_PATCH_FUNCTION replace_spell_symbol STR_VAR new = "" old = "" BEGIN
-    //Sanitize.
-    LPF get_spell_res STR_VAR spell = "%old%" RET exists = resource END
-    PATCH_IF ("%exists%" STRING_EQUAL_CASE "*") BEGIN
-        PATCH_FAIL "change_spell_symbol: symbol '%old%' does not exist in 'spell.ids'."
+DEFINE_PATCH_FUNCTION alias_spell_symbol STR_VAR symbol = "" aliased = "" BEGIN
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "%symbol%" RET row_symbol = index END
+    PATCH_IF (0 - 1 = row_symbol) BEGIN
+        PATCH_FAIL "alias_spell_symbol: symbol '%symbol%' does not exist in 'spell.ids'."
     END
 
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "%aliased%" RET row_aliased = index END
+    PATCH_IF (0 - 1 = row_aliased) BEGIN
+        PATCH_FAIL "alias_spell_symbol: symbol '%aliased%' does not exist in 'spell.ids'."
+    END
+
+    COUNT_2DA_ROWS 2 row_count
+    READ_2DA_ENTRY row_aliased 0 2 spell_id
+
+    //Move row to the end, changing the id column.
+    REMOVE_2DA_ROW row_symbol 2
+    INSERT_2DA_ROW (row_count - 1) 2 "%spell_id% %symbol%"
+END
+
+DEFINE_PATCH_FUNCTION replace_spell_symbol STR_VAR new = "" old = "" BEGIN
+    //Sanitize.
     LPF get_spell_res STR_VAR spell = "%new%" RET exists = resource END
     PATCH_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_FAIL "change_spell_symbol: symbol '%new%' already exists in 'spell.ids'."
     END
 
     LPF find_row_index INT_VAR col = 1 STR_VAR key = "%old%" RET row = index END
-    SET_2DA_ENTRY row 1 2 "%new%"
+    PATCH_IF (0 - 1 = row) BEGIN
+        PATCH_FAIL "change_spell_symbol: symbol '%old%' does not exist in 'spell.ids'."
+    END
+
+    COUNT_2DA_ROWS 2 row_count
+    READ_2DA_ENTRY row 0 2 spell_id
+
+    //Move row to the end, changing the symbol column.
+    REMOVE_2DA_ROW row 2
+    INSERT_2DA_ROW (row_count - 1) 2 "%spell_id% %new%" 
 END
 
 DEFINE_PATCH_FUNCTION deprecate_spell_symbol STR_VAR symbol = "" BEGIN
@@ -103,14 +126,14 @@ DEFINE_PATCH_FUNCTION deprecate_spell_symbol STR_VAR symbol = "" BEGIN
     END
 END
 
-DEFINE_PATCH_FUNCTION replace_spell_symbol_hole INT_VAR level = 0 id = 0 STR_VAR symbol = "" type = "" BEGIN
+DEFINE_PATCH_FUNCTION assign_spell_symbol_hole INT_VAR level = 0 id = 0 STR_VAR symbol = "" type = "" BEGIN
     //Sanitize.
     PATCH_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
-        PATCH_FAIL "replace_spell_symbol_hole: '%level%' must be an integer in the [0-9] range."
+        PATCH_FAIL "assign_spell_symbol_hole: '%level%' must be an integer in the [0-9] range."
     END
 
     PATCH_IF NOT ((0 <= id) AND (id <= 99)) BEGIN
-        PATCH_FAIL "replace_spell_symbol_hole: '%id%' must be an integer in the [0-99] range."
+        PATCH_FAIL "assign_spell_symbol_hole: '%id%' must be an integer in the [0-99] range."
     END
 
     LPF get_array_element STR_VAR
@@ -118,18 +141,18 @@ DEFINE_PATCH_FUNCTION replace_spell_symbol_hole INT_VAR level = 0 id = 0 STR_VAR
         key = "%type%"
     RET type_id = value END
     PATCH_IF (0 - 1 = type_id) BEGIN
-        PATCH_FAIL "replace_spell_symbol_hole: '%type%' is not a valid spell type."
+        PATCH_FAIL "assign_spell_symbol_hole: '%type%' is not a valid spell type."
     END
 
     LPF get_spell_res STR_VAR spell = "%symbol%" RET exists = resource END
     PATCH_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
-        PATCH_FAIL "replace_spell_symbol_hole: symbol '%symbol%' already exists in 'spell.ids'."
+        PATCH_FAIL "assign_spell_symbol_hole: symbol '%symbol%' already exists in 'spell.ids'."
     END
 
     spell_id = (1000 * type_id) + (100 * level) + id
     LPF find_row_index STR_VAR key = "%spell_id%" RET row = index END
     PATCH_IF NOT (0 - 1 = row) BEGIN
-        PATCH_FAIL "replace_spell_symbol_hole: numeric id for symbol '%symbol%' already exists in 'spell.ids'."
+        PATCH_FAIL "assign_spell_symbol_hole: numeric id for symbol '%symbol%' already exists in 'spell.ids'."
     END
 
     //Add spell symbol.
@@ -196,6 +219,39 @@ DEFINE_ACTION_FUNCTION add_spell_symbols STR_VAR table = "" patches = "*" BEGIN
             END
         END
     END
+END
+
+DEFINE_ACTION_FUNCTION alias_spell_symbols STR_VAR table = "" BEGIN
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "symbol:install:aliased"
+    RET_ARRAY resources = table END
+
+    COPY_EXISTING "spell.ids" "override"
+        LPF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT symbol $"row"("symbol")
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT aliased $"row"("aliased")
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    LPF alias_spell_symbol STR_VAR
+                        symbol = "%symbol%"
+                        aliased = "%aliased%"
+                    END
+                END
+            END
+        END
+    BUT_ONLY
 END
 
 DEFINE_ACTION_FUNCTION change_spell_symbols STR_VAR table = "" BEGIN
@@ -299,7 +355,7 @@ DEFINE_ACTION_FUNCTION deprecate_spell_symbols STR_VAR table = "" BEGIN
     BUT_ONLY
 END
 
-DEFINE_ACTION_FUNCTION replace_spell_symbol_holes STR_VAR table = "" BEGIN
+DEFINE_ACTION_FUNCTION assign_spell_symbol_holes STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
@@ -326,14 +382,14 @@ DEFINE_ACTION_FUNCTION replace_spell_symbol_holes STR_VAR table = "" BEGIN
                 PATCH_IF NOT (install = 0) BEGIN
                     //Sanitize.
                     PATCH_IF NOT (IS_AN_INT level) BEGIN
-                        PATCH_FAIL "replace_spell_symbol_holes: level '%level%' of row '%i%' is not an integer."
+                        PATCH_FAIL "assign_spell_symbol_holes: level '%level%' of row '%i%' is not an integer."
                     END
 
                     PATCH_IF NOT (IS_AN_INT level) BEGIN
-                        PATCH_FAIL "replace_spell_symbol_holes: id '%id%' of row '%i%' is not an integer."
+                        PATCH_FAIL "assign_spell_symbol_holes: id '%id%' of row '%i%' is not an integer."
                     END
 
-                    LPF replace_spell_symbol_hole INT_VAR
+                    LPF assign_spell_symbol_hole INT_VAR
                         level = level
                         id = id
                     STR_VAR
