@@ -28,19 +28,19 @@ Changes the spell `symbol` to `type` and `level`. This is implemented as a call 
 note(s):
 * Unless explicitly said otherwise, all functions in this section are patching functions for `spell.ids`.
 
+`alias_spell_symbol STR_VAR symbol aliased`
+
+This function changes `symbol` to reference the same spell resource of `aliased`. The function fails if either `symbol` or `aliased` do not exist in `spell.ids`.
+
+note(s):
+* This function explicitly breaks the injectivity rule, so it is wise to subsequently change `aliased` to something else.
+
 `replace_spell_symbol STR_VAR new old`
 
 Replaces spell symbol `old` with `new`. The function FAIL's if either `old` is not present in `spell.ids` or `new` is. The underlying spell resource is left untouched.
 
 note(s):
 * This function makes the `old` spell symbol unavailable so any code that relies on its existence will fail.
-
-`alias_spell_symbol STR_VAR new old`
-
-This function changes `new` symbol to reference the same spell resource of `old`. The function fails if either `old` or `new` do not exist.
-
-note(s):
-* This function explicitly breaks the injectivity rule, so it is wise to subsequently change `old` to something else.
 
 `deprecate_spell_symbol STR_VAR symbol`
 
@@ -51,7 +51,7 @@ note(s):
 
 `assign_spell_symbol_hole INT_VAR level id STR_VAR symbol type`
 
-Assign a hole in `spell.ids` (unassigned slot) to the spell symbol `symbol`.
+Assign a hole in `spell.ids` (unassigned slot) to the spell symbol `symbol`. The function fails if `level` or `id` are out of bounds, `type` is not a valid spell type or `symbol` already exists in `spell.ids`.
 
 # B. Table interface.
 
@@ -63,6 +63,10 @@ note(s):
 `add_spell_symbols STR_VAR table patches = "*"`
 
 Add new spell symbols to `spell.ids` using a table that must have the format of [Add spell symbols table](../../resources/2da/templates/add_symbols.2da). `patches` is an optional file to be `INCLUDED` containing patching functions referenced by name in `table`; any such patching function will be called with no arguments.
+
+`alias_spell_symbols STR_VAR table`
+
+Action function that replaces spell symbols in `spell.ids` using a table with the format of [Replace spell symbols table](../../resources/2da/templates/alias_symbols.2da).
 
 `change_spell_symbols STR_VAR table`
 
@@ -76,6 +80,6 @@ Action function that replaces spell symbols in `spell.ids` using a table with th
 
 Action function that deprecates spell symbols in `spell.ids` using a table with the format of [Deprecate spell symbols table](../../resources/2da/templates/deprecate_symbols.2da).
 
-`alias_spell_symbol_holes STR_VAR table`
+`assign_spell_symbol_holes STR_VAR table`
 
-Action function that replaces spell symbol holes in `spell.ids` (unassigned slots) using a table with the format of [Replace spell symbol holes table](../../resources/2da/templates/replace_symbol_holes.2da).
+Action function that replaces spell symbol holes in `spell.ids` (unassigned slots) using a table with the format of [Replace spell symbol holes table](../../resources/2da/templates/assign_symbol_holes.2da).
