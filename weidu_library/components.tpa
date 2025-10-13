@@ -1,5 +1,5 @@
 //Installers.
-DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT = "" dir = "*" BEGIN
+DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT = "" root = "*" BEGIN
     //Clear on entry.
     CLEAR_ARRAYS
     CLEAR_CODES
@@ -17,9 +17,9 @@ DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT = "" dir = "*" BEGIN
     END
 
     //Main component file.
-    OUTER_TEXT_SPRINT COMPONENT_DIR "%MOD_FOLDER%/components/%COMPONENT%"
+    OUTER_TEXT_SPRINT COMPONENT_ROOT "%COMPONENT%"
     ACTION_IF NOT ("*" STRING_EQUAL_CASE "%dir%") BEGIN
-        OUTER_TEXT_SPRINT COMPONENT_DIR "%MOD_FOLDER%/components/%dir%"
+        OUTER_TEXT_SPRINT COMPONENT_ROOT "%root%"
     END
 
     OUTER_TEXT_SPRINT main "%MOD_FOLDER%/components/%COMPONENT%/main.tpa"
@@ -50,11 +50,11 @@ DEFINE_DIMORPHIC_FUNCTION get_component_main RET file BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_component_resources_dir RET dir BEGIN
-    OUTER_TEXT_SPRINT dir "%COMPONENT_DIR%/resources"
+    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/components/%COMPONENT_ROOT%/resources"
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_component_tra_dir RET dir BEGIN
-    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%"
+    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_ROOT%"
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_component_tra_main RET file BEGIN
