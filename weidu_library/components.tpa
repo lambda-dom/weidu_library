@@ -18,7 +18,7 @@ DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT = "" root = "*" BEGIN
 
     //Main component file.
     OUTER_TEXT_SPRINT COMPONENT_ROOT "%COMPONENT%"
-    ACTION_IF NOT ("*" STRING_EQUAL_CASE "%dir%") BEGIN
+    ACTION_IF NOT ("*" STRING_EQUAL_CASE "%root%") BEGIN
         OUTER_TEXT_SPRINT COMPONENT_ROOT "%root%"
     END
 
