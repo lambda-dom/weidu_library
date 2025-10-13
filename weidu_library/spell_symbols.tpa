@@ -96,6 +96,13 @@ DEFINE_PATCH_FUNCTION replace_spell_symbol STR_VAR new = "" old = "" BEGIN
     SET_2DA_ENTRY row 1 2 "%new%"
 END
 
+DEFINE_PATCH_FUNCTION deprecate_spell_symbol STR_VAR symbol = "" BEGIN
+    LPF replace_spell_symbol STR_VAR
+        new = "%symbol%_DEPRECATED"
+        old = "%symbol%"
+    END
+END
+
 DEFINE_PATCH_FUNCTION replace_spell_symbol_hole INT_VAR level = 0 id = 0 STR_VAR symbol = "" type = "" BEGIN
     //Sanitize.
     PATCH_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
@@ -257,6 +264,35 @@ DEFINE_ACTION_FUNCTION replace_spell_symbols STR_VAR table = "" BEGIN
                         old = "%old%"
                         new = "%new%"
                     END
+                END
+            END
+        END
+    BUT_ONLY
+END
+
+DEFINE_ACTION_FUNCTION deprecate_spell_symbols STR_VAR table = "" BEGIN
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "symbol:install"
+    RET_ARRAY resources = table END
+
+    COPY_EXISTING "spell.ids" "override"
+        LPF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT symbol $"row"("symbol")
+                TEXT_SPRINT install $"row"("install")
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    LPF deprecate_spell_symbol STR_VAR symbol = "%symbol%" END
                 END
             END
         END
