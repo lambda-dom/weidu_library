@@ -82,18 +82,22 @@ END
 //Patchers for spell.ids.
 DEFINE_PATCH_FUNCTION replace_spell_symbol STR_VAR new = "" old = "" BEGIN
     //Sanitize.
-    LPF get_spell_res STR_VAR spell = "%old%" RET exists = resource END
-    PATCH_IF ("%exists%" STRING_EQUAL_CASE "*") BEGIN
-        PATCH_FAIL "change_spell_symbol: symbol '%old%' does not exist in 'spell.ids'."
-    END
-
     LPF get_spell_res STR_VAR spell = "%new%" RET exists = resource END
     PATCH_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_FAIL "change_spell_symbol: symbol '%new%' already exists in 'spell.ids'."
     END
 
     LPF find_row_index INT_VAR col = 1 STR_VAR key = "%old%" RET row = index END
-    SET_2DA_ENTRY row 1 2 "%new%"
+    PATCH_IF (0 - 1 = row) BEGIN
+        PATCH_FAIL "change_spell_symbol: symbol '%old%' does not exist in 'spell.ids'."
+    END
+
+    COUNT_2DA_ROWS 2 row_count
+    READ_2DA_ENTRY row 0 2 spell_id
+
+    //Move row to the end, changing the symbol column.
+    REMOVE_2DA_ROW row 2
+    INSERT_2DA_ROW (row_count - 1) 2 "%spell_id% %new%" 
 END
 
 DEFINE_PATCH_FUNCTION deprecate_spell_symbol STR_VAR symbol = "" BEGIN
@@ -103,7 +107,7 @@ DEFINE_PATCH_FUNCTION deprecate_spell_symbol STR_VAR symbol = "" BEGIN
     END
 END
 
-DEFINE_PATCH_FUNCTION replace_spell_symbol_hole INT_VAR level = 0 id = 0 STR_VAR symbol = "" type = "" BEGIN
+DEFINE_PATCH_FUNCTION assign_spell_symbol_hole INT_VAR level = 0 id = 0 STR_VAR symbol = "" type = "" BEGIN
     //Sanitize.
     PATCH_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
         PATCH_FAIL "replace_spell_symbol_hole: '%level%' must be an integer in the [0-9] range."
@@ -299,7 +303,7 @@ DEFINE_ACTION_FUNCTION deprecate_spell_symbols STR_VAR table = "" BEGIN
     BUT_ONLY
 END
 
-DEFINE_ACTION_FUNCTION replace_spell_symbol_holes STR_VAR table = "" BEGIN
+DEFINE_ACTION_FUNCTION assign_spell_symbol_hole STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
