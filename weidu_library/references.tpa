@@ -66,6 +66,32 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_suffix STR_VAR value = "" RET return BEGI
     RET return = resource END
 END
 
+DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT regexp "^\([a-zA-Z0-9][a-zA-Z0-9]\):\([a-zA-Z0-9]\):\([a-zA-Z0-9_]+\)$"
+
+    //Sanitize.
+    ACTION_IF NOT (0 = ("%value%" STRING_MATCHES_REGEXP "%regexp%")) BEGIN
+        FAIL "encode_spell_suffix: string '%value%' does not have a valid format."
+    END
+
+    //Generate name.
+    OUTER_PATCH "%value%" BEGIN
+        REPLACE_EVALUATE CASE_INSENSITIVE "%regexp%" BEGIN
+            TEXT_SPRINT prefix "%MATCH1%"
+            TEXT_SPRINT suffix "%MATCH2%"
+            TEXT_SPRINT spell "%MATCH3%"
+        END ~~
+    END
+
+    LAF encode_spell_res STR_VAR value = "%spell%" RET return END   
+    LAF replace_affixes STR_VAR
+        spell = "%return%"
+        prefix = "%prefix%"
+        suffix = "%suffix%"
+    RET return = resource END
+END
+
+
 //Main function.
 DEFINE_DIMORPHIC_FUNCTION get_resource_ref STR_VAR ref = "" RET resource BEGIN
     //Available formats.
@@ -74,6 +100,7 @@ DEFINE_DIMORPHIC_FUNCTION get_resource_ref STR_VAR ref = "" RET resource BEGIN
         "spl" => "encode_spell_res"
         "lbl" => "encode_missile_res"
         "suf" => "encode_spell_suffix"
+        "aff" => "encode_spell_affix"
         "opc" => "encode_opcode_type"
         "sct" => "encode_spell_sectype"
     END
