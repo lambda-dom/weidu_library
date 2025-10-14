@@ -209,3 +209,16 @@ DEFINE_PATCH_FUNCTION set_spell_header_field INT_VAR header = 0 STR_VAR field = 
         value = "%value%"
     END
 END
+
+//Convenience spell patchers.
+DEFINE_PATCH_FUNCTION set_spell_header_fields STR_VAR field = "" value = "" BEGIN
+    LPF get_spell_header_count RET header_count = count END
+    FOR (i = 0; i < header_count; ++i) BEGIN
+        LPF set_spell_header_field INT_VAR
+            header = i
+        STR_VAR
+            field = "%field%"
+            value = "%value%"
+        END
+    END
+END

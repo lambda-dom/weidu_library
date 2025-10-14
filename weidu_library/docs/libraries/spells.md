@@ -91,6 +91,12 @@ Return `offset` of the opcode block for the `header` (equivalently, the offset o
 
 Return `offset` of `index` opcode of `header`. If any of `index` or `header` are out of bounds, it returns -1.
 
+## C. 5. Spell header patchers.
+
+Convenience spell header patcher that applies a field change to every header.
+
+`set_spell_header_fields STR_VAR field value`
+
 # D. Readers and writers.
 
 Specializations of the generic reader and writer for spells.
