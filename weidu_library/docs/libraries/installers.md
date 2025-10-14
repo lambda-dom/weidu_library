@@ -78,6 +78,8 @@ For each `type` of resource there is a template example for the structure of the
 
 * copy_item: copy `itm` files.
 
+* copy_item_simplified: copy `itm` files, but with a simplified table format. For items like a summon's weapons, that need much less information.
+
 * add_projectile: table interface around `ADD_PROJECTILE` to install `pro` files.
 
 * copy_projectile: copy `itm` files.
