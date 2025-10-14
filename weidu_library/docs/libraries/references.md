@@ -77,10 +77,18 @@ note(s):
 
 `encode_spell_suffix STR_VAR value RET return`
 
-Returns the symbolic spell reference suffixed with the character. For example, e.g. `a:CLERIC_BLESS` returns `sppr101a`. Function FAIL's if `value` not present in `spell.ids`. Format is:
+Returns the symbolic spell reference suffixed with the character. For example, e.g. `a:CLERIC_BLESS` returns `sppr101a`. Function FAIL's if the spell symbol (last component) not present in `spell.ids`. Format is:
 
 ```
 #suf:<one alphanumeric character>:<spell symbolic reference>
+```
+
+`encode_spell_affix STR_VAR value RET return`
+
+Returns the symbolic spell reference suffixed with a character and the first two characters relaced by the affix. For example, e.g. `dv:a:CLERIC_BLESS` returns `dvpr101a`. Function FAIL's if the spell symbol (last component) not present in `spell.ids`. Format is:
+
+```
+#afx:<two alphanumeric characters>:<one alphanumeric character>:<spell symbolic reference>
 ```
 
 `encode_opcode_type STR_VAR value RET return`
