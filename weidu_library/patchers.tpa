@@ -69,8 +69,8 @@ END
 DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" BEGIN
     PHP_EACH "%replacement%" AS string => spell BEGIN
         //Sanitize.
-        PATCH_IF ( 7 < STRING_LENGTH "%spell%") BEGIN
-            PATCH_FAIL "patch_script_spell_replacements: resource '%spell%' has more than 7 characters."
+        PATCH_IF ( 8 < STRING_LENGTH "%spell%") BEGIN
+            PATCH_FAIL "patch_script_spell_replacements: resource '%spell%' has more than 8 characters."
         END
 
         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%spell%.spl") BEGIN

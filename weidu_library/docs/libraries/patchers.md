@@ -31,7 +31,7 @@ STR_VAR
 
 `patch_script_spell_replacements STR_VAR replacements`
 
-Patch a script with a `replacements` array of pairs `key => spell` with `spell` spell references. The spell must exist in game, the name must be 7 characters or less and is written upper-cased.
+Patch a script with a `replacements` array of pairs `key => spell` with `spell` spell references. The spell must exist in game, the reference must be 8 characters or less and is written upper-cased.
 
 `patch_script_item_replacements STR_VAR replacements`
 
