@@ -1,0 +1,4 @@
+2DA V1.0
+*
+            name    description arg1                arg2                    arg3                patch   patch_description
+subspell    0       0           name_first_argument name_second_argument    name_third_argument *       *
