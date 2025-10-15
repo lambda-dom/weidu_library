@@ -41,6 +41,7 @@ Replaces spell symbol `old` with `new`. The function FAIL's if either `old` is n
 
 note(s):
 * This function makes the `old` spell symbol unavailable so any code that relies on its existence will fail.
+* This is a slow operation.
 
 `deprecate_spell_symbol STR_VAR symbol`
 
@@ -52,6 +53,9 @@ note(s):
 `assign_spell_symbol_hole INT_VAR level id STR_VAR symbol type`
 
 Assign a hole in `spell.ids` (unassigned slot) to the spell symbol `symbol`. The function fails if `level` or `id` are out of bounds, `type` is not a valid spell type or `symbol` already exists in `spell.ids`.
+
+note(s):
+* This is a slow operation.
 
 # B. Table interface.
 

@@ -23,6 +23,20 @@ STR_VAR
     references
 ```
 
-# B. Creature patcher.
+# B. Creature patchers.
 
 `creature_add_item STR_VAR reference slot flags array`
+
+# C. Script patchers.
+
+`patch_script_spell_replacements STR_VAR replacements`
+
+Patch a script with a `replacements` array of pairs `key => spell` with `spell` spell references. The spell must exist in game, the reference must be 8 characters or less and is written upper-cased.
+
+`patch_script_item_replacements STR_VAR replacements`
+
+Patch a script with a `replacements` array of pairs `key => item` with `item` item references. The item must exist in game, otherwise the function FAIL's.
+
+`patch_script_string_replacements STR_VAR replacements tra`
+
+Patch a script with a `replacements` array of pairs `key => tra_ref` with `tra_ref` tra references looked up in the `tra` file (full path, no extension), which is loaded on entering the function and then automatically unloaded on exiting it.

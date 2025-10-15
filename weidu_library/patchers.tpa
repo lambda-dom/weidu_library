@@ -63,3 +63,50 @@ BEGIN
     //Equip item.
     ADD_CRE_ITEM "%item%" #0 #0 #0 "%flags%" "%slot%"
 END
+
+
+//Script patchers.
+DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" BEGIN
+    PHP_EACH "%replacement%" AS string => spell BEGIN
+        //Sanitize.
+        PATCH_IF ( 8 < STRING_LENGTH "%spell%") BEGIN
+            PATCH_FAIL "patch_script_spell_replacements: resource '%spell%' has more than 8 characters."
+        END
+
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%spell%.spl") BEGIN
+            PATCH_FAIL "patch_script_spell_replacements: spell '%spell%.spl' does not exist in game."
+        END
+
+        TO_UPPER spell
+
+        //Perform substitution.
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%string%" "%spell%"
+    END
+END
+
+DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR replacements = "" BEGIN
+    PHP_EACH "%replacement%" AS string => item BEGIN
+        //Sanitize.
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%item%.itm") BEGIN
+            PATCH_FAIL "patch_script_item_replacements: item '%item%.itm' does not exist in game."
+        END
+
+        //Perform substitution.
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%string%" "%item%"
+    END
+END
+
+DEFINE_PATCH_FUNCTION patch_script_string_replacements STR_VAR replacements = "" tra = "" BEGIN
+    PATCH_IF NOT (FILE_EXISTS "%tra%.tra") BEGIN
+        PATCH_FAIL "patch_script_string_replacements: tra file '%tra%.tra' does not exist."
+    END
+
+    PATCH_WITH_TRA "%tra%.tra" BEGIN
+        PHP_EACH "%replacement%" AS string => tra_ref BEGIN
+            tlk_ref = RESOLVE_STR_REF ((AT tra_ref))
+
+            //Perform substitution.
+            REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%string%" "%tlk_ref%"
+        END
+    END
+END
