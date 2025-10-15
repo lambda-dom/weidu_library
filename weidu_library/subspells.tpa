@@ -1,6 +1,7 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/sectypes.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
@@ -34,9 +35,9 @@ BEGIN
 
     //Load table of subspells to clone.
     LAF load_table STR_VAR
-        file = "%table%"
+        file = "%subspells%"
         fields = "subspell:name:description:arg1:arg2:arg3:patch:patch_description"
-    RET_ARRAY subspells = table END
+    RET_ARRAY subspells_table = table END
 
     //Load table
     LAF load_table STR_VAR
@@ -95,7 +96,7 @@ BEGIN
 
                     //Find spell to clone.
                     LAF find_table_row STR_VAR
-                        table = "subspells"
+                        table = "subspells_table"
                         field = "subspell"
                         key = "%subspell%"
                     RET index END
@@ -107,7 +108,7 @@ BEGIN
                     LAF get_row_from_table INT_VAR
                         row = index
                     STR_VAR
-                        table = "subspells"
+                        table = "subspells_table"
                     RET_ARRAY clone_row = array END
 
                     //Inject names.
@@ -143,7 +144,7 @@ BEGIN
 
                         //Patch name.
                         name_tlk = RESOLVE_STR_REF ((AT name))
-                        LPF set_spell_field STR_VAR name = "name" value = "%name_tlk%" END
+                        LPF set_spell_field STR_VAR field = "name" value = "%name_tlk%" END
 
                         //Patch description.
                         PATCH_IF NOT ("%patch_description%" STRING_EQUAL_CASE "*") BEGIN
@@ -156,16 +157,18 @@ BEGIN
                             RET desc_text = text END
 
                             desc_tlk = RESOLVE_STR_REF ("%desc_text%")
-                            LPF set_spell_field STR_VAR name = "description" value = "%desc_tlk%" END
+                            LPF set_spell_field STR_VAR field = "description" value = "%desc_tlk%" END
                         END
 
 
                         //Fill school and sectype.
                         PATCH_IF NOT ("%school%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF encode_school STR_VAR value = "%school%" RET school = return END
                             LPF set_spell_field STR_VAR field = "school" value = "%school%" END
                         END
 
                         PATCH_IF NOT ("%sectype%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF encode_spell_sectype STR_VAR value = "%sectype%" RET sectype = return END
                             LPF set_spell_field STR_VAR field = "sectype" value = "%sectype%" END
                         END
 
