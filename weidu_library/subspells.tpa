@@ -1,0 +1,190 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/sectypes.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Installer.
+DEFINE_ACTION_FUNCTION install_subspells STR_VAR
+    table = ""
+    subspells = ""
+    dir = ""
+    tra = ""
+    patches = ""
+BEGIN
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%subspells%") BEGIN
+        FAIL "install_subspells: table '%subspells%' of subspells to clone not found."
+    END
+
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_subspells: subspells dir '%dir%' does not exist."
+    END
+
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "install_subspells: subspells tra file '%tra%' does not exist."
+    END
+
+    ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+        FAIL "install_subspells: patches file '%patches%' does not exist."
+    END ELSE BEGIN
+        INCLUDE "%patches%"
+    END
+
+    //Load table of subspells to clone.
+    LAF load_table STR_VAR
+        file = "%subspells%"
+        fields = "subspell:name:description:arg1:arg2:arg3:patch:patch_description"
+    RET_ARRAY subspells_table = table END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "symbol:install:subspell:arg1:arg2:arg3:school:sectype:override:destination"
+    RET_ARRAY resources = table END
+
+    WITH_TRA "%tra%" BEGIN
+        //Loop.
+        LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+            LAF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                OUTER_TEXT_SPRINT install $"row"("install")
+                OUTER_TEXT_SPRINT override $"row"("override")
+                OUTER_TEXT_SPRINT destination $"row"("destination")
+
+                ACTION_IF NOT (install = 0) BEGIN
+                    //Compute destination.
+                    LAF get_resource_ref STR_VAR
+                        ref = "%destination%"
+                    RET destination = resource END
+
+                    //Override checks.
+                    //Sanitize override.
+                    ACTION_IF NOT (IS_AN_INT override) BEGIN
+                        FAIL "install_subspells: '%override%' is not an integer."
+                    END
+
+                    ACTION_IF NOT ((0 <= override) AND (override <= 2)) BEGIN
+                        FAIL "install_subspells: '%override%' not an integer in the [0, 2] range."
+                    END
+
+                    ACTION_IF (0 = override) AND (FILE_EXISTS_IN_GAME "%destination%.spl") BEGIN
+                        FAIL "install_subspells: destination '%destination%.spl' for '%resource%' already exists in game."
+                    END
+
+                    ACTION_IF (2 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%")) BEGIN
+                        FAIL "install_subspells: destination '%destination%.spl' for '%resource%' declared to exist but does not."
+                    END
+
+                    //Process record.
+                    //Inject names in scope.
+                    OUTER_TEXT_SPRINT subspell $"row"("subspell")
+                    OUTER_TEXT_SPRINT arg1 $"row"("arg1")
+                    OUTER_TEXT_SPRINT arg2 $"row"("arg2")
+                    OUTER_TEXT_SPRINT arg3 $"row"("arg3")
+                    OUTER_TEXT_SPRINT school $"row"("school")
+                    OUTER_TEXT_SPRINT sectype $"row"("sectype")
+
+                    //Find spell to clone.
+                    LAF find_table_row STR_VAR
+                        table = "subspells_table"
+                        field = "subspell"
+                        key = "%subspell%"
+                    RET index END
+
+                    ACTION_IF (0 - 1 = index) BEGIN
+                        FAIL "install_subspells: subspell '%subspell%' does not exist in table '%subspells%'."
+                    END
+
+                    LAF get_row_from_table INT_VAR
+                        row = index
+                    STR_VAR
+                        table = "subspells_table"
+                    RET_ARRAY clone_row = array END
+
+                    //Inject names.
+                    OUTER_TEXT_SPRINT name $"clone_row"("name")
+                    OUTER_TEXT_SPRINT description $"clone_row"("description")
+                    OUTER_TEXT_SPRINT patch $"clone_row"("patch")
+                    OUTER_TEXT_SPRINT patch_description $"clone_row"("patch_description")
+
+                    //Sanitize.
+                    ACTION_IF NOT (IS_AN_INT name) BEGIN
+                        FAIL "install_subspells: name '%name%' must be an integer tra reference."
+                    END
+
+                    ACTION_IF NOT (IS_AN_INT description) BEGIN
+                        FAIL "install_subspells: description '%description%' must be an integer tra reference."
+                    END
+
+                    //Set source and sanitize.
+                    OUTER_TEXT_SPRINT source "%dir%/%subspell%.spl"
+                    ACTION_IF NOT (FILE_EXISTS "%source%") BEGIN
+                        FAIL "install_subspells: resource '%source%' for subspell '%subspell%' to clone not found."
+                    END
+
+                    //Copy.
+                    COPY "%source%" "override/%destination%.spl"
+                        //Correct self-references.
+                        LPF ALTER_EFFECT INT_VAR
+                            silent = 1
+                        STR_VAR
+                            match_resource = "self#res"
+                            resource = "%destination%"
+                        END
+
+                        //Patch name.
+                        name_tlk = RESOLVE_STR_REF ((AT name))
+                        LPF set_spell_field STR_VAR field = "name" value = "%name_tlk%" END
+
+                        //Patch description.
+                        PATCH_IF NOT ("%patch_description%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF "%patch_description%" INT_VAR
+                                description = description
+                            STR_VAR
+                                arg1 = "%arg1%"
+                                arg2 = "%arg2%"
+                                arg3 = "%arg3%"
+                            RET desc_text = text END
+
+                            desc_tlk = RESOLVE_STR_REF ("%desc_text%")
+                            LPF set_spell_field STR_VAR field = "description" value = "%desc_tlk%" END
+                        END
+
+
+                        //Fill school and sectype.
+                        PATCH_IF NOT ("%school%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF encode_school STR_VAR value = "%school%" RET school = return END
+                            LPF set_spell_field STR_VAR field = "school" value = "%school%" END
+                        END
+
+                        PATCH_IF NOT ("%sectype%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF encode_spell_sectype STR_VAR value = "%sectype%" RET sectype = return END
+                            LPF set_spell_field STR_VAR field = "sectype" value = "%sectype%" END
+                        END
+
+                        //Call table patch.
+                        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF "%patch%" STR_VAR arg1 = "%arg1%" arg2 = "%arg2%" arg3 = "%arg3%" END
+                        END
+                END
+            END
+        END
+    END
+END
+
+DEFINE_ACTION_FUNCTION install_subspells_library STR_VAR table = "" BEGIN
+    LAF install_subspells STR_VAR
+        table = "%table%"
+        dir = "%WEIDU_LIBRARY_DIR%/resources/spl/subspells"
+    END
+END
