@@ -1,6 +1,6 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
-INCLUDE "%WEIDU_LIBRARY_DIR%/internal/encoders.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 
 
 //Patches.

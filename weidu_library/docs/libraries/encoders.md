@@ -4,7 +4,7 @@ Library of encoder converters from a human-readable format into binary more prop
 
 file(s):
 
-* [Source code](../../../internal/encoders.tpa)
+* [Source code](../../internal/encoders.tpa)
 
 Other encoders are available in other modules. This is necessary to avoid circular imports.
 
@@ -41,7 +41,7 @@ Resolves the tra reference `value`, adding its text to the .tlk and returning th
 
 `encode_opcode_resist_dispel STR_VAR value RET return`
 
-`encode_save_bonus STR_VAR value RET return`
+`encode_opcode_save_bonus STR_VAR value RET return`
 
 # E. Projectiles.
 
@@ -73,4 +73,4 @@ Convert spell flags encoded as a string of binary values to an integer to be wri
 
 Convert item flags encoded as a string of binary values to an integer to be written to an item's main block.
 
-`encode_proficiency STR_VAR value RET return`
+`encode_item_proficiency STR_VAR value RET return`

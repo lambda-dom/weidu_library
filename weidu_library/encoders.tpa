@@ -114,14 +114,14 @@ DEFINE_DIMORPHIC_FUNCTION encode_opcode_resist_dispel STR_VAR value = "" RET ret
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION encode_save_bonus STR_VAR value = "" RET return BEGIN
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_save_bonus STR_VAR value = "" RET return BEGIN
     //Sanitize.
     ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
-        FAIL "encode_save_bonus: save bonus '%value%' is not an integer."
+        FAIL "encode_opcode_save_bonus: save bonus '%value%' is not an integer."
     END
 
     ACTION_IF NOT ((0 - 20 <= value) AND (value <= 20)) BEGIN
-        FAIL "encode_save_bonus: save bonus '%value%' must be in the [-20, 20] range."
+        FAIL "encode_opcode_save_bonus: save bonus '%value%' must be in the [-20, 20] range."
     END
 
     OUTER_TEXT_SPRINT return "%value%"
@@ -274,7 +274,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_item_flags STR_VAR value = "" RET return BEGIN
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION encode_proficiency STR_VAR value = "" RET return BEGIN
+DEFINE_DIMORPHIC_FUNCTION encode_item_proficiency STR_VAR value = "" RET return BEGIN
     //Lower-case to avoid trivial mismatches.
     ACTION_TO_LOWER value
 
@@ -283,7 +283,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_proficiency STR_VAR value = "" RET return BEGIN
     RET return = id END
 
     ACTION_IF (0 - 1 = return) BEGIN
-        FAIL "encode_proficiency: item proficiency '%value%' is not valid."
+        FAIL "encode_item_proficiency: item proficiency '%value%' is not valid."
     END
 END
 
