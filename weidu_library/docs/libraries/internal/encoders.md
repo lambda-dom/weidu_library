@@ -57,7 +57,7 @@ Encoder version of `get_spell_res`.
 
 `encode_spell_type STR_VAR value RET return`
 
-`encode_school STR_VAR value RET return`
+`encode_spell_school STR_VAR value RET return`
 
 `encode_spell_flags STR_VAR value RET return`
 

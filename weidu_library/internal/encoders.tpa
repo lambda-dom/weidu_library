@@ -162,11 +162,11 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_type STR_VAR value = "" RET return BEGIN
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION encode_school STR_VAR value = "" RET return BEGIN
+DEFINE_DIMORPHIC_FUNCTION encode_spell_school STR_VAR value = "" RET return BEGIN
     LAF get_school_id STR_VAR school = "%value%" RET return = id END
 
     ACTION_IF (0 - 1 = return) BEGIN
-        FAIL "encode_school: invalid magic school '%value%'."
+        FAIL "encode_spell_school: invalid magic school '%value%'."
     END
 END
 
