@@ -23,6 +23,8 @@ The trivial encoder, returning `value` unchanged.
 
 `encode_positive STR_VAR value RET return`
 
+`encode_strictly_positive STR_VAR value RET return`
+
 # C. Text.
 
 `encode_tra_ref STR_VAR value RET return`

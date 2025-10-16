@@ -39,6 +39,19 @@ DEFINE_DIMORPHIC_FUNCTION encode_positive STR_VAR value = "" RET return BEGIN
     OUTER_TEXT_SPRINT return "%value%"
 END
 
+DEFINE_DIMORPHIC_FUNCTION encode_strictly_positive STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_strictly_positive: value '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT (0 < value) BEGIN
+        FAIL "encode_strictly_positive: value '%value%' must be strictly positive."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
 //Text.
 DEFINE_DIMORPHIC_FUNCTION encode_tra_ref STR_VAR value = "" RET return BEGIN
     ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
