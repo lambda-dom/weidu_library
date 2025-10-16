@@ -66,8 +66,8 @@ END
 
 
 //Script patchers.
-DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" references = "" BEGIN
-    PATCH_FOR_EACH spell IN "%replacements%" BEGIN
+DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR spells = "" references = "" BEGIN
+    PHP_EACH "%spells%" AS _ => spell BEGIN
         //Get reference.
         LPF get_table_ref STR_VAR
             value = "%spell%"
@@ -83,23 +83,28 @@ DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" 
 
         //Quote string.
         TEXT_SPRINT resource ~"%resource%"~
+        //Protect from mangling prefixes.
+        TEXT_SPRINT spell "\b%spell%\b"
 
         //Perform substitution.
         REPLACE_TEXTUALLY CASE_INSENSITIVE "%spell%" "%resource%"
     END
 END
 
-DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR replacements = "" references = "" BEGIN
-    PATCH_FOR_EACH item IN "%replacements%"  BEGIN
+DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR items = "" references = "" BEGIN
+    PHP_EACH "%items%" AS _ => item BEGIN
         //Get reference.
         LPF get_table_ref STR_VAR
             value = "%item%"
             array = "%references%"
             ext = "itm"
         RET resource END
+        TO_UPPER resource
 
         //Quote string.
         TEXT_SPRINT resource ~"%resource%"~
+        //Protect from mangling prefixes.
+        TEXT_SPRINT item "\b%item%\b"
 
         //Perform substitution.
         REPLACE_TEXTUALLY CASE_INSENSITIVE "%item%" "%resource%"
