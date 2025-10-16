@@ -67,7 +67,7 @@ END
 
 //Script patchers.
 DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" references = "" BEGIN
-    PHP_EACH "%replacements%" AS regexp => spell BEGIN
+    PHP_EACH "%replacements%" AS _ => spell BEGIN
         //Get reference.
         LPF get_table_ref STR_VAR
             value = "%spell%"
@@ -82,12 +82,12 @@ DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" 
         END
 
         //Perform substitution.
-        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%regexp%" "%resource%"
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%spell%" "%resource%"
     END
 END
 
 DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR replacements = "" references = "" BEGIN
-    PHP_EACH "%replacements%" AS regexp => item BEGIN
+    PHP_EACH "%replacements%" AS _ => item BEGIN
         //Get reference.
         LPF get_table_ref STR_VAR
             value = "%item%"
@@ -96,7 +96,7 @@ DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR replacements = "" r
         RET resource END
 
         //Perform substitution.
-        REPLACE_TEXTUALLY CASE_INSENSITIVE "%regexp%" "%resource%"
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%item%" "%resource%"
     END
 END
 
