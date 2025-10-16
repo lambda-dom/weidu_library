@@ -31,8 +31,8 @@ Support libraries: libraries providing basic functionality supporting everything
 * [Spells](./libraries/spells.md): handle spell .spl files.
 * [Strings](./libraries/strings.md): string manipulation functions.
 * [Tables](./libraries/tables.md): construct and manipulate tables.
+* [Encoders](./libraries/internal/encoders.md): library of encoders.
 
 Internal libraries: internal libraries, usually low-level, that are not part of the public API. 
 
 * [Binary](./libraries/internal/binary.md): library of binary readers and writers.
-* [Encoders](./libraries/internal/encoders.md): library of encoders.

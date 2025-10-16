@@ -163,7 +163,7 @@ BEGIN
 
                         //Fill school and sectype.
                         PATCH_IF NOT ("%school%" STRING_EQUAL_CASE "*") BEGIN
-                            LPF encode_school STR_VAR value = "%school%" RET school = return END
+                            LPF encode_spell_school STR_VAR value = "%school%" RET school = return END
                             LPF set_spell_field STR_VAR field = "school" value = "%school%" END
                         END
 

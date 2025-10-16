@@ -38,7 +38,7 @@ BEGIN
             "resource3"     => "encode_resource_ref"
             "special"       => "encode_identity"
             "projectile"    => "encode_projectile_ref"
-            "school"        => "encode_school"
+            "school"        => "encode_spell_school"
             "sectype"       => "encode_spell_sectype"
         END
 

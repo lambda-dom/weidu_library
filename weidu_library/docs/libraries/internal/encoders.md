@@ -23,6 +23,8 @@ The trivial encoder, returning `value` unchanged.
 
 `encode_positive STR_VAR value RET return`
 
+`encode_strictly_positive STR_VAR value RET return`
+
 # C. Text.
 
 `encode_tra_ref STR_VAR value RET return`
@@ -55,7 +57,7 @@ Encoder version of `get_spell_res`.
 
 `encode_spell_type STR_VAR value RET return`
 
-`encode_school STR_VAR value RET return`
+`encode_spell_school STR_VAR value RET return`
 
 `encode_spell_flags STR_VAR value RET return`
 
