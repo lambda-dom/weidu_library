@@ -67,7 +67,7 @@ END
 
 //Script patchers.
 DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" references = "" BEGIN
-    PHP_EACH "%replacements%" AS _ => spell BEGIN
+    PATCH_FOR_EACH spell IN "%replacements%" BEGIN
         //Get reference.
         LPF get_table_ref STR_VAR
             value = "%spell%"
@@ -90,7 +90,7 @@ DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" 
 END
 
 DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR replacements = "" references = "" BEGIN
-    PHP_EACH "%replacements%" AS _ => item BEGIN
+    PATCH_FOR_EACH item IN "%replacements%"  BEGIN
         //Get reference.
         LPF get_table_ref STR_VAR
             value = "%item%"
