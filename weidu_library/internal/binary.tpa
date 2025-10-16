@@ -3,6 +3,10 @@ DEFINE_PATCH_FUNCTION read_byte INT_VAR offset = 0 RET value BEGIN
     READ_BYTE offset value
 END
 
+DEFINE_PATCH_FUNCTION read_byte_signed INT_VAR offset = 0 RET value BEGIN
+    READ_SBYTE offset value
+END
+
 DEFINE_PATCH_FUNCTION read_short INT_VAR offset = 0 RET value BEGIN
     READ_SHORT offset value
 END
@@ -34,6 +38,16 @@ DEFINE_PATCH_FUNCTION write_byte INT_VAR offset = 0 STR_VAR value = "" BEGIN
     END
     PATCH_IF NOT ((0 <= value) AND (value <= 0xff)) BEGIN
         PATCH_FAIL "write_byte: value '%value%' is not in the unsigned 8-bit byte range."
+    END
+    WRITE_BYTE offset value
+END
+
+DEFINE_PATCH_FUNCTION write_byte_signed INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT (IS_AN_INT "%value%") BEGIN
+        PATCH_FAIL "write_byte_signed: value '%value%' is not an integer numeric value."
+    END
+    PATCH_IF NOT ((0 - 127 <= value) AND (value <= 128)) BEGIN
+        PATCH_FAIL "write_byte_signed: value '%value%' is not in the signed 8-bit byte range."
     END
     WRITE_BYTE offset value
 END

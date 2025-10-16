@@ -21,7 +21,7 @@ ac_crush                0x004a  read_short_signed   write_short_signed
 ac_missile              0x004c  read_short_signed   write_short_signed
 ac_pierce               0x004e  read_short_signed   write_short_signed
 ac_slash                0x0050  read_short_signed   write_short_signed
-thac0                   0x0052  read_byte           write_byte
+thac0                   0x0052  read_byte_signed    write_byte_signed
 apr                     0x0053  read_byte           write_byte
 saves_death             0x0054  read_byte           write_byte
 saves_wand              0x0055  read_byte           write_byte
