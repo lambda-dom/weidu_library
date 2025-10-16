@@ -81,8 +81,11 @@ DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" 
             PATCH_FAIL "patch_script_spell_replacements: resource '%resource%' for '%spell%' has more than 8 characters."
         END
 
+        //Quote string.
+        TEXT_SPRINT resource ~"%resource%"~
+
         //Perform substitution.
-        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%spell%" "%resource%"
+        REPLACE_TEXTUALLY CASE_INSENSITIVE "%spell%" "%resource%"
     END
 END
 
@@ -95,8 +98,11 @@ DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR replacements = "" r
             ext = "itm"
         RET resource END
 
+        //Quote string.
+        TEXT_SPRINT resource ~"%resource%"~
+
         //Perform substitution.
-        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%item%" "%resource%"
+        REPLACE_TEXTUALLY CASE_INSENSITIVE "%item%" "%resource%"
     END
 END
 
