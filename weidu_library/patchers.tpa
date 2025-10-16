@@ -66,33 +66,37 @@ END
 
 
 //Script patchers.
-DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" BEGIN
-    PHP_EACH "%replacement%" AS string => spell BEGIN
+DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR replacements = "" references = "" BEGIN
+    PHP_EACH "%replacements%" AS regexp => spell BEGIN
+        //Get reference.
+        LPF get_table_ref STR_VAR
+            value = "%spell%"
+            array = "%references%"
+            ext = "spl"
+        RET resource END
+        TO_UPPER resource
+
         //Sanitize.
-        PATCH_IF ( 8 < STRING_LENGTH "%spell%") BEGIN
-            PATCH_FAIL "patch_script_spell_replacements: resource '%spell%' has more than 8 characters."
+        PATCH_IF ( 8 < STRING_LENGTH "%resource%") BEGIN
+            PATCH_FAIL "patch_script_spell_replacements: resource '%resource%' for '%spell%' has more than 8 characters."
         END
-
-        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%spell%.spl") BEGIN
-            PATCH_FAIL "patch_script_spell_replacements: spell '%spell%.spl' does not exist in game."
-        END
-
-        TO_UPPER spell
 
         //Perform substitution.
-        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%string%" "%spell%"
+        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%regexp%" "%resource%"
     END
 END
 
-DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR replacements = "" BEGIN
-    PHP_EACH "%replacement%" AS string => item BEGIN
-        //Sanitize.
-        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%item%.itm") BEGIN
-            PATCH_FAIL "patch_script_item_replacements: item '%item%.itm' does not exist in game."
-        END
+DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR replacements = "" references = "" BEGIN
+    PHP_EACH "%replacements%" AS regexp => item BEGIN
+        //Get reference.
+        LPF get_table_ref STR_VAR
+            value = "%item%"
+            array = "%references%"
+            ext = "itm"
+        RET resource END
 
         //Perform substitution.
-        REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%string%" "%item%"
+        REPLACE_TEXTUALLY CASE_INSENSITIVE "%regexp%" "%resource%"
     END
 END
 
@@ -102,11 +106,11 @@ DEFINE_PATCH_FUNCTION patch_script_string_replacements STR_VAR replacements = ""
     END
 
     PATCH_WITH_TRA "%tra%.tra" BEGIN
-        PHP_EACH "%replacement%" AS string => tra_ref BEGIN
+        PHP_EACH "%replacements%" AS regexp => tra_ref BEGIN
             tlk_ref = RESOLVE_STR_REF ((AT tra_ref))
 
             //Perform substitution.
-            REPLACE_TEXTUALLY CASE_INSENSITIVE EXACT_MATCH "%string%" "%tlk_ref%"
+            REPLACE_TEXTUALLY CASE_INSENSITIVE "%regexp%" "%tlk_ref%"
         END
     END
 END
