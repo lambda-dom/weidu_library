@@ -333,8 +333,8 @@ DEFINE_DIMORPHIC_FUNCTION encode_cre_thac0 STR_VAR value = "" RET return BEGIN
         FAIL "encode_cre_thac0: creature thac0 '%value%' is not an integer."
     END
 
-    ACTION_IF NOT ((0 <= value) AND (value <= 25)) BEGIN
-        FAIL "encode_cre_thac0: creature thac0 '%value%' must be in the [0, 25] range."
+    ACTION_IF NOT ((0 - 20 <= value) AND (value <= 20)) BEGIN
+        FAIL "encode_cre_thac0: creature thac0 '%value%' must be in the [-20, 20] range."
     END
 
     OUTER_TEXT_SPRINT return "%value%"
@@ -359,8 +359,8 @@ DEFINE_DIMORPHIC_FUNCTION encode_cre_resistance STR_VAR value = "" RET return BE
         FAIL "encode_cre_resistance: value '%value%' is not an integer."
     END
 
-    ACTION_IF NOT ((0 <= value) AND (value <= 100)) BEGIN
-        FAIL "encode_cre_resistance: value '%value%' must be in the [0, 100] range."
+    ACTION_IF NOT ((0 <= value) AND (value <= 125)) BEGIN
+        FAIL "encode_cre_resistance: value '%value%' must be in the [0, 125] range."
     END
 
     OUTER_TEXT_SPRINT return "%value%"
