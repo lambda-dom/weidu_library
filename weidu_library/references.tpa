@@ -1,7 +1,7 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/projectiles.tpa"
-INCLUDE "%WEIDU_LIBRARY_DIR%/internal/encoders.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 
 
 //Auxiliary functions.

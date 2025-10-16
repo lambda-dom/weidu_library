@@ -32,7 +32,7 @@ BEGIN
             "resist_dispel" => "encode_opcode_resist_dispel"
             //Currently can only insert saves as integers.
             "savingthrow"   => "encode_positive"
-            "savebonus"     => "encode_save_bonus"
+            "savebonus"     => "encode_opcode_save_bonus"
             "resource"      => "encode_resource_ref"
             "resource2"     => "encode_resource_ref"
             "resource3"     => "encode_resource_ref"
