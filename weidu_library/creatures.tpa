@@ -75,3 +75,8 @@ DEFINE_DIMORPHIC_FUNCTION encode_creature_slot_id STR_VAR value = "" RET return 
         OUTER_SET return = slot_id
     END
 END
+
+DEFINE_DIMORPHIC_FUNCTION encode_creature_animation_id STR_VAR value = "" RET return BEGIN
+    ACTION_TO_UPPER proficiency
+    LAF get_id_from_ids STR_VAR ids = "animate" value = "%value%" RET return = id END
+END

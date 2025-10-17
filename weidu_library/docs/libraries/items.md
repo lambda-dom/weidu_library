@@ -110,7 +110,7 @@ Specializations of the generic reader and writer for items.
 
 # E. Getters.
 
-`get_item_type_id STR_VAR type RET id`
+`get_item_category_id STR_VAR category RET id`
 
 `get_item_proficiency_id STR_VAR proficiency RET id`
 

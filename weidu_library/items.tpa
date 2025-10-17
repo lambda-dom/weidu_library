@@ -175,15 +175,10 @@ DEFINE_PATCH_FUNCTION set_item_header_field INT_VAR header = 0 STR_VAR field = "
 END
 
 //Getters.
-DEFINE_DIMORPHIC_FUNCTION get_item_type_id STR_VAR type = "" RET id BEGIN
+DEFINE_DIMORPHIC_FUNCTION get_item_category_id STR_VAR category = "" RET id BEGIN
     //Lower-case to avoid trivial mismatches.
-    ACTION_TO_LOWER type
-    OUTER_TEXT_SPRINT type_id $"item_types"("%type%")
-
-    OUTER_SET id = 0 - 1
-    ACTION_IF (IS_AN_INT type_id) BEGIN
-        OUTER_SET id = type_id
-    END
+    ACTION_TO_UPPER category
+    LAF get_id_from_ids STR_VAR ids = "itemcat" value = "%category%" RET id END
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_item_proficiency_id STR_VAR proficiency = "" RET id BEGIN

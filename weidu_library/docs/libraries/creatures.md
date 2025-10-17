@@ -53,3 +53,5 @@ Specializations of the generic reader and writer for creature files.
 # E. Encoders.
 
 `encode_creature_slot_id STR_VAR value RET return`
+
+`encode_creature_animation_id STR_VAR value RET return`
