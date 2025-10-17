@@ -223,15 +223,22 @@ END
 
 //Items.
 DEFINE_DIMORPHIC_FUNCTION encode_item_type STR_VAR value = "" RET return BEGIN
-    //Lower-case to avoid trivial mismatches.
-    ACTION_TO_LOWER value
-
     LAF get_item_type_id STR_VAR
-        value = "%value%"
+        type = "%value%"
     RET return = id END
 
     ACTION_IF (0 - 1 = return) BEGIN
         FAIL "encode_item_type: item type '%value%' is not valid."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_item_proficiency STR_VAR value = "" RET return BEGIN
+    LAF get_item_proficiency_id STR_VAR
+        proficiency = "%value%"
+    RET return = id END
+
+    ACTION_IF (0 - 1 = return) BEGIN
+        FAIL "encode_item_proficiency: item proficiency '%value%' is not valid."
     END
 END
 
@@ -271,19 +278,6 @@ DEFINE_DIMORPHIC_FUNCTION encode_item_flags STR_VAR value = "" RET return BEGIN
                 OUTER_SET return = return BOR (1 << index)
             END
         END
-    END
-END
-
-DEFINE_DIMORPHIC_FUNCTION encode_item_proficiency STR_VAR value = "" RET return BEGIN
-    //Lower-case to avoid trivial mismatches.
-    ACTION_TO_LOWER value
-
-    LAF get_proficiency_id STR_VAR
-        proficiency = "%value%"
-    RET return = id END
-
-    ACTION_IF (0 - 1 = return) BEGIN
-        FAIL "encode_item_proficiency: item proficiency '%value%' is not valid."
     END
 END
 

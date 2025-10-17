@@ -69,8 +69,10 @@ Convert spell flags encoded as a string of binary values to an integer to be wri
 
 `encode_item_type STR_VAR value RET return`
 
+`encode_item_proficiency STR_VAR value RET return`
+
+Versions of corresponding getters that also do validation.
+
 `encode_item_flags STR_VAR value RET return`
 
 Convert item flags encoded as a string of binary values to an integer to be written to an item's main block.
-
-`encode_item_proficiency STR_VAR value RET return`
