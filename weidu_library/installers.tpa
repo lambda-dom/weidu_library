@@ -176,9 +176,9 @@ BEGIN
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
                     ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
-                        LAF get_resource_ref STR_VAR
-                            ref = "%destination%"
-                        RET destination = resource END
+                        LAF encode_table_reference STR_VAR
+                            value = "%destination%"
+                        RET destination = return END
                     END
 
                     //Existence debug checks.
@@ -188,15 +188,19 @@ BEGIN
                             FAIL "install_resources: '%override%' is not an integer."
                         END
 
-                        ACTION_IF NOT ((0 <= override) AND (override <= 2)) BEGIN
-                            FAIL "install_resources: '%override%' not an integer in the [0, 2] range."
+                        ACTION_IF NOT ((0 <= override) AND (override <= 3)) BEGIN
+                            FAIL "install_resources: '%override%' not an integer in the [0, 3] range."
                         END
 
                         ACTION_IF (0 = override) AND (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
                             FAIL "install_resources: destination '%destination%.%ext%' for '%resource%' already exists in game."
                         END
 
-                        ACTION_IF (2 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%")) BEGIN
+                        ACTION_IF (2 = override) AND (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
+                            WARN "Warning:install_resources: destination '%destination%.%ext%' for '%resource%' already exists in game."
+                        END
+
+                        ACTION_IF (3 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%")) BEGIN
                             FAIL "install_resources: destination '%destination%.%ext%' for '%resource%' declared to exist but does not."
                         END
                     END
@@ -245,9 +249,9 @@ DEFINE_DIMORPHIC_FUNCTION get_table_references STR_VAR tables = "" dir = "*" RET
                 READ_2DA_ENTRY_FORMER "table#rows" i (cols - 1) ref
 
                 //Compute final destination.
-                LPF get_resource_ref STR_VAR
-                    ref = "%ref%"
-                RET destination = resource END
+                LPF encode_table_reference STR_VAR
+                    value = "%ref%"
+                RET destination = return END
                 
                 TEXT_SPRINT $"references"("%resource%") "%destination%"
             END

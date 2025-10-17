@@ -43,7 +43,7 @@ BEGIN
             LPF encode_opcode_type STR_VAR value = "%opcode%" RET opcode = return END
 
             PATCH_IF NOT ("%parameter1%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%parameter1%" RET parameter1 = return END
+                LPF encode_table_reference STR_VAR value = "%parameter1%" RET parameter1 = return END
                 PATCH_IF NOT (IS_AN_INT parameter1) BEGIN
                     PATCH_FAIL "patch_block_with_table: 'parameter1' value of row '%i%' is not an encoded integer."
                 END
@@ -52,7 +52,7 @@ BEGIN
             END
 
             PATCH_IF NOT ("%parameter2%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%parameter2%" RET parameter2 = return END
+                LPF encode_table_reference STR_VAR value = "%parameter2%" RET parameter2 = return END
                 PATCH_IF NOT (IS_AN_INT parameter1) BEGIN
                     PATCH_FAIL "patch_block_with_table: 'parameter2' value of row '%i%' is not an encoded integer."
                 END
@@ -61,7 +61,7 @@ BEGIN
             END
             
             PATCH_IF NOT ("%resource%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%resource%" RET resource = return END
+                LPF encode_table_reference STR_VAR value = "%resource%" RET resource = return END
             END ELSE BEGIN
                 TEXT_SPRINT resource ""
             END
@@ -129,7 +129,7 @@ DEFINE_PATCH_FUNCTION append_item_block_with_table STR_VAR table = "" BEGIN
             LPF encode_opcode_type STR_VAR value = "%opcode%" RET opcode = return END
 
             PATCH_IF NOT ("%parameter1%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%parameter1%" RET parameter1 = return END
+                LPF encode_table_reference STR_VAR value = "%parameter1%" RET parameter1 = return END
                 PATCH_IF NOT (IS_AN_INT parameter1) BEGIN
                     PATCH_FAIL "append_item_block_with_table: 'parameter1' value of row '%i%' is not an encoded integer."
                 END
@@ -138,7 +138,7 @@ DEFINE_PATCH_FUNCTION append_item_block_with_table STR_VAR table = "" BEGIN
             END
 
             PATCH_IF NOT ("%parameter2%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%parameter2%" RET parameter2 = return END
+                LPF encode_table_reference STR_VAR value = "%parameter2%" RET parameter2 = return END
                 PATCH_IF NOT (IS_AN_INT parameter1) BEGIN
                     PATCH_FAIL "append_item_block_with_table: 'parameter2' value of row '%i%' is not an encoded integer."
                 END
@@ -147,7 +147,7 @@ DEFINE_PATCH_FUNCTION append_item_block_with_table STR_VAR table = "" BEGIN
             END
             
             PATCH_IF NOT ("%resource%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%resource%" RET resource = return END
+                LPF encode_table_reference STR_VAR value = "%resource%" RET resource = return END
             END ELSE BEGIN
                 TEXT_SPRINT resource ""
             END
@@ -210,7 +210,7 @@ BEGIN
             LPF encode_opcode_type STR_VAR value = "%opcode%" RET opcode = return END
 
             PATCH_IF NOT ("%parameter1%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%parameter1%" RET parameter1 = return END
+                LPF encode_table_reference STR_VAR value = "%parameter1%" RET parameter1 = return END
                 PATCH_IF NOT (IS_AN_INT parameter1) BEGIN
                     PATCH_FAIL "append_spell_block_with_table: 'parameter1' value of row '%i%' is not an encoded integer."
                 END
@@ -219,7 +219,7 @@ BEGIN
             END
 
             PATCH_IF NOT ("%parameter2%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%parameter2%" RET parameter2 = return END
+                LPF encode_table_reference STR_VAR value = "%parameter2%" RET parameter2 = return END
                 PATCH_IF NOT (IS_AN_INT parameter1) BEGIN
                     PATCH_FAIL "append_spell_block_with_table: 'parameter2' value of row '%i%' is not an encoded integer."
                 END
@@ -228,7 +228,7 @@ BEGIN
             END
             
             PATCH_IF NOT ("%resource%" STRING_EQUAL_CASE "*") BEGIN
-                LPF encode_resource_ref STR_VAR value = "%resource%" RET resource = return END
+                LPF encode_table_reference STR_VAR value = "%resource%" RET resource = return END
             END ELSE BEGIN
                 TEXT_SPRINT resource ""
             END

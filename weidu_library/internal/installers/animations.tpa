@@ -8,9 +8,9 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/vvcs.tpa"
 DEFINE_PATCH_FUNCTION write_projectile_fields STR_VAR fields = "" BEGIN
     PHP_EACH "%fields%" AS field => value BEGIN
         PATCH_IF ("%field%" STRING_EQUAL_CASE "animation") AND (NOT ("%value%" STRING_EQUAL_CASE "*")) BEGIN
-            LPF get_resource_ref STR_VAR
-                ref = "%value%"
-            RET res = resource END
+            LPF encode_table_reference STR_VAR
+                value = "%value%"
+            RET res = return END
 
             PATCH_IF NOT (FILE_EXISTS_IN_GAME "%res%.bam") BEGIN
                 PATCH_FAIL "write_projectile_fields: resource '%res%.bam' for animation field does not exist in game."

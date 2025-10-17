@@ -63,9 +63,9 @@ BEGIN
 
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
-                    LAF get_resource_ref STR_VAR
-                        ref = "%destination%"
-                    RET destination = resource END
+                    LAF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
 
                     //Override checks.
                     //Sanitize override.
@@ -73,16 +73,20 @@ BEGIN
                         FAIL "install_subspells: '%override%' is not an integer."
                     END
 
-                    ACTION_IF NOT ((0 <= override) AND (override <= 2)) BEGIN
-                        FAIL "install_subspells: '%override%' not an integer in the [0, 2] range."
+                    ACTION_IF NOT ((0 <= override) AND (override <= 3)) BEGIN
+                        FAIL "install_subspells: '%override%' not an integer in the [0, 3] range."
                     END
 
                     ACTION_IF (0 = override) AND (FILE_EXISTS_IN_GAME "%destination%.spl") BEGIN
                         FAIL "install_subspells: destination '%destination%.spl' for '%resource%' already exists in game."
                     END
 
-                    ACTION_IF (2 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%")) BEGIN
-                        FAIL "install_subspells: destination '%destination%.spl' for '%resource%' declared to exist but does not."
+                    ACTION_IF (2 = override) AND (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
+                        WARN "install_subspells: destination '%destination%.%ext%' for '%resource%' already exists in game."
+                    END
+
+                    ACTION_IF (3 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%")) BEGIN
+                        FAIL "install_subspells: destination '%destination%.%ext%' for '%resource%' declared to exist but does not."
                     END
 
                     //Process record.
