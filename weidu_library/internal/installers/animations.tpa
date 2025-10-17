@@ -8,7 +8,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/vvcs.tpa"
 DEFINE_PATCH_FUNCTION write_projectile_fields STR_VAR fields = "" BEGIN
     PHP_EACH "%fields%" AS field => value BEGIN
         PATCH_IF ("%field%" STRING_EQUAL_CASE "animation") AND (NOT ("%value%" STRING_EQUAL_CASE "*")) BEGIN
-            LPF get_table_ref STR_VAR
+            LPF expand_table_reference STR_VAR
                 ref = "%value%"
             RET res = resource END
 
