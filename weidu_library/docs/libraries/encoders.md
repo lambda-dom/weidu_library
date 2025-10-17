@@ -71,7 +71,7 @@ Convert spell flags encoded as a string of binary values to an integer to be wri
 
 # G. Items.
 
-`encode_item_type STR_VAR value RET return`
+`encode_item_category STR_VAR value RET return`
 
 `encode_item_proficiency STR_VAR value RET return`
 

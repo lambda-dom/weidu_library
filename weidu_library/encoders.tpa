@@ -207,13 +207,13 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_level STR_VAR value = "" RET return BEGIN
 END
 
 //Items.
-DEFINE_DIMORPHIC_FUNCTION encode_item_type STR_VAR value = "" RET return BEGIN
-    LAF get_item_type_id STR_VAR
-        type = "%value%"
+DEFINE_DIMORPHIC_FUNCTION encode_item_category STR_VAR value = "" RET return BEGIN
+    LAF get_item_category_id STR_VAR
+        category = "%value%"
     RET return = id END
 
     ACTION_IF (0 - 1 = return) BEGIN
-        FAIL "encode_item_type: item type '%value%' is not valid."
+        FAIL "encode_item_category: item type '%value%' is not valid."
     END
 END
 

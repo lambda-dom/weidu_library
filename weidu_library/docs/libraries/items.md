@@ -20,20 +20,9 @@ file(s):
 
 ## A. 2. Arrays.
 
-`item_types`
-
-[Array](../../resources/2da/items/types.2da) with keys the symbolic names for item types and values the associated integer values.
-
 `item_flags`
 
 [Array](../../resources/2da/items/flags.2da) with keys the names for item flags and values the associated bit index for the flags word.
-
-`item_proficiencies`
-
-[Array](../../resources/2da/items/proficiencies.2da) with keys the symbolic names for item proficiencies and values the associated integer values.
-
-note(s):
-* only the BG2 proficiencies are in the array.
 
 # B. Basic functions.
 
@@ -110,7 +99,7 @@ Specializations of the generic reader and writer for items.
 
 # E. Getters.
 
-`get_item_type_id STR_VAR type RET id`
+`get_item_category_id STR_VAR category RET id`
 
 `get_item_proficiency_id STR_VAR proficiency RET id`
 
