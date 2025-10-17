@@ -64,19 +64,18 @@ DEFINE_DIMORPHIC_FUNCTION get_spell_res STR_VAR spell = "" RET resource BEGIN
     ACTION_TO_LOWER resource
 END
 
-DEFINE_DIMORPHIC_FUNCTION get_spell_type_id STR_VAR value = "" RET id BEGIN
-    LAF get_array_element STR_VAR
-        array = "spell_types"
-        key = "%value%"
-    RET type = value END
+DEFINE_DIMORPHIC_FUNCTION get_spell_type_id STR_VAR type = "" RET id BEGIN
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER type
+    OUTER_TEXT_SPRINT type_id $"spell_types"("%type%")
 
     OUTER_SET id = 0 - 1
-    ACTION_IF NOT ("%type%" STRING_EQUAL_CASE "*") BEGIN
-        OUTER_SET id = type
+    ACTION_IF IS_AN_INT type_id BEGIN
+        OUTER_SET id = type_id
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION get_school_id STR_VAR school = "" RET id BEGIN
+DEFINE_DIMORPHIC_FUNCTION get_spell_school_id STR_VAR school = "" RET id BEGIN
     //Get school.
     COPY_EXISTING - "mschool.2da" "override"
         LPF find_row_index STR_VAR key = "%school%" RET id = index END
