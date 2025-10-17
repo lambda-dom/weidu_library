@@ -115,9 +115,11 @@ Specializations of the generic reader and writer for spells.
 
 Return the `resource` associated to symbolic name of `spell` in `spell.ids`. Function returns `*` if `spell` is not in spell.ids.
 
-`get_spell_type_id STR_VAR value RET id`
+`get_spell_type_id STR_VAR type RET id`
 
-`get_school_id STR_VAR school RET id`
+Get the type `id` of the spell `type`.
+
+`get_spell_school_id STR_VAR school RET id`
 
 Get the `id` of the magic `school`, -1 if `school` not valid.
 

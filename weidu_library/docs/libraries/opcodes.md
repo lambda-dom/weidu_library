@@ -58,7 +58,7 @@ The `array` of [pairs](../../resources/2da/opcodes/ids.2da) `ids => id` of ids f
 
 # C. Getters.
 
-The next set of functions convert a value in a human-readable format like an opcode type, to their corresponding numeric id, usually to be written out in binary format.
+The next set of functions convert a value in a human-readable format like an opcode type, to their corresponding numeric id, usually to be written out in binary format. If validation is also needed, use the encoder versions in the [Encoders module](./encoders.md).
 
 `get_opcode_type_id STR_VAR value RET id`
 
@@ -68,9 +68,9 @@ The next set of functions convert a value in a human-readable format like an opc
 
 `get_opcode_resist_dispel_id STR_VAR value RET id`
 
-`get_save_flag_index STR_VAR value RET index`
-
 `get_ids_file_id STR_VAR file RET id`
+
+`get_save_flag_index STR_VAR value RET index`
 
 # D. Readers and writers.
 

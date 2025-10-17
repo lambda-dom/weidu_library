@@ -51,73 +51,67 @@ RET_ARRAY ids_ids = array END
 
 //Getters.
 DEFINE_DIMORPHIC_FUNCTION get_opcode_type_id STR_VAR value = "" RET id BEGIN
-    LAF get_array_element STR_VAR
-        array = "opcode_types"
-        key = "%value%"
-    RET type = value END
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+    OUTER_TEXT_SPRINT type $"opcode_types"("%value%")
 
     OUTER_SET id = 0 - 1
-    ACTION_IF NOT ("%type%" STRING_EQUAL_CASE "*") BEGIN
+    ACTION_IF (IS_AN_INT type) BEGIN
         OUTER_SET id = type
     END
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_opcode_target_id STR_VAR value = "" RET id BEGIN
-    LAF get_array_element STR_VAR
-        array = "opcode_targets"
-        key = "%value%"
-    RET target = value END
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+    OUTER_TEXT_SPRINT target $"opcode_targets"("%value%")
 
     OUTER_SET id = 0 - 1
-    ACTION_IF NOT ("%target%" STRING_EQUAL_CASE "*") BEGIN
+    ACTION_IF (IS_AN_INT target) BEGIN
         OUTER_SET id = target
     END
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_opcode_timing_id STR_VAR value = "" RET id BEGIN
-    LAF get_array_element STR_VAR
-        array = "opcode_timings"
-        key = "%value%"
-    RET timing = value END
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+    OUTER_TEXT_SPRINT timing $"opcode_timings"("%value%")
 
     OUTER_SET id = 0 - 1
-    ACTION_IF NOT ("%timing%" STRING_EQUAL_CASE "*") BEGIN
+    ACTION_IF IS_AN_INT timing BEGIN
         OUTER_SET id = timing
     END
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_opcode_resist_dispel_id STR_VAR value = "" RET id BEGIN
-    LAF get_array_element STR_VAR
-        array = "opcode_resist_dispels"
-        key = "%value%"
-    RET resist_dispel = value END
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+    OUTER_TEXT_SPRINT resist_dispel $"opcode_resist_dispels"("%value%")
 
     OUTER_SET id = 0 - 1
-    ACTION_IF NOT ("%resist_dispel%" STRING_EQUAL_CASE "*") BEGIN
+    ACTION_IF IS_AN_INT resist_dispel BEGIN
         OUTER_SET id = resist_dispel
     END
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_save_flag_index STR_VAR value = "" RET index BEGIN
-    LAF get_array_element STR_VAR
-        array = "save_flags"
-        key = "%value%"
-    RET flag = value END
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+    OUTER_TEXT_SPRINT flag $"save_flags"("%value%")
 
     OUTER_SET index = 0 - 1
-    ACTION_IF NOT ("%flag%" STRING_EQUAL_CASE "*") BEGIN
+    ACTION_IF IS_AN_INT flag BEGIN
         OUTER_SET index = flag
     END
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_ids_file_id STR_VAR file = "" RET id BEGIN
-    LAF get_array_element STR_VAR
-        array = "ids_ids"
-        key = "%file%"
-    RET ids_id = value END
+    //Lower-case to avoid trivial mismatches.
+    ACTION_TO_LOWER value
+    OUTER_TEXT_SPRINT ids_id $"ids_ids"("%value%")
 
     OUTER_SET id = 0 - 1
-    ACTION_IF NOT ("%ids_id%" STRING_EQUAL_CASE "*") BEGIN
+    ACTION_IF IS_AN_INT ids_id BEGIN
         OUTER_SET id = ids_id
     END
 END

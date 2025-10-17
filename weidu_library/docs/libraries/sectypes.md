@@ -21,7 +21,7 @@ note(s):
 
 `encode_spell_sectype STR_VAR value RET return`
 
-Encoder version of `get_sectype_id`.
+Encoder version of `get_sectype_id` that also does validation.
 
 # B. Sectype addition.
 

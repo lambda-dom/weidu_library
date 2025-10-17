@@ -226,7 +226,7 @@ BEGIN
 END
 
 //Managing references.
-DEFINE_DIMORPHIC_FUNCTION get_table_references STR_VAR tables = "" dir = "*" RET_ARRAY references BEGIN
+DEFINE_DIMORPHIC_FUNCTION load_table_references STR_VAR tables = "" dir = "*" RET_ARRAY references BEGIN
     //Set resources dir.
     ACTION_IF ("%dir%" STRING_EQUAL_CASE "*") BEGIN
         LAF get_component_resources_dir RET dir = dir END
@@ -240,6 +240,11 @@ DEFINE_DIMORPHIC_FUNCTION get_table_references STR_VAR tables = "" dir = "*" RET
 
     ACTION_DEFINE_ASSOCIATIVE_ARRAY references BEGIN END
     ACTION_PHP_EACH "ref_tables" AS _ => table BEGIN
+        //Sanitize.
+        ACTION_IF NOT (FILE_EXISTS "%dir%/%table%.2da") BEGIN
+            FAIL "load_table_references: file '%dir%/%table%.2da' for '%table%' not found."
+        END
+
         COPY - "%dir%/%table%.2da" "override"
             COUNT_2DA_COLS cols
             READ_2DA_ENTRIES_NOW "table#rows" cols
@@ -258,7 +263,7 @@ DEFINE_DIMORPHIC_FUNCTION get_table_references STR_VAR tables = "" dir = "*" RET
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION get_table_ref STR_VAR value = "" array = "" ext = "" RET resource BEGIN
+DEFINE_DIMORPHIC_FUNCTION get_table_reference STR_VAR value = "" array = "" ext = "" RET resource BEGIN
     LAF get_array_element STR_VAR
         array = "%array%"
         key = "%value%"
@@ -266,10 +271,10 @@ DEFINE_DIMORPHIC_FUNCTION get_table_ref STR_VAR value = "" array = "" ext = "" R
 
     //Sanitize.
     ACTION_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "get_table_ref: reference '%value%' not found in array '%array%'."
+        FAIL "get_table_reference: reference '%value%' not found in array '%array%'."
     END
 
     ACTION_IF (NOT (FILE_EXISTS_IN_GAME "%resource%.%ext%")) BEGIN
-        FAIL "get_table_ref: resource '%resource%.%ext%' for reference '%value%' does not exist in game."
+        FAIL "get_table_reference: resource '%resource%.%ext%' for reference '%value%' does not exist in game."
     END
 END

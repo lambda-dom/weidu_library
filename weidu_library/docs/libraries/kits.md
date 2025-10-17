@@ -76,7 +76,7 @@ All functions in this section are patch functions for clab table files like `cla
 
 `make_clab_replacements STR_VAR array`
 
-Patch resource references in a clab file using an `array` of references, loaded via `get_table_references` from the [installers library](./installers.md).
+Patch resource references in a clab file using an `array` of references, loaded via `load_table_references` from the [installers library](./installers.md).
 
 note(s):
 * this function is slow; it has to crawl through the entire clab, check if the reference is in the `array` and if it is, set it.

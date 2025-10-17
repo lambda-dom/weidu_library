@@ -50,6 +50,6 @@ Specializations of the generic reader and writer for creature files.
 
 `set_cre_field STR_VAR field value`
 
-# E. Getters.
+# E. Encoders.
 
-`get_creature_slot_id STR_VAR slot RET id`
+`encode_creature_slot_id STR_VAR value RET return`

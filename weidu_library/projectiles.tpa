@@ -47,6 +47,10 @@ DEFINE_DIMORPHIC_FUNCTION get_projectile_id STR_VAR projectile = "" RET id BEGIN
     END
 END
 
+DEFINE_DIMORPHIC_FUNCTION get_missile_id STR_VAR missile = "" RET id BEGIN
+    OUTER_SET id = IDS_OF_SYMBOL ("missile" "%missile%")
+END
+
 DEFINE_DIMORPHIC_FUNCTION get_projectile_res INT_VAR id = 0 RET resource BEGIN
     OUTER_PATCH ~~ BEGIN
         //Correct projectile value: the original value is what is read from a .spl or .itm.
@@ -57,16 +61,12 @@ DEFINE_DIMORPHIC_FUNCTION get_projectile_res INT_VAR id = 0 RET resource BEGIN
     END
 
     //Avoid casing shenanigans.
-    ACTION_TO_LOWER resource
-END
-
-DEFINE_DIMORPHIC_FUNCTION get_missile_id STR_VAR missile = "" RET id BEGIN
-    OUTER_SET id = IDS_OF_SYMBOL ("missile" "%missile%")
+    ACTION_TO_UPPER resource
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_missile_res STR_VAR missile = "" RET resource BEGIN
     OUTER_TEXT_SPRINT resource "*"
-    LAF get_missile_id STR_VAR missile = "%missile%" RET id = id END
+    LAF get_missile_id STR_VAR missile = "%missile%" RET id END
 
     ACTION_IF NOT (0 - 1 = id) BEGIN
         LAF get_projectile_res INT_VAR id = id RET resource END
