@@ -176,7 +176,7 @@ BEGIN
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
                     ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
-                        LAF get_resource_ref STR_VAR
+                        LAF get_table_ref STR_VAR
                             ref = "%destination%"
                         RET destination = resource END
                     END
@@ -249,7 +249,7 @@ DEFINE_DIMORPHIC_FUNCTION get_table_references STR_VAR tables = "" dir = "*" RET
                 READ_2DA_ENTRY_FORMER "table#rows" i (cols - 1) ref
 
                 //Compute final destination.
-                LPF get_resource_ref STR_VAR
+                LPF get_table_ref STR_VAR
                     ref = "%ref%"
                 RET destination = resource END
                 

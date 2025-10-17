@@ -63,7 +63,7 @@ BEGIN
 
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
-                    LAF get_resource_ref STR_VAR
+                    LAF get_table_ref STR_VAR
                         ref = "%destination%"
                     RET destination = resource END
 

@@ -33,9 +33,9 @@ BEGIN
             //Currently can only insert saves as integers.
             "savingthrow"   => "encode_positive"
             "savebonus"     => "encode_opcode_save_bonus"
-            "resource"      => "encode_resource_ref"
-            "resource2"     => "encode_resource_ref"
-            "resource3"     => "encode_resource_ref"
+            "resource"      => "encode_table_ref"
+            "resource2"     => "encode_table_ref"
+            "resource3"     => "encode_table_ref"
             "special"       => "encode_identity"
             "projectile"    => "encode_projectile_ref"
             "school"        => "encode_spell_school"

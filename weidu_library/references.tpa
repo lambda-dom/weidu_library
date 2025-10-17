@@ -31,15 +31,80 @@ DEFINE_DIMORPHIC_FUNCTION replace_affixes STR_VAR spell = "" prefix = "" suffix 
     ACTION_TO_LOWER resource
 END
 
+
+//Main function.
+DEFINE_DIMORPHIC_FUNCTION get_table_ref STR_VAR ref = "" RET resource BEGIN
+    //Available formats.
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
+        "lit" => "encode_resource_literal"
+        "int" => "encode_int_literal"
+        "nul" => "encode_empty_string"
+        "spl" => "encode_spell_res"
+        "suf" => "encode_spell_suffix"
+        "afx" => "encode_spell_affix"
+        "lbl" => "encode_missile_res"
+        "sct" => "encode_spell_sectype"
+        "opc" => "encode_opcode_type"
+    END
+
+    OUTER_TEXT_SPRINT regexp "^#\([a-zA-Z0-9][a-zA-Z0-9_-]*\):\(.*\)$"
+    //Sanitize.
+    ACTION_IF NOT (("%ref%" STRING_MATCHES_REGEXP "%regexp%") = 0) THEN BEGIN
+        FAIL "get_table_ref: string '%ref%' does not have the format of a resource reference."
+    END
+
+    //Parse.
+    OUTER_PATCH "%ref%" BEGIN
+        REPLACE_EVALUATE "%regexp%" BEGIN
+            TEXT_SPRINT name "%MATCH1%"
+            TEXT_SPRINT argument "%MATCH2%"
+        END ~~
+    END
+
+    //Get encoder's name.
+    LAF get_array_element STR_VAR
+        array = "encoders"
+        key = "%name%"
+    RET encoder = value END
+
+    ACTION_IF ("%encoder%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "get_table_ref: unknown prefix '%name%' in '%ref%' for a resource converter."
+    END
+
+    LAF "%encoder%" STR_VAR value = "%argument%" RET resource = return END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_table_ref STR_VAR value = "" RET return BEGIN
+    LAF get_table_ref STR_VAR ref = "%value%" RET return = resource END
+END
+
+
 //Formats.
-DEFINE_DIMORPHIC_FUNCTION encode_ref_literal STR_VAR value = "" RET return BEGIN
+DEFINE_DIMORPHIC_FUNCTION encode_resource_literal STR_VAR value = "" RET return BEGIN
     OUTER_TEXT_SPRINT return "%value%"
 
     //Normalize and sanitize.
-    ACTION_TO_LOWER return
+    ACTION_TO_UPPER return
     ACTION_IF NOT ((STRING_LENGTH "%return%") <= 8) BEGIN
-        FAIL "encode_ref_literal: '%return%' is more than 8 characters long."
+        FAIL "encode_resource_literal: '%return%' is more than 8 characters long."
     END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_int_literal STR_VAR value = "" RET return BEGIN
+    ACTION_IF NOT (IS_AN_INT value) BEGIN
+        FAIL "encode_int_literal: value '%value%' is not an integer literal."
+    END
+
+    //Implicit number conversion.
+    OUTER_SET return = value
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_empty_string STR_VAR value = "" RET return BEGIN
+    ACTION_IF NOT (0 = STRING_LENGTH value) BEGIN
+        FAIL "encode_empty_string: value '%value%' is not the null string."
+    END
+
+    OUTER_TEXT_SPRINT return ""
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_spell_suffix STR_VAR value = "" RET return BEGIN
@@ -91,54 +156,8 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
     RET return = resource END
 END
 
-
-//Main function.
-DEFINE_DIMORPHIC_FUNCTION get_resource_ref STR_VAR ref = "" RET resource BEGIN
-    //Available formats.
-    ACTION_DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
-        "lit" => "encode_ref_literal"
-        "spl" => "encode_spell_res"
-        "lbl" => "encode_missile_res"
-        "suf" => "encode_spell_suffix"
-        "afx" => "encode_spell_affix"
-        "opc" => "encode_opcode_type"
-        "sct" => "encode_spell_sectype"
-    END
-
-    OUTER_TEXT_SPRINT regexp "^#\([a-zA-Z0-9][a-zA-Z0-9_-]*\):\(.+\)$"
-    //Sanitize.
-    ACTION_IF NOT (("%ref%" STRING_MATCHES_REGEXP "%regexp%") = 0) THEN BEGIN
-        FAIL "get_resource_ref: string '%ref%' does not have the format of a resource reference."
-    END
-
-    //Parse.
-    OUTER_PATCH "%ref%" BEGIN
-        REPLACE_EVALUATE "%regexp%" BEGIN
-            TEXT_SPRINT name "%MATCH1%"
-            TEXT_SPRINT argument "%MATCH2%"
-        END ~~
-    END
-
-    //Get encoder's name.
-    LAF get_array_element STR_VAR
-        array = "encoders"
-        key = "%name%"
-    RET encoder = value END
-
-    ACTION_IF ("%encoder%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "get_resource_ref: unknown prefix '%name%' in '%ref%' for a resource converter."
-    END
-
-    LAF "%encoder%" STR_VAR value = "%argument%" RET resource = return END
-END
-
-//Encoders.
-DEFINE_DIMORPHIC_FUNCTION encode_resource_ref STR_VAR value = "" RET return BEGIN
-    LAF get_resource_ref STR_VAR ref = "%value%" RET return = resource END
-END
-
 DEFINE_DIMORPHIC_FUNCTION encode_bam_ref STR_VAR value = "" RET return BEGIN
-    LAF get_resource_ref STR_VAR ref = "%value%" RET return = resource END
+    LAF get_table_ref STR_VAR ref = "%value%" RET return = resource END
 
     //Sanitize.
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.bam") BEGIN
@@ -147,7 +166,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_bam_ref STR_VAR value = "" RET return BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_projectile_ref STR_VAR value = "" RET return BEGIN
-    LAF encode_resource_ref STR_VAR
+    LAF encode_table_ref STR_VAR
         value = "%value%"
     RET resource = return END
     
@@ -161,7 +180,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_projectile_ref STR_VAR value = "" RET return BE
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_script_ref STR_VAR value = "" RET return BEGIN
-    LAF get_resource_ref STR_VAR ref = "%value%" RET return = resource END
+    LAF get_table_ref STR_VAR ref = "%value%" RET return = resource END
 
     //Sanitize.
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.bcs") BEGIN
