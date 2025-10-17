@@ -55,7 +55,7 @@ BEGIN
     RET item = resource END
 
     //Sanitize slot.
-    LPF get_creature_slot_id STR_VAR slot = "%slot%" RET id = id END
+    LPF encode_creature_slot_id STR_VAR value = "%slot%" RET id = return END
     PATCH_IF (0 - 1 = id) BEGIN
         PATCH_FAIL "creature_add_item: invalid creature slot '%slot%'."
     END

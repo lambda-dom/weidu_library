@@ -66,15 +66,12 @@ DEFINE_PATCH_FUNCTION set_cre_field STR_VAR field = "" value = "" BEGIN
     END
 END
 
-//Getters.
-DEFINE_DIMORPHIC_FUNCTION get_creature_slot_id STR_VAR slot = "" RET id BEGIN
-    LAF get_array_element STR_VAR
-        array = "item_slots"
-        key = "%slot%"
-    RET slot_id = value END
+//Encoders.
+DEFINE_DIMORPHIC_FUNCTION encode_creature_slot_id STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT slot_id $"item_slots"("%value%")
 
-    OUTER_SET id = 0 - 1
-    ACTION_IF NOT ("%slot_id%" STRING_EQUAL_CASE "*") BEGIN
-        OUTER_SET id = slot_id
+    OUTER_SET return = 0 - 1
+    ACTION_IF (IS_AN_INT slot_id) BEGIN
+        OUTER_SET return = slot_id
     END
 END
