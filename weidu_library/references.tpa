@@ -33,7 +33,7 @@ END
 
 
 //Main function.
-DEFINE_DIMORPHIC_FUNCTION expand_table_reference STR_VAR ref = "" RET resource BEGIN
+DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return BEGIN
     //Available formats.
     ACTION_DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
         "lit" => "encode_resource_literal"
@@ -49,12 +49,12 @@ DEFINE_DIMORPHIC_FUNCTION expand_table_reference STR_VAR ref = "" RET resource B
 
     OUTER_TEXT_SPRINT regexp "^#\([a-zA-Z0-9][a-zA-Z0-9_-]*\):\(.*\)$"
     //Sanitize.
-    ACTION_IF NOT (("%ref%" STRING_MATCHES_REGEXP "%regexp%") = 0) THEN BEGIN
-        FAIL "expand_table_reference: string '%ref%' does not have the format of a resource reference."
+    ACTION_IF NOT (("%value%" STRING_MATCHES_REGEXP "%regexp%") = 0) THEN BEGIN
+        FAIL "encode_table_reference: string '%value%' does not have the format of a table reference."
     END
 
     //Parse.
-    OUTER_PATCH "%ref%" BEGIN
+    OUTER_PATCH "%value%" BEGIN
         REPLACE_EVALUATE "%regexp%" BEGIN
             TEXT_SPRINT name "%MATCH1%"
             TEXT_SPRINT argument "%MATCH2%"
@@ -68,16 +68,11 @@ DEFINE_DIMORPHIC_FUNCTION expand_table_reference STR_VAR ref = "" RET resource B
     RET encoder = value END
 
     ACTION_IF ("%encoder%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "expand_table_reference: unknown prefix '%name%' in '%ref%' for a resource converter."
+        FAIL "encode_table_reference: unknown prefix '%name%' in '%value%' for encoder."
     END
 
-    LAF "%encoder%" STR_VAR value = "%argument%" RET resource = return END
+    LAF "%encoder%" STR_VAR value = "%argument%" RET return END
 END
-
-DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return BEGIN
-    LAF expand_table_reference STR_VAR ref = "%value%" RET return = resource END
-END
-
 
 //Formats.
 DEFINE_DIMORPHIC_FUNCTION encode_resource_literal STR_VAR value = "" RET return BEGIN
@@ -157,7 +152,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_bam_ref STR_VAR value = "" RET return BEGIN
-    LAF expand_table_reference STR_VAR ref = "%value%" RET return = resource END
+    LAF encode_table_reference STR_VAR value = "%value%" RET return END
 
     //Sanitize.
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.bam") BEGIN
@@ -180,7 +175,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_projectile_ref STR_VAR value = "" RET return BE
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_script_ref STR_VAR value = "" RET return BEGIN
-    LAF expand_table_reference STR_VAR ref = "%value%" RET return = resource END
+    LAF encode_table_reference STR_VAR value = "%value%" RET return END
 
     //Sanitize.
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.bcs") BEGIN

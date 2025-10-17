@@ -63,9 +63,9 @@ BEGIN
 
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
-                    LAF expand_table_reference STR_VAR
-                        ref = "%destination%"
-                    RET destination = resource END
+                    LAF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
 
                     //Override checks.
                     //Sanitize override.

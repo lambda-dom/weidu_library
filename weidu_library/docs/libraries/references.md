@@ -25,7 +25,7 @@ file(s):
 note(s):
 * All functions in this section have patch and action variants.
 
-`expand_table_reference STR_VAR ref RET resource`
+`encode_table_reference STR_VAR value RET return`
 
 This is the main entry point of the library, and parses a `ref` into a function call. In details: parses the string `ref` against the regexp `^#([a-zA-Z0-9][a-zA-Z0-9_-]*):(.*)$` and grabs the extracted function's name and the argument value. If `ref` does not match the regexp, the function FAIL's. If it matches, lookup the name in a table of `name => function` pairs and return whatever the function call returns:
 
@@ -34,10 +34,6 @@ LPF "%function%" STR_VAR value = "%value%" RET return
 ```
 
 Note the signature of the called function: one argument named `value` and the return value named `return` -- the signature of an *encoder*. The available formats are detailed in the formats section.
-
-`encode_table_reference STR_VAR value RET return`
-
-Encoder version of `expand_table_reference`.
 
 # B. Formats.
 

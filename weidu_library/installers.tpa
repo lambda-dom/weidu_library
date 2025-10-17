@@ -176,9 +176,9 @@ BEGIN
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
                     ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
-                        LAF expand_table_reference STR_VAR
-                            ref = "%destination%"
-                        RET destination = resource END
+                        LAF encode_table_reference STR_VAR
+                            value = "%destination%"
+                        RET destination = return END
                     END
 
                     //Existence debug checks.
@@ -249,9 +249,9 @@ DEFINE_DIMORPHIC_FUNCTION get_table_references STR_VAR tables = "" dir = "*" RET
                 READ_2DA_ENTRY_FORMER "table#rows" i (cols - 1) ref
 
                 //Compute final destination.
-                LPF expand_table_reference STR_VAR
-                    ref = "%ref%"
-                RET destination = resource END
+                LPF encode_table_reference STR_VAR
+                    value = "%ref%"
+                RET destination = return END
                 
                 TEXT_SPRINT $"references"("%resource%") "%destination%"
             END

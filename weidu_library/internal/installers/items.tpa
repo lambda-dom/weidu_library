@@ -148,9 +148,9 @@ DEFINE_ACTION_FUNCTION item_post_processing STR_VAR table = "" BEGIN
 
                     PATCH_IF NOT ("%exclusion%" STRING_EQUAL_CASE "*") BEGIN
                         //Compute destination.
-                        LPF expand_table_reference STR_VAR
-                            ref = "%destination%"
-                        RET destination = resource END
+                        LPF encode_table_reference STR_VAR
+                            value = "%destination%"
+                        RET destination = return END
 
                         //Write out.
                         LPF set_item_exclusion INT_VAR
@@ -186,9 +186,9 @@ DEFINE_ACTION_FUNCTION item_post_processing STR_VAR table = "" BEGIN
                     TEXT_SPRINT ability3 $"row"("ability3")
 
                     //Compute destination.
-                    LPF expand_table_reference STR_VAR
-                        ref = "%destination%"
-                    RET destination = resource END
+                    LPF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
 
                     //Sanitize
                     PATCH_IF NOT (IS_AN_INT ability1) BEGIN
