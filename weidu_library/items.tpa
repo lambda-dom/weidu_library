@@ -193,7 +193,7 @@ END
 DEFINE_DIMORPHIC_FUNCTION get_item_proficiency_id STR_VAR proficiency = "" RET id BEGIN
     //Lower-case to avoid trivial mismatches.
     ACTION_TO_LOWER proficiency
-    OUTER_TEXT_SPRINT prof_id $"item_types"("%proficiency%")
+    OUTER_TEXT_SPRINT prof_id $"item_proficiencies"("%proficiency%")
 
     OUTER_SET id = 0 - 1
     ACTION_IF (IS_AN_INT prof_id) BEGIN
