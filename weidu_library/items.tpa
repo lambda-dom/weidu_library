@@ -25,10 +25,6 @@ LAF load_array STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/flags.2da"
 RET_ARRAY item_flags = array END
 
-LAF load_array STR_VAR
-    table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/proficiencies.2da"
-RET_ARRAY item_proficiencies = array END
-
 
 //Basic functions.
 DEFINE_DIMORPHIC_FUNCTION get_item_size RET size BEGIN
@@ -191,13 +187,12 @@ DEFINE_DIMORPHIC_FUNCTION get_item_type_id STR_VAR type = "" RET id BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_item_proficiency_id STR_VAR proficiency = "" RET id BEGIN
-    //Lower-case to avoid trivial mismatches.
-    ACTION_TO_LOWER proficiency
-    OUTER_TEXT_SPRINT prof_id $"item_proficiencies"("%proficiency%")
-
-    OUTER_SET id = 0 - 1
-    ACTION_IF (IS_AN_INT prof_id) BEGIN
-        OUTER_SET id = prof_id
+    ACTION_IF ("%proficiency%" STRING_EQUAL_CASE "none") BEGIN
+        OUTER_SET id = 0
+    END ELSE BEGIN
+        OUTER_TEXT_SPRINT proficiency "proficiency%proficiency%"
+        ACTION_TO_UPPER proficiency
+        LAF get_id_from_ids STR_VAR ids = "wprof" value = "%proficiency%" RET id END
     END
 END
 
