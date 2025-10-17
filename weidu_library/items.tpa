@@ -18,10 +18,6 @@ RET_ARRAY item_header_offsets = table END
 
 //Arrays.
 LAF load_array STR_VAR
-    table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/types.2da"
-RET_ARRAY item_types = array END
-
-LAF load_array STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/flags.2da"
 RET_ARRAY item_flags = array END
 
