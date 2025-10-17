@@ -63,9 +63,6 @@ END
 
 //Opcodes.
 DEFINE_DIMORPHIC_FUNCTION encode_opcode_type STR_VAR value = "" RET return BEGIN
-    //Lower-case to avoid trivial mismatches.
-    ACTION_TO_LOWER value
-
     LAF get_opcode_type_id STR_VAR
         value = "%value%"
     RET return = id END
@@ -76,9 +73,6 @@ DEFINE_DIMORPHIC_FUNCTION encode_opcode_type STR_VAR value = "" RET return BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_opcode_target STR_VAR value = "" RET return BEGIN
-    //Lower-case to avoid trivial mismatches.
-    ACTION_TO_LOWER value
-
     LAF get_opcode_target_id STR_VAR
         value = "%value%"
     RET return = id END
@@ -89,9 +83,6 @@ DEFINE_DIMORPHIC_FUNCTION encode_opcode_target STR_VAR value = "" RET return BEG
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_opcode_timing STR_VAR value = "" RET return BEGIN
-    //Lower-case to avoid trivial mismatches.
-    ACTION_TO_LOWER value
-
     LAF get_opcode_timing_id STR_VAR
         value = "%value%"
     RET return = id END
@@ -102,9 +93,6 @@ DEFINE_DIMORPHIC_FUNCTION encode_opcode_timing STR_VAR value = "" RET return BEG
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_opcode_resist_dispel STR_VAR value = "" RET return BEGIN
-    //Lower-case to avoid trivial mismatches.
-    ACTION_TO_LOWER value
-
     LAF get_opcode_resist_dispel_id STR_VAR
         value = "%value%"
     RET return = id END
