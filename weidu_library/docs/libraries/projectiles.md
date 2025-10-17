@@ -41,19 +41,19 @@ Return the projectile `id` associated to `projectile` in `projectl.ids`. Functio
 note(s):
 * The value looked up in `projectl.ids` is corrected by +1 to match the corresponding missile id. This is the value that is to be inserted in spell and item headers, effects, etc.
 
-`get_projectile_res INT_VAR id RET resource`
-
-Return the `resource` associated to the projectile numeric `id`.
-
-note(s):
-* the `id` is the value read directly from an .spl or an .itm, and is corrected by -1 to return the correct projectile resource.
-
 `get_missile_id STR_VAR missile RET id`
 
 Return the missile `id` associated to label `missile` in `missile.ids`. Function returns `-1` if `missile` not in `missile.ids`.
 
 note(s):
 * subtract `-1` to get the projectile id.
+
+`get_projectile_res INT_VAR id RET resource`
+
+Return the `resource` associated to the projectile numeric `id`, `*` if none.
+
+note(s):
+* the `id` is the value read directly from an .spl or an .itm, and is corrected by -1 to return the correct projectile resource.
 
 `get_missile_res STR_VAR missile RET resource`
 
