@@ -25,7 +25,7 @@ STR_VAR
     ext = "spl"
     references = ""
 BEGIN
-    LPF get_table_ref STR_VAR
+    LPF get_table_reference STR_VAR
         value = "%resource%"
         array = "%references%"
         ext = "%ext%"
@@ -48,7 +48,7 @@ DEFINE_PATCH_FUNCTION creature_add_item STR_VAR
     flags = "identified&unstealable&undroppable"
     array = ""
 BEGIN
-    LPF get_table_ref STR_VAR
+    LPF get_table_reference STR_VAR
         value = "%reference%"
         array = "%array%"
         ext = "itm"
@@ -69,7 +69,7 @@ END
 DEFINE_PATCH_FUNCTION patch_script_spell_replacements STR_VAR spells = "" references = "" BEGIN
     PHP_EACH "%spells%" AS _ => spell BEGIN
         //Get reference.
-        LPF get_table_ref STR_VAR
+        LPF get_table_reference STR_VAR
             value = "%spell%"
             array = "%references%"
             ext = "spl"
@@ -94,7 +94,7 @@ END
 DEFINE_PATCH_FUNCTION patch_script_item_replacements STR_VAR items = "" references = "" BEGIN
     PHP_EACH "%items%" AS _ => item BEGIN
         //Get reference.
-        LPF get_table_ref STR_VAR
+        LPF get_table_reference STR_VAR
             value = "%item%"
             array = "%references%"
             ext = "itm"

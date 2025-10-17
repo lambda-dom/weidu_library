@@ -23,7 +23,7 @@ note(s):
 
 `get_installer_extension STR_VAR type RET extension`
 
-Return the file extension of resources of `type`.
+Return the file extension for resources of `type`.
 
 `get_installer_fields STR_VAR type RET fields`
 
@@ -50,9 +50,13 @@ For each `type` of resource there is a template example for the structure of the
 
 # D. Managing references.
 
-`get_table_references STR_VAR tables dir = "*" RET_ARRAY references`
+`load_table_references STR_VAR tables dir = "*" RET_ARRAY references`
 
-`get_table_ref STR_VAR value array RET return`
+Construct the arrays of pairs `name => value` from each table in the `tables` list, with name from the first column and value from the last and interpreting the values as table references, merging them (left to right). `dir` is the (optional) directory where the tables are located, defaulting to the standardized cxomponent resources dir.
+
+`get_table_reference STR_VAR value array ext RET return`
+
+Gets and validates the resource reference `return` associated to the symbolic name `value` in the `array`, an array loaded via `load_table_references`.
 
 # E. Types of installers.
 

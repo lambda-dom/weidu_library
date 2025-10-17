@@ -86,12 +86,12 @@ Desconstruct an ability string into an ability `prefix` and a `resource`. If the
 
 # D. Table installers.
 
-These two functions perform batch HLA deletion and addition from tables.
-
 `delete_hlas STR_VAR table`
 
 `add_hlas STR_VAR table`
 
+These two functions perform batch HLA deletion and addition using tables.
+
 `patch_hla_table STR_VAR kit deletions additions`
 
-This is an action function.
+Combine batch addition and deletion.
