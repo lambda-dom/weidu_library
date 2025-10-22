@@ -13,7 +13,7 @@ note(s):
 
 `get_id_from_ids STR_VAR ids value RET id`
 
-Return the integer `value` associated to `id` in ids resource `ids`. If `ids` is not a valid ids file or `id` not in the ids file, return `-1`.
+Return the integer `id` associated to `value` in ids resource `ids`. If `ids` is not a valid ids file or `id` not in the ids file, return `-1`.
 
 note(s):
 * casing of `id` or `ids` are irrelevant.
