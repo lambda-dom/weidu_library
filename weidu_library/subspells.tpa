@@ -57,6 +57,7 @@ BEGIN
 
             WITH_SCOPE BEGIN
                 //Inject names in local scope.
+                OUTER_TEXT_SPRINT symbol $"row"("symbol")
                 OUTER_TEXT_SPRINT install $"row"("install")
                 OUTER_TEXT_SPRINT override $"row"("override")
                 OUTER_TEXT_SPRINT destination $"row"("destination")
@@ -78,15 +79,15 @@ BEGIN
                     END
 
                     ACTION_IF (0 = override) AND (FILE_EXISTS_IN_GAME "%destination%.spl") BEGIN
-                        FAIL "install_subspells: destination '%destination%.spl' for '%resource%' already exists in game."
+                        FAIL "install_subspells: destination '%destination%.spl' for '%symbol%' already exists in game."
                     END
 
-                    ACTION_IF (2 = override) AND (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
-                        WARN "install_subspells: destination '%destination%.%ext%' for '%resource%' already exists in game."
+                    ACTION_IF (2 = override) AND (FILE_EXISTS_IN_GAME "%destination%.spl") BEGIN
+                        WARN "install_subspells: destination '%destination%.spl' for '%symbol%' already exists in game."
                     END
 
-                    ACTION_IF (3 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%")) BEGIN
-                        FAIL "install_subspells: destination '%destination%.%ext%' for '%resource%' declared to exist but does not."
+                    ACTION_IF (3 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.spl")) BEGIN
+                        FAIL "install_subspells: destination '%destination%.spl' for '%symbol%' declared to exist but does not."
                     END
 
                     //Process record.
