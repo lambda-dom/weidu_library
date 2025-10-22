@@ -165,7 +165,6 @@ BEGIN
                             LPF set_spell_field STR_VAR field = "description" value = "%desc_tlk%" END
                         END
 
-
                         //Fill school and sectype.
                         PATCH_IF NOT ("%school%" STRING_EQUAL_CASE "*") BEGIN
                             LPF encode_spell_school STR_VAR value = "%school%" RET school = return END
