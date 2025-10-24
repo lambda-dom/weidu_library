@@ -85,6 +85,14 @@ BEGIN
 
     //Copy file.
     COPY "%source%" "override/%dest%"
+        //Correct self-references: a few item items use this.
+        LPF ALTER_EFFECT INT_VAR
+            silent = 1
+        STR_VAR
+            match_resource = "self#res"
+            resource = "%destination%"
+        END
+
         PATCH_WITH_SCOPE BEGIN
             LPF write_item_fields STR_VAR array = "%fields%" END
 
