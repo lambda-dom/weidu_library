@@ -1,6 +1,6 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
-INCLUDE "%WEIDU_LIBRARY_DIR%/internal/binary.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/binary.tpa"
 
 
 //Builders.
@@ -10,6 +10,7 @@ DEFINE_DIMORPHIC_FUNCTION load_offsets_table STR_VAR file = "" RET_ARRAY table B
         fields = "field:offset:reader:writer"
     RET_ARRAY table END
 END
+
 
 //Generic reader and writer.
 DEFINE_PATCH_FUNCTION get_field_at INT_VAR offset = 0 STR_VAR field = "" offsets = "" RET value BEGIN

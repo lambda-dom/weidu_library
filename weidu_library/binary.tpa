@@ -90,15 +90,23 @@ DEFINE_PATCH_FUNCTION write_long_signed INT_VAR offset = 0 STR_VAR value = "" BE
 END
 
 DEFINE_PATCH_FUNCTION write_resource INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    //Sanitize.
     PATCH_IF NOT ((STRING_LENGTH "%value%") <= 8) BEGIN
         PATCH_FAIL "write_resource: resource reference '%value%' is more than 8 characters long."
     END
+
+    //Capitalize to avoid casing problems.
+    TO_UPPER value
     WRITE_EVALUATED_ASCII offset "%value%" #8
 END
 
 DEFINE_PATCH_FUNCTION write_ascii32 INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    //Sanitize.
     PATCH_IF NOT ((STRING_LENGTH "%value%") <= 32) BEGIN
         PATCH_FAIL "write_resource: resource reference '%value%' is more than 32 characters long."
     END
+
+    //Capitalize to avoid casing problems.
+    TO_UPPER value
     WRITE_EVALUATED_ASCII offset "%value%" #32
 END

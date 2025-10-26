@@ -17,8 +17,10 @@ High-level libraries:
 Support libraries: libraries providing basic functionality supporting everything else.
 
 * [2da](./libraries/2da.md): functions to search and patch through .2da table files.
+* [Binary](./libraries/binary.md): low-level library of binary readers and writers.
 * [Arrays](./libraries/arrays.md): manipulate (associative) arrays.
 * [Creatures](./libraries/creatures.md): handle creature .cre files.
+* [Encoders](./libraries/internal/encoders.md): library of encoders.
 * [Effects](./libraries/effects.md): handle effect .eff files.
 * [Generic](./libraries/generic.md): generic reader and writer using relative offset tables.
 * [Ids](./libraries/ids.md): functions for getting values out of .ids files.
@@ -31,8 +33,3 @@ Support libraries: libraries providing basic functionality supporting everything
 * [Spells](./libraries/spells.md): handle spell .spl files.
 * [Strings](./libraries/strings.md): string manipulation functions.
 * [Tables](./libraries/tables.md): construct and manipulate tables.
-* [Encoders](./libraries/internal/encoders.md): library of encoders.
-
-Internal libraries: internal libraries, usually low-level, that are not part of the public API. 
-
-* [Binary](./libraries/internal/binary.md): library of binary readers and writers.
