@@ -3,7 +3,7 @@
 Low-level library to read and write form binary formats. Most likely, there is a higher-level library to do what is needed.
 file(s):
 
-* [Source code](../../../internal/binary.tpa)
+* [Source code](../../binary.tpa)
 
 # A. Generic binary readers.
 
