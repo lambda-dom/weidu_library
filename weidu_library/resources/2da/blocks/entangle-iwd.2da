@@ -1,0 +1,7 @@
+2DA V1.0
+*
+                        parameter1  parameter2      resource
+immunity_opcode         *           #opc:entangle   *
+immunity_icon           *           #lit:144        *
+immunity_spell          #lit:0      *               #spl:CLERIC_ENTANGLE
+immunity_spell          #lit:0      *               #lit:spwm111
