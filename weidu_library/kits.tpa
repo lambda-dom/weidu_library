@@ -87,8 +87,7 @@ DEFINE_ACTION_FUNCTION set_enginest_class_description INT_VAR tlk = 0 STR_VAR cl
         END
 
         PATCH_IF (found = 0) BEGIN
-            //Only warn on non-existent.
-            PATCH_WARN "set_enginest_class_description: string '%string%' for class '%class%' not found in 'enginest.2da'."
+            PATCH_FAIL "set_enginest_class_description: string '%string%' for class '%class%' not found in 'enginest.2da'."
         END
     BUT_ONLY
 END
