@@ -66,9 +66,9 @@ DEFINE_ACTION_FUNCTION set_kitlist_description INT_VAR tlk = 0 STR_VAR kit = "" 
     BUT_ONLY
 END
 
-DEFINE_ACTION_FUNCTION set_enginest_description INT_VAR tlk = 0 STR_VAR kit = "" BEGIN
+DEFINE_ACTION_FUNCTION set_enginest_class_description INT_VAR tlk = 0 STR_VAR class = "" BEGIN
     //Filter out blackguards; have no entry.
-    OUTER_TEXT_SPRINT string "STRREF_GUI_HELP_%kit%"
+    OUTER_TEXT_SPRINT string "STRREF_GUI_HELP_%class%"
     ACTION_TO_UPPER string
 
     COPY_EXISTING "enginest.2da" "override"
@@ -86,7 +86,32 @@ DEFINE_ACTION_FUNCTION set_enginest_description INT_VAR tlk = 0 STR_VAR kit = ""
 
         PATCH_IF (found = 0) BEGIN
             //Only warn on non-existent.
-            PATCH_WARN "set_enginest_description: string '%string%' for '%kit%' not found in 'enginest.2da'."
+            PATCH_WARN "set_enginest_class_description: string '%string%' for class '%class%' not found in 'enginest.2da'."
+        END
+    BUT_ONLY
+END
+
+DEFINE_ACTION_FUNCTION set_enginest_kit_description INT_VAR tlk = 0 STR_VAR kit = "" BEGIN
+    //Filter out blackguards; have no entry.
+    OUTER_TEXT_SPRINT string "STRREF_GUI_HELP_KIT_%kit%"
+    ACTION_TO_UPPER string
+
+    COPY_EXISTING "enginest.2da" "override"
+        //Set description.
+        COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols row_count
+        found = 0
+        FOR (i = 0 ; (i < row_count) AND (found != 1) ; ++i) BEGIN
+            READ_2DA_ENTRY i 0 cols value
+            PATCH_IF ("%string%" STRING_EQUAL_CASE "%value%") BEGIN
+                SET_2DA_ENTRY i 1 cols tlk
+                found = 1
+            END
+        END
+
+        PATCH_IF (found = 0) BEGIN
+            //Only warn on non-existent.
+            PATCH_WARN "set_enginest_kit_description: string '%string%' for kit '%kit%' not found in 'enginest.2da'."
         END
     BUT_ONLY
 END
@@ -97,7 +122,7 @@ DEFINE_DIMORPHIC_FUNCTION set_class_description INT_VAR descr = 0 STR_VAR class 
     OUTER_SET class_descr = RESOLVE_STR_REF ((AT descr))
 
     LAF set_clastext_description INT_VAR tlk = class_descr STR_VAR class = "%class%" END
-    LAF set_enginest_description INT_VAR tlk = class_descr STR_VAR kit = "%class%" END
+    LAF set_enginest_class_description INT_VAR tlk = class_descr STR_VAR class = "%class%" END
 END
 
 DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = "" BEGIN
@@ -120,7 +145,7 @@ DEFINE_DIMORPHIC_FUNCTION set_kit_description INT_VAR descr = 0 STR_VAR kit = ""
     RET kit_name = value END
     ACTION_TO_UPPER kit_name
 
-    LAF set_enginest_description INT_VAR tlk = kit_descr STR_VAR kit = "KIT_%kit_name%" END
+    LAF set_enginest_kit_description INT_VAR tlk = kit_descr STR_VAR kit = "%kit_name%" END
 END
 
 
