@@ -68,28 +68,27 @@ END
 
 DEFINE_ACTION_FUNCTION set_enginest_description INT_VAR tlk = 0 STR_VAR kit = "" BEGIN
     //Filter out blackguards; have no entry.
-    ACTION_IF NOT ("%kit%" STRING_EQUAL_CASE "kit_blackguard") BEGIN
-        OUTER_TEXT_SPRINT string "STRREF_GUI_HELP_%kit%"
-        ACTION_TO_UPPER string
+    OUTER_TEXT_SPRINT string "STRREF_GUI_HELP_%kit%"
+    ACTION_TO_UPPER string
 
-        COPY_EXISTING "enginest.2da" "override"
-            //Set description.
-            COUNT_2DA_COLS cols
-            COUNT_2DA_ROWS cols row_count
-            found = 0
-            FOR (i = 0 ; (i < row_count) AND (found != 1) ; ++i) BEGIN
-                READ_2DA_ENTRY i 0 cols value
-                PATCH_IF ("%string%" STRING_EQUAL_CASE "%value%") BEGIN
-                    SET_2DA_ENTRY i 1 cols tlk
-                    found = 1
-                END
+    COPY_EXISTING "enginest.2da" "override"
+        //Set description.
+        COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols row_count
+        found = 0
+        FOR (i = 0 ; (i < row_count) AND (found != 1) ; ++i) BEGIN
+            READ_2DA_ENTRY i 0 cols value
+            PATCH_IF ("%string%" STRING_EQUAL_CASE "%value%") BEGIN
+                SET_2DA_ENTRY i 1 cols tlk
+                found = 1
             END
+        END
 
-            PATCH_IF (found = 0) BEGIN
-                PATCH_FAIL "set_enginest_description: string '%string%' for '%kit%' not found in 'enginest.2da'."
-            END
-        BUT_ONLY
-    END
+        PATCH_IF (found = 0) BEGIN
+            //Only warn on non-existent.
+            PATCH_WARN "set_enginest_description: string '%string%' for '%kit%' not found in 'enginest.2da'."
+        END
+    BUT_ONLY
 END
 
 
