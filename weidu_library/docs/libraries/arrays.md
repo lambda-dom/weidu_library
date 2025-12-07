@@ -75,7 +75,7 @@ Return a new associative array with pairs `key => value` with keys the elements 
 
 `merge_arrays STR_VAR arrays RET_ARRAY array`
 
-Merge `arrays` passed by name as a `|`-separated. If there are common keys, the last one wins.
+Merge `arrays` passed by name as a `|`-separated stringified list. If there are common keys, the last one wins.
 
 `load_array INT_VAR col = 1 STR_VAR table RET_ARRAY array`
 
