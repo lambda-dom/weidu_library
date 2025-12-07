@@ -79,4 +79,4 @@ All functions in this section are patch functions for clab table files like `cla
 Patch resource references in a clab file using a `table` of spell references, loaded via `load_table_references` from the [installers library](./installers.md).
 
 note(s):
-* this function is slow; it has to crawl through the entire clab, check if the reference is in the `array` and if it is, set it.
+* this function is slow; it has to crawl through the entire clab, check if the reference is in the `table` and if it is, set it.
