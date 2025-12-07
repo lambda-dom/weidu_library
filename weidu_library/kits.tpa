@@ -199,7 +199,7 @@ DEFINE_PATCH_FUNCTION patch_proficiencies STR_VAR kit = "" array = "" BEGIN
 END
 
 //Clab patchers.
-DEFINE_PATCH_FUNCTION make_clab_replacements STR_VAR array = "" BEGIN
+DEFINE_PATCH_FUNCTION make_clab_replacements STR_VAR table = "" BEGIN
     COUNT_2DA_COLS cols
     COUNT_2DA_ROWS cols rows
 
@@ -219,10 +219,11 @@ DEFINE_PATCH_FUNCTION make_clab_replacements STR_VAR array = "" BEGIN
                     PATCH_FAIL "make_clab_replacements: malformed ability '%value%'."
                 END
 
-                LPF get_array_element STR_VAR
+                LPF get_table_reference STR_VAR
+                    value = "%resource%"
                     array = "%array%"
-                    key = "%resource%"
-                RET ability = value END
+                    ext = "spl"
+                RET ability = resource END
 
                 PATCH_IF NOT ("%ability%" STRING_EQUAL_CASE "*") BEGIN
                     SET_2DA_ENTRY i j cols "%prefix%_%ability%"

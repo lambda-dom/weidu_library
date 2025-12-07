@@ -68,15 +68,15 @@ note(s):
 
 `patch_proficiencies STR_VAR kit array`
 
-Patch a kit's proficiencies using a an array `proficiency => amount`.
+Patch a kit's proficiencies using an array `proficiency => amount`.
 
 # D. Abilities.
 
 All functions in this section are patch functions for clab table files like `clab*.2da`. The caller is responsible for opening the file, pretty-printing, etc.
 
-`make_clab_replacements STR_VAR array`
+`make_clab_replacements STR_VAR table`
 
-Patch resource references in a clab file using an `array` of references, loaded via `load_table_references` from the [installers library](./installers.md).
+Patch resource references in a clab file using a `table` of spell references, loaded via `load_table_references` from the [installers library](./installers.md).
 
 note(s):
 * this function is slow; it has to crawl through the entire clab, check if the reference is in the `array` and if it is, set it.
