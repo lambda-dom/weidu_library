@@ -73,6 +73,10 @@ note(s):
 
 Return a new associative array with pairs `key => value` with keys the elements of the list of `keys` and values their indices.
 
+`merge_arrays STR_VAR arrays RET_ARRAY array`
+
+Merge `arrays` passed by name as a `|`-separated stringified list. If there are common keys, the last one wins.
+
 `load_array INT_VAR col = 1 STR_VAR table RET_ARRAY array`
 
 Builds an array from the `table` file (full path) and a column index. The keys are the values in the first column and the values are the values in the `col` column. This function implicitly assumes the keys are unique.

@@ -92,6 +92,22 @@ DEFINE_DIMORPHIC_FUNCTION enumerate_list STR_VAR keys = "" RET_ARRAY array BEGIN
     END
 END
 
+DEFINE_DIMORPHIC_FUNCTION merge_arrays STR_VAR arrays = "" RET_ARRAY array BEGIN
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+
+    LAF list_from_string STR_VAR
+        string = "%arrays%"
+        separator = "|"
+    RET count RET_ARRAY list END
+    
+    //Loop.
+    ACTION_PHP_EACH "list" AS _ => arr_value BEGIN
+        ACTION_PHP_EACH "%arr_value%" AS key => value BEGIN
+            OUTER_TEXT_SPRINT $"array"("%key%") "%value%"
+        END
+    END
+END
+
 DEFINE_DIMORPHIC_FUNCTION load_array INT_VAR col = 1 STR_VAR table = "" RET_ARRAY array BEGIN
     //Existence check.
     ACTION_IF NOT (FILE_EXISTS "%table%") BEGIN
