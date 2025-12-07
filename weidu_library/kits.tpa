@@ -219,7 +219,7 @@ DEFINE_PATCH_FUNCTION make_clab_replacements STR_VAR table = "" BEGIN
                     PATCH_FAIL "make_clab_replacements: malformed ability '%value%'."
                 END
 
-                TEXT_SPRINT ability $"%array%"("%resource%")
+                TEXT_SPRINT ability $"%table%"("%resource%")
                 PATCH_IF NOT (FILE_EXISTS_IN_GAME "%ability%.spl") BEGIN
                     PATCH_FAIL "make_clab_replacements: '%resource%' unknown or does not exist in game."
                 END
