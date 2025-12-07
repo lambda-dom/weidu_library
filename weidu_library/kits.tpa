@@ -219,17 +219,15 @@ DEFINE_PATCH_FUNCTION make_clab_replacements STR_VAR table = "" BEGIN
                     PATCH_FAIL "make_clab_replacements: malformed ability '%value%'."
                 END
 
-                LPF get_table_reference STR_VAR
-                    value = "%resource%"
-                    array = "%array%"
-                    ext = "spl"
-                RET ability = resource END
-
-                PATCH_IF NOT ("%ability%" STRING_EQUAL_CASE "*") BEGIN
-                    SET_2DA_ENTRY i j cols "%prefix%_%ability%"
+                TEXT_SPRINT ability $"%array%"("%resource%")
+                PATCH_IF NOT (FILE_EXISTS_IN_GAME "%ability%.spl") BEGIN
+                    PATCH_FAIL "make_clab_replacements: '%resource%' unknown or does not exist in game."
                 END
+
+                TEXT_SPRINT prefixed_ability "%prefix%_%ability%"
+                TO_UPPER prefixed_ability
+                SET_2DA_ENTRY i j cols "%prefixed_ability%"
             END
         END
     END
 END
-
