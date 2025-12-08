@@ -246,7 +246,7 @@ END
 
 //Auxiliary functions used by add_new_spells_clab.
 DEFINE_DIMORPHIC_FUNCTION get_spell_progression_array STR_VAR kit = "" RET_ARRAY progression_array BEGIN
-    LAF get_class_spell_progression STR_VAR kit = "%kit%" RET table END
+    LAF get_kit_spell_progression STR_VAR kit = "%kit%" RET table END
     ACTION_IF ("%kit%" STRING_EQUAL_CASE "*") BEGIN
         FAIL "get_spell_progression_array: unknown '%kit%'."
     END
