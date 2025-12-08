@@ -256,12 +256,13 @@ DEFINE_DIMORPHIC_FUNCTION get_spell_progression_array STR_VAR kit = "" RET_ARRAY
         COUNT_2DA_COLS columns
         FOR (i = 1; i < columns; ++i) BEGIN
             LPF find_row_index INT_VAR col = i STR_VAR key = "1" RET char_level = index END
+            char_level += 1
             TEXT_SPRINT $"progression_array"("%i%") "%char_level%"
         END
     BUT_ONLY
 END
 
-DEFINE_DIMORPHIC_FUNCTION get_spell_ability_array STR_VAR kit = "" table = "" RET_ARRAY ability_array BEGIN
+DEFINE_DIMORPHIC_FUNCTION get_spell_ability_array STR_VAR kit = "" table = "" RET ability_number RET_ARRAY ability_array BEGIN
     //Sanitize.
     ACTION_IF NOT (FILE_EXISTS "%table%") BEGIN
         FAIL "get_spell_ability_array: table '%table%' does not exist."
@@ -276,27 +277,32 @@ DEFINE_DIMORPHIC_FUNCTION get_spell_ability_array STR_VAR kit = "" table = "" RE
         
         //Sanitize.
         LPF get_array_count STR_VAR array = "progression_array" RET col_count = count END
-        PATCH_IF cols > col_count BEGIN
+        PATCH_IF cols - 1 > col_count BEGIN
             PATCH_FAIL "get_spell_ability_array: expected <= '%col_count%' columns in '%table%', got '%cols%'."
         END
 
+        ability_number = rows
         FOR (i = 0; i < rows; ++i) BEGIN
             FOR (j = 1; j < cols; ++j) BEGIN
                 TEXT_SPRINT char_level $"progression_array"("%j%")
                 READ_2DA_ENTRY i j cols ability
-                TEXT_SPRINT $"ability_array"("%i%") "%char_level%_%ability%"
+                PATCH_IF NOT ("%ability%" STRING_EQUAL_CASE "*") BEGIN
+                    TEXT_SPRINT $"ability_array"("%i%_%char_level%") "%ability%"
+                END
             END
         END
 END
 
-DEFINE_DIMORPHIC_FUNCTION deconstruct_level_ability STR_VAR string = "" RET level ability BEGIN
-    OUTER_TEXT_SPRINT regexp "^\([1-9]\)_\(.*\)$"
+DEFINE_DIMORPHIC_FUNCTION deconstruct_level_ability STR_VAR string = "" RET ability_row char_level BEGIN
+    OUTER_SET ability_row = 0
+    OUTER_SET char_level = 0
+    OUTER_TEXT_SPRINT regexp "^\([0-9]\)_\([0-9]+\)$"
     //Extract values via regexp matching.
     OUTER_INNER_PATCH "%string%" BEGIN
         REPLACE_EVALUATE "%regexp%" BEGIN
             PATCH_IF ("%string%" STRING_EQUAL_CASE "%MATCH0%") BEGIN
-                TEXT_SPRINT level "%MATCH1%"
-                TEXT_SPRINT ability "%MATCH2%"
+                ability_row = "%MATCH1%"
+                char_level = "%MATCH2%"
             END ELSE BEGIN
                 PATCH_FAIL "deconstruct_level_ability: '%string%' is not a valid levelled spell ability."
             END
@@ -308,22 +314,27 @@ DEFINE_PATCH_FUNCTION add_new_spells_clab STR_VAR kit = "" table = "" BEGIN
     LPF get_spell_ability_array STR_VAR
         kit = "%kit%"
         table = "%table%"
-    RET_ARRAY ability_array END
+    RET ability_number RET_ARRAY ability_array END
 
     COUNT_2DA_COLS cols
     COUNT_2DA_ROWS cols rows
-    ability_nbr = rows + 1
-    PHP_EACH "ability_array" AS _ => levelled_ability BEGIN
+
+    //Append rows, one per ability row.
+    FOR (i = 0; i < ability_number; ++i) BEGIN
+        index = rows + i + 1
         LPF append_row STR_VAR
-            key = "ABILITY%row_ability%"
+            key = "ABILITY%index%"
             default = "****"
         END
+    END
 
+    //Fill out entries.
+    COUNT_2DA_COLS cols
+    PHP_EACH "ability_array" AS levelled_ability => ability BEGIN
         LPF deconstruct_level_ability STR_VAR
             string = "%levelled_ability%"
-        RET level ability END
+        RET ability_row char_level END
 
-        SET_2DA_ENTRY ability_nbr level cols "GA_%ability%"
-        ability_nbr += 1
+        SET_2DA_ENTRY (rows + ability_row) char_level cols "GA_%ability%"
     END
 END
