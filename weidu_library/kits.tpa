@@ -15,6 +15,10 @@ LAF load_array STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/kits/kit_classes.2da"
 RET_ARRAY kit_classes = array END
 
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/kits/kit_spell_progression.2da"
+RET_ARRAY kit_spell_progression = array END
+
 
 //Basic functions.
 DEFINE_DIMORPHIC_FUNCTION get_kit_clab STR_VAR kit = "" RET clab BEGIN
@@ -32,6 +36,14 @@ DEFINE_DIMORPHIC_FUNCTION get_kit_clab STR_VAR kit = "" RET clab BEGIN
         END ELSE BEGIN
             TEXT_SPRINT clab "*"
         END
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_kit_spell_progression STR_VAR kit = "" RET table BEGIN
+    LAF get_array_element STR_VAR
+        array = "kit_spell_progression"
+        key = "%kit%"
+        default = "*"
+    RET table = value END
 END
 
 
@@ -229,5 +241,100 @@ DEFINE_PATCH_FUNCTION make_clab_replacements STR_VAR table = "" BEGIN
                 SET_2DA_ENTRY i j cols "%prefixed_ability%"
             END
         END
+    END
+END
+
+//Auxiliary functions used by add_new_spells_clab.
+DEFINE_DIMORPHIC_FUNCTION get_spell_progression_array STR_VAR kit = "" RET_ARRAY progression_array BEGIN
+    LAF get_kit_spell_progression STR_VAR kit = "%kit%" RET table END
+    ACTION_IF ("%kit%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "get_spell_progression_array: unknown '%kit%'."
+    END
+
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY progression_array BEGIN END
+    COPY_EXISTING "%table%.2da" "override"
+        COUNT_2DA_COLS columns
+        FOR (i = 1; i < columns; ++i) BEGIN
+            LPF find_row_index INT_VAR col = i STR_VAR key = "1" RET char_level = index END
+            char_level += 1
+            TEXT_SPRINT $"progression_array"("%i%") "%char_level%"
+        END
+    BUT_ONLY
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_spell_ability_array STR_VAR kit = "" table = "" RET ability_number RET_ARRAY ability_array BEGIN
+    //Sanitize.
+    ACTION_IF NOT (FILE_EXISTS "%table%") BEGIN
+        FAIL "get_spell_ability_array: table '%table%' does not exist."
+    END
+
+    //Get spell progression array.
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY ability_array BEGIN END
+    LAF get_spell_progression_array STR_VAR kit = "%kit%" RET_ARRAY progression_array END
+    COPY - "%table%" "override"
+        COUNT_2DA_COLS cols
+        COUNT_2DA_ROWS cols rows
+        
+        //Sanitize.
+        LPF get_array_count STR_VAR array = "progression_array" RET col_count = count END
+        PATCH_IF cols - 1 > col_count BEGIN
+            PATCH_FAIL "get_spell_ability_array: expected <= '%col_count%' columns in '%table%', got '%cols%'."
+        END
+
+        ability_number = rows
+        FOR (i = 0; i < rows; ++i) BEGIN
+            FOR (j = 1; j < cols; ++j) BEGIN
+                TEXT_SPRINT char_level $"progression_array"("%j%")
+                READ_2DA_ENTRY i j cols ability
+                PATCH_IF NOT ("%ability%" STRING_EQUAL_CASE "*") BEGIN
+                    TEXT_SPRINT $"ability_array"("%i%_%char_level%") "%ability%"
+                END
+            END
+        END
+END
+
+DEFINE_DIMORPHIC_FUNCTION deconstruct_level_ability STR_VAR string = "" RET ability_row char_level BEGIN
+    OUTER_SET ability_row = 0
+    OUTER_SET char_level = 0
+    OUTER_TEXT_SPRINT regexp "^\([0-9]\)_\([0-9]+\)$"
+    //Extract values via regexp matching.
+    OUTER_INNER_PATCH "%string%" BEGIN
+        REPLACE_EVALUATE "%regexp%" BEGIN
+            PATCH_IF ("%string%" STRING_EQUAL_CASE "%MATCH0%") BEGIN
+                ability_row = "%MATCH1%"
+                char_level = "%MATCH2%"
+            END ELSE BEGIN
+                PATCH_FAIL "deconstruct_level_ability: '%string%' is not a valid levelled spell ability."
+            END
+        END ~~
+    END
+END
+
+DEFINE_PATCH_FUNCTION add_new_spells_clab STR_VAR kit = "" table = "" BEGIN
+    LPF get_spell_ability_array STR_VAR
+        kit = "%kit%"
+        table = "%table%"
+    RET ability_number RET_ARRAY ability_array END
+
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+
+    //Append rows, one per ability row.
+    FOR (i = 0; i < ability_number; ++i) BEGIN
+        index = rows + i + 1
+        LPF append_row STR_VAR
+            key = "ABILITY%index%"
+            default = "****"
+        END
+    END
+
+    //Fill out entries.
+    COUNT_2DA_COLS cols
+    PHP_EACH "ability_array" AS levelled_ability => ability BEGIN
+        LPF deconstruct_level_ability STR_VAR
+            string = "%levelled_ability%"
+        RET ability_row char_level END
+
+        SET_2DA_ENTRY (rows + ability_row) char_level cols "GA_%ability%"
     END
 END

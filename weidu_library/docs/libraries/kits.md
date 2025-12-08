@@ -19,6 +19,10 @@ note(s):
 * this function opens `kitlist.2da` on each call, to search for the kit.
 * technically, this returns the first `kit` match, but if there are two entries for the same kit in `kitlist.2da`, then the table is malformed.
 
+`get_kit_spell_progression STR_VAR kit RET table`
+
+Return the spell progression `table` for the `kit` (no `2da` extension), `*` if `kit` does not exist.
+
 # B. Descriptions.
 
 note(s):
@@ -80,3 +84,7 @@ Patch resource references in a clab file using a `table` of spell references, lo
 
 note(s):
 * this function is slow; it has to crawl through the entire clab, check if the reference is in the `table` and if it is, set it.
+
+`add_new_spells_clab STR_VAR kit table`
+
+Add new gained spells to the `kit` clab table using `table` (full path).
