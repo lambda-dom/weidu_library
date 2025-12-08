@@ -19,7 +19,7 @@ note(s):
 * this function opens `kitlist.2da` on each call, to search for the kit.
 * technically, this returns the first `kit` match, but if there are two entries for the same kit in `kitlist.2da`, then the table is malformed.
 
-`get_class_spell_progression STR_VAR kit RET table`
+`get_kit_spell_progression STR_VAR kit RET table`
 
 Return the spell progression `table` for the `kit` (no `2da` extension), `*` if `kit` does not exist.
 

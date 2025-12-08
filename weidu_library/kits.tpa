@@ -305,4 +305,25 @@ DEFINE_DIMORPHIC_FUNCTION deconstruct_level_ability STR_VAR string = "" RET leve
 END
 
 DEFINE_PATCH_FUNCTION add_new_spells_clab STR_VAR kit = "" table = "" BEGIN
+    LPF get_spell_ability_array STR_VAR
+        kit = "%kit%"
+        table = "%table%"
+    RET_ARRAY ability_array END
+
+    COUNT_2DA_COLS cols
+    COUNT_2DA_ROWS cols rows
+    ability_nbr = rows + 1
+    PHP_EACH "ability_array" AS _ => levelled_ability BEGIN
+        LPF append_row STR_VAR
+            key = "ABILITY%row_ability%"
+            default = "****"
+        END
+
+        LPF deconstruct_level_ability STR_VAR
+            string = "%levelled_ability%"
+        RET level ability END
+
+        SET_2DA_ENTRY ability_nbr level cols "GA_%ability%"
+        ability_nbr += 1
+    END
 END
