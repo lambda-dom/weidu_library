@@ -1,280 +1,35 @@
 //Libraries.
-INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
-INCLUDE "%WEIDU_LIBRARY_DIR%/lists.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
-INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
-
-//Tables.
-LAF load_table STR_VAR
-    file = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/installers.2da"
-    fields = "type:extension:template:module:writer:handler:fields"
-RET_ARRAY installers = table END
-
-
-//Basic functions.
-DEFINE_DIMORPHIC_FUNCTION get_installer_extension STR_VAR type = "" RET extension BEGIN
-    LAF find_table_row STR_VAR
-        table = "installers"
-        field = "type"
-        key = "%type%"
-    RET row = index END
-
-    //Sanitize.
-    ACTION_IF (0 - 1 = row) BEGIN
-        FAIL "get_installer_extension: resource type '%type%' not found in 'installers' table."
-    END
-
-    //Fetch entry.
-    OUTER_TEXT_SPRINT extension $"installers"("%row%" "extension")
-END
-
-DEFINE_DIMORPHIC_FUNCTION get_installer_module STR_VAR type = "" RET module BEGIN
-    LAF find_table_row STR_VAR
-        table = "installers"
-        field = "type"
-        key = "%type%"
-    RET row = index END
-
-    //Sanitize.
-    ACTION_IF (0 - 1 = row) BEGIN
-        FAIL "get_installer_module: resource type '%type%' not found in 'installers' table."
-    END
-
-    //Fetch entry.
-    OUTER_TEXT_SPRINT module $"installers"("%row%" "module")
-END
-
-
-DEFINE_DIMORPHIC_FUNCTION get_installer_writer STR_VAR type = "" RET writer BEGIN
-    LAF find_table_row STR_VAR
-        table = "installers"
-        field = "type"
-        key = "%type%"
-    RET row = index END
-
-    //Sanitize.
-    ACTION_IF (0 - 1 = row) BEGIN
-        FAIL "get_installer_writer: resource type '%type%' not found in 'installers' table."
-    END
-
-    //Fetch entry.
-    OUTER_TEXT_SPRINT writer $"installers"("%row%" "writer")
-END
-
-DEFINE_DIMORPHIC_FUNCTION get_installer_handler STR_VAR type = "" RET handler BEGIN
-    LAF find_table_row STR_VAR
-        table = "installers"
-        field = "type"
-        key = "%type%"
-    RET row = index END
-
-    //Sanitize.
-    ACTION_IF (0 - 1 = row) BEGIN
-        FAIL "get_installer_writer: resource type '%type%' not found in 'installers' table."
-    END
-
-    //Fetch entry.
-    OUTER_TEXT_SPRINT handler $"installers"("%row%" "handler")
-END
-
-DEFINE_DIMORPHIC_FUNCTION get_installer_fields STR_VAR type = "" RET fields BEGIN
-    LAF find_table_row STR_VAR
-        table = "installers"
-        field = "type"
-        key = "%type%"
-    RET row = index END
-
-    ACTION_IF (0 - 1 = row) BEGIN
-        FAIL "get_installer_fields: resource type '%type%' not found in 'installers' table."
-    END
-
-    //Normalize fields string from table.
-    OUTER_TEXT_SPRINT fields $"installers"("%row%" "fields")
-    ACTION_IF ("%fields%" STRING_EQUAL_CASE "*") BEGIN
-        OUTER_TEXT_SPRINT fields "resource:install:patch:override:destination"
-    END ELSE BEGIN
-        OUTER_TEXT_SPRINT fields "resource:install:%fields%:patch:override:destination"
-    END
-END
-
-//Installer.
-DEFINE_ACTION_FUNCTION install_resources STR_VAR
-    type = ""
-    table = ""
-    patches = "*"
-    tra = "*"
-    dir = "*"
-BEGIN
-    //Get resource extension.
-    LAF get_installer_extension STR_VAR
-        type = "%type%"
-    RET ext = extension END
-
-    //Normalize dir.
-    ACTION_IF ("%dir%" STRING_EQUAL_CASE "*") BEGIN
-        LAF get_component_resources_dir RET dir = dir END
-        OUTER_TEXT_SPRINT dir "%dir%/%ext%"
-    END
-
-    //Normalize tra.
-    ACTION_IF ("%tra%" STRING_EQUAL_CASE "*") BEGIN
-        OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/resources/tra/empty.tra"
-    END
-
-    //Existence checks.
-    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
-        FAIL "install_resources: tra file '%tra%' does not exist."
-    END
-
-    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
-        //Sanitize.
-        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "install_resources: patches file '%patches%' does not exist."
-        END
-
-        //Include patches file.
-        INCLUDE "%patches%"
-    END
-
-    //Get module and writer function.
-    LAF get_installer_module STR_VAR type = "%type%" RET module END
-    ACTION_IF NOT ("%module%" STRING_EQUAL_CASE "*") BEGIN
-        ACTION_IF NOT (FILE_EXISTS "%WEIDU_LIBRARY_DIR%/internal/installers/%module%") BEGIN
-            FAIL "install_resources: file '%module%' for installer writer not found."
-        END
-
-        INCLUDE "%WEIDU_LIBRARY_DIR%/internal/installers/%module%"
-    END
-    LAF get_installer_writer STR_VAR type = "%type%" RET writer END
-
-    //Load table
-    LAF get_installer_fields STR_VAR type = "%type%" RET fields END
-    LAF load_table STR_VAR
-        file = "%table%"
-        fields = "%fields%"
-    RET_ARRAY resources = table END
-
-    WITH_TRA "%tra%" BEGIN
-        //Loop.
-        LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
-        OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
-            LAF get_row_from_table INT_VAR row = i STR_VAR
-                table = "resources"
-            RET_ARRAY
-                row = array
-            END
-
-            WITH_SCOPE BEGIN
-                //Inject names in local scope.
-                OUTER_TEXT_SPRINT resource $"row"("resource")
-                OUTER_TEXT_SPRINT install $"row"("install")
-                OUTER_TEXT_SPRINT patch $"row"("patch")
-                OUTER_TEXT_SPRINT override $"row"("override")
-                OUTER_TEXT_SPRINT destination $"row"("destination")
-
-                ACTION_IF NOT (install = 0) BEGIN
-                    //Compute destination.
-                    ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
-                        LAF encode_table_reference STR_VAR
-                            value = "%destination%"
-                        RET destination = return END
-                    END
-
-                    //Existence debug checks.
-                    ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
-                        //Sanitize.
-                        ACTION_IF NOT (IS_AN_INT override) BEGIN
-                            FAIL "install_resources: '%override%' is not an integer."
-                        END
-
-                        ACTION_IF NOT ((0 <= override) AND (override <= 3)) BEGIN
-                            FAIL "install_resources: '%override%' not an integer in the [0, 3] range."
-                        END
-
-                        ACTION_IF (0 = override) AND (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
-                            FAIL "install_resources: destination '%destination%.%ext%' for '%resource%' already exists in game."
-                        END
-
-                        ACTION_IF (2 = override) AND (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
-                            WARN "Warning:install_resources: destination '%destination%.%ext%' for '%resource%' already exists in game."
-                        END
-
-                        ACTION_IF (3 = override) AND (NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%")) BEGIN
-                            FAIL "install_resources: destination '%destination%.%ext%' for '%resource%' declared to exist but does not."
-                        END
-                    END
-
-                    LAF "%writer%" STR_VAR
-                        resource = "%resource%"
-                        dir = "%dir%"
-                        destination = "%destination%"
-                        ext = "%ext%"
-                        patch = "%patch%"
-                        fields = "row"
-                    END
-                END
-            END
-        END
-
-        //Post processor
-        LAF get_installer_handler STR_VAR type = "%type%" RET handler END
-        ACTION_IF NOT ("%handler%" STRING_EQUAL_CASE "*") BEGIN
-            LAF "%handler%" STR_VAR table = "resources" END
-        END
-    END
-END
 
 //Managing references.
-DEFINE_DIMORPHIC_FUNCTION load_table_references STR_VAR tables = "" dir = "*" RET_ARRAY references BEGIN
-    //Set resources dir.
-    ACTION_IF ("%dir%" STRING_EQUAL_CASE "*") BEGIN
-        LAF get_component_resources_dir RET dir = dir END
-        OUTER_TEXT_SPRINT dir "%dir%/2da"
+DEFINE_DIMORPHIC_FUNCTION load_table_references STR_VAR table = "" RET_ARRAY references BEGIN
+    //Sanitize.
+    ACTION_IF NOT (FILE_EXISTS "%table%") BEGIN
+        FAIL "load_table_references: file '%table%' not found."
     END
-
-    //Get list of table names.
-    LAF list_from_string STR_VAR
-        string = "%tables%"
-    RET _ = count RET_ARRAY ref_tables = list END
 
     ACTION_DEFINE_ASSOCIATIVE_ARRAY references BEGIN END
-    ACTION_PHP_EACH "ref_tables" AS _ => table BEGIN
-        //Sanitize.
-        ACTION_IF NOT (FILE_EXISTS "%dir%/%table%.2da") BEGIN
-            FAIL "load_table_references: file '%dir%/%table%.2da' for '%table%' not found."
+    COPY - "%table%" "override"
+        COUNT_2DA_COLS cols
+        READ_2DA_ENTRIES_NOW "table#rows" cols
+
+        FOR (i = 0; i < table#rows; ++i) BEGIN
+            READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
+            READ_2DA_ENTRY_FORMER "table#rows" i (cols - 1) ref
+
+            //Compute final destination.
+            LPF encode_table_reference STR_VAR
+                value = "%ref%"
+            RET destination = return END
+            
+            TEXT_SPRINT $"references"("%resource%") "%destination%"
         END
-
-        COPY - "%dir%/%table%.2da" "override"
-            COUNT_2DA_COLS cols
-            READ_2DA_ENTRIES_NOW "table#rows" cols
-
-            FOR (i = 0; i < table#rows; ++i) BEGIN
-                READ_2DA_ENTRY_FORMER "table#rows" i 0 resource
-                READ_2DA_ENTRY_FORMER "table#rows" i (cols - 1) ref
-
-                //Compute final destination.
-                LPF encode_table_reference STR_VAR
-                    value = "%ref%"
-                RET destination = return END
-                
-                TEXT_SPRINT $"references"("%resource%") "%destination%"
-            END
-    END
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_table_reference STR_VAR value = "" array = "" ext = "" RET resource BEGIN
-    LAF get_array_element STR_VAR
-        array = "%array%"
-        key = "%value%"
-    RET resource = value END
-
-    //Sanitize.
-    ACTION_IF ("%resource%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "get_table_reference: reference '%value%' not found in array '%array%'."
-    END
-
+    OUTER_TEXT_SPRINT resource $%array%("%value%")
     ACTION_IF (NOT (FILE_EXISTS_IN_GAME "%resource%.%ext%")) BEGIN
-        FAIL "get_table_reference: resource '%resource%.%ext%' for reference '%value%' does not exist in game."
+        FAIL "get_table_reference: resource '%resource%.%ext%' for reference '%value%' either does not exist in-game or in table '%array%'."
     END
 END

@@ -27,4 +27,4 @@ note(s):
 
 `get_equipped_zero_opcode RET_ARRAY array`
 
-Return the opcode `array` zero-out with timing mode equipped and target self.
+Return the zeroed-out opcode `array` with timing mode equipped and target self.
