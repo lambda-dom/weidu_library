@@ -1,0 +1,93 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/installers.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Installer.
+DEFINE_ACTION_FUNCTION install_tables STR_VAR
+    table = ""
+    resources_dir = ""
+    destination_dir = "override"
+    tra = "*"
+    patches = "*"
+BEGIN
+    //Sanitize.
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "install_tables: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    //Normalize tra.
+    ACTION_IF ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/resources/tra/empty.tra"
+    END
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "install_tables: tra file '%tra%' does not exist."
+    END
+
+    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
+        FAIL "install_tables: resources directory '%resources_dir%' does not exist."
+    END
+
+    ACTION_IF NOT (DIRECTORY_EXISTS "%destination_dir%") BEGIN
+        FAIL "install_tables: destination directory '%destination_dir%' does not exist."
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,patch,override,destination"
+    RET_ARRAY resources = table END
+
+    //Loop.
+    WITH_TRA "%tra%" BEGIN
+        LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+            LAF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                OUTER_TEXT_SPRINT resource $"row"("resource")
+                OUTER_TEXT_SPRINT install $"row"("install")
+                OUTER_TEXT_SPRINT patch $"row"("patch")
+                OUTER_TEXT_SPRINT override $"row"("override")
+                OUTER_TEXT_SPRINT destination $"row"("destination")
+
+                ACTION_IF NOT (install = 0) BEGIN
+                    //Compute destination.
+                    ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
+                        LAF encode_table_reference STR_VAR
+                            value = "%destination%"
+                        RET destination = return END
+                    END
+
+                    //Sanitize.
+                    ACTION_IF ("%destination_dir%" STRING_EQUAL_CASE "override") BEGIN
+                        LAF sanitize_resource STR_VAR
+                            override = "%override%"
+                            destination = "%destination%.2da"
+                            resource = "%resource%"
+                        END
+                    END
+
+                    COPY "%resources_dir%/%resource%.2da" "%destination_dir%/%destination%.2da"
+                        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF "%patch%" STR_VAR destination = "%destination%" END
+                        END
+                    PRETTY_PRINT_2DA
+                END
+            END
+        END
+    END
+END

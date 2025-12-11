@@ -4,8 +4,14 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
-//Installer.
-DEFINE_ACTION_FUNCTION install_sounds STR_VAR
+//Arrays.
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/effects/encoders.2da"
+RET_ARRAY effect_encoders = array END
+
+
+//Installers.
+DEFINE_ACTION_FUNCTION copy_effects STR_VAR
     table = ""
     resources_dir = ""
     patches = "*"
@@ -13,7 +19,7 @@ BEGIN
     //Sanitize.
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "install_sounds: patches file '%patches%' does not exist."
+            FAIL "copy_effects: patches file '%patches%' does not exist."
         END
 
         //Include patches file.
@@ -21,7 +27,7 @@ BEGIN
     END
 
     ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_sounds: resources directory '%resources_dir%' does not exist."
+        FAIL "copy_effects: resources directory '%resources_dir%' does not exist."
     END
 
     //Load table
@@ -58,14 +64,57 @@ BEGIN
                 //Sanitize.
                 LAF sanitize_resource STR_VAR
                     override = "%override%"
-                    destination = "%destination%.wav"
+                    destination = "%destination%.eff"
                     resource = "%resource%"
                 END
 
-                COPY "%resources_dir%/%resource%.wav" "override/%destination%.wav"
+                COPY "%resources_dir%/%resource%.eff" "override/%destination%.eff"
                     PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                         LPF "%patch%" STR_VAR destination = "%destination%" END
                     END
+            END
+        END
+    END
+END
+
+DEFINE_ACTION_FUNCTION create_effects STR_VAR table = "" tra = "*" patches = "*" BEGIN
+    //Sanitize.
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "create_effects: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    //Normalize tra.
+    ACTION_IF ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/resources/tra/empty.tra"
+    END
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "create_effects: tra file '%tra%' does not exist."
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,opcode,target,parameter1,parameter2,parameter3,parameter4,power,timing,duration,probability1,probability2,dicenumber,dicesize,savingthrow,savebonus,resist_dispel,special,resource,resource2,resource3,projectile,school,sectype,patch,override,destination"
+    RET_ARRAY resources = table END
+
+    WITH_TRA "%tra%" BEGIN
+        //Loop.
+        LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+            LAF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            WITH_SCOPE BEGIN
             END
         END
     END

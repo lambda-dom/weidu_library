@@ -1,5 +1,6 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/installers.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
@@ -12,7 +13,7 @@ BEGIN
     //Sanitize.
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "install_resources: patches file '%patches%' does not exist."
+            FAIL "install_icons: patches file '%patches%' does not exist."
         END
 
         //Include patches file.
@@ -20,7 +21,7 @@ BEGIN
     END
 
     ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_resources: resources directory '%resources_dir%' does not exist."
+        FAIL "install_icons: resources directory '%resources_dir%' does not exist."
     END
 
     //Load table
