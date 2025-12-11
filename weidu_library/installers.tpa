@@ -33,3 +33,33 @@ DEFINE_DIMORPHIC_FUNCTION get_table_reference STR_VAR value = "" array = "" ext 
         FAIL "get_table_reference: resource '%resource%.%ext%' for reference '%value%' either does not exist in-game or in table '%array%'."
     END
 END
+
+
+//Installer helpers.
+DEFINE_ACTION_FUNCTION sanitize_resource STR_VAR
+    override = ""
+    destination = ""
+    resource = ""
+    ext = ""
+BEGIN
+    ACTION_MATCH "%override%" WITH
+    "0" BEGIN
+        ACTION_IF (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
+            FAIL "sanitize_resource: destination '%destination%.%ext%' for '%resource%' already exists in game."
+        END
+    END
+    "1" BEGIN END
+    "2" BEGIN
+        ACTION_IF (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
+            WARN "Warning: sanitize_resource: destination '%destination%.%ext%' for '%resource%' already exists in game."
+        END
+    END
+    "3" BEGIN
+        ACTION_IF NOT (FILE_EXISTS_IN_GAME "%destination%.%ext%") BEGIN
+            FAIL "sanitize_resource: destination '%destination%.%ext%' for '%resource%' declared to exist but does not."
+        END
+    END
+    DEFAULT
+        FAIL "sanitize_resource: override value '%override%' not valid."
+    END
+END

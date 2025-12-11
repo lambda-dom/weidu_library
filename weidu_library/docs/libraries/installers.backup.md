@@ -46,8 +46,6 @@ For each `type` of resource there is a template example for the structure of the
 
 * table: copy `2da` files.
 
-* icon: copy `bam` files.
-
 * animation: copy `vvc` files.
 
 * sound: copy `wav` files.
