@@ -16,9 +16,9 @@ DEFINE_DIMORPHIC_FUNCTION load_table STR_VAR file = "" fields = "" RET_ARRAY tab
 
     //Load table.
     ACTION_DEFINE_ASSOCIATIVE_ARRAY table BEGIN END
-    COPY - ~%file%~ ~override~
+    COPY - "%file%" "override"
         COUNT_2DA_COLS cols
-        //Sanitize values.
+        //Sanitize.
         PATCH_IF NOT (count = cols) BEGIN
             PATCH_FAIL "load_table: number '%count%' of fields in '%fields%' is not equal to column number '%cols%' of table '%file%'."
         END
