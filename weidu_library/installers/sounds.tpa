@@ -4,7 +4,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
 //Installer.
-DEFINE_ACTION_FUNCTION install_icons STR_VAR
+DEFINE_ACTION_FUNCTION install_sounds STR_VAR
     table = ""
     resources_dir = ""
     patches = "*"
@@ -12,7 +12,7 @@ BEGIN
     //Sanitize.
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "install_resources: patches file '%patches%' does not exist."
+            FAIL "install_sounds: patches file '%patches%' does not exist."
         END
 
         //Include patches file.
@@ -20,7 +20,7 @@ BEGIN
     END
 
     ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_resources: resources directory '%resources_dir%' does not exist."
+        FAIL "install_sounds: resources directory '%resources_dir%' does not exist."
     END
 
     //Load table
@@ -57,11 +57,11 @@ BEGIN
                 //Sanitize.
                 LAF sanitize_resource STR_VAR
                     override = "%override%"
-                    destination = "%destination%.bam"
+                    destination = "%destination%.wav"
                     resource = "%resource%"
                 END
 
-                COPY "%resources_dir%/%resource%.bam" "override/%destination%.bam"
+                COPY "%resources_dir%/%resource%.wav" "override/%destination%.wav"
                     PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                         LPF "%patch%" STR_VAR destination = "%destination%" END
                     END
