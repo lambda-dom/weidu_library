@@ -15,7 +15,7 @@ This is a variation of WeiDU's `READ_2DA_ENTRY_FORMER` loading the entire table 
 
 `load_table STR_VAR file fields RET_ARRAY table`
 
-This function loads the entire .2da `file` (full path) into an associative array `table` where each entry is indexed by the row and field, where row is an integer and field is an element from the `:`-separated list `fields` constructed via `list_from_string` from the [Lists library](./lists.md). The function FAIL's if the number of columns in the table is not equal to the number of fields. Uniqueness of fields in the `fields` list is *not* checked; if this condition is not met the returning array will be malformed.
+This function loads the entire .2da `file` (full path) into an associative array `table` where each entry is indexed by the row and field, where row is an integer and field is an element from the `,`-separated list `fields` constructed via `list_from_string` from the [Lists library](./lists.md). The function FAIL's if the number of columns in the table is not equal to the number of fields. Uniqueness of fields in the `fields` list is *not* checked; if this condition is not met the returning array will be malformed.
 
 Once the table is loaded into an array, use the usual array indexing, e.g. assuming `array` is the array's name:
 
@@ -41,7 +41,7 @@ Return the number of rows in `table`, a table passed by name. The function FAIL'
 
 `get_table_fields STR_VAR table RET fields`
 
-Return the `:`-separated list of fields of the table. Will return garbage if `table` does not have the table format.
+Return the list of fields of the table as `,`-separated string. Will return garbage if `table` does not have the table format.
 
 `get_row_from_table INT_VAR row STR_VAR table RET_ARRAY array`
 

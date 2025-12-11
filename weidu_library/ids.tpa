@@ -4,7 +4,7 @@ DEFINE_DIMORPHIC_FUNCTION get_id_from_ids STR_VAR ids = "" value = "" RET id BEG
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_ids_from_id INT_VAR id = 0 STR_VAR ids = "" RET value BEGIN
-    OUTER_PATCH ~~ BEGIN
+    OUTER_PATCH "" BEGIN
         LOOKUP_IDS_SYMBOL_OF_INT value "%ids%" id
     END
 

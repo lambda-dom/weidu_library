@@ -1,13 +1,13 @@
 //Libraries.
-INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/binary.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
 //Builders.
 DEFINE_DIMORPHIC_FUNCTION load_offsets_table STR_VAR file = "" RET_ARRAY table BEGIN
     LAF load_table STR_VAR
         file = "%file%"
-        fields = "field:offset:reader:writer"
+        fields = "field,offset,reader,writer"
     RET_ARRAY table END
 END
 
