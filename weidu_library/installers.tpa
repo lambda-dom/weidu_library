@@ -29,7 +29,7 @@ END
 
 DEFINE_DIMORPHIC_FUNCTION get_table_reference STR_VAR value = "" array = "" ext = "" RET resource BEGIN
     OUTER_TEXT_SPRINT resource $%array%("%value%")
-    ACTION_IF (NOT (FILE_EXISTS_IN_GAME "%resource%.%ext%")) BEGIN
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%resource%.%ext%") BEGIN
         FAIL "get_table_reference: resource '%resource%.%ext%' for reference '%value%' either does not exist in-game or in table '%array%'."
     END
 END
