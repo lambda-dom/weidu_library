@@ -72,6 +72,53 @@ BEGIN
     END
 END
 
+DEFINE_ACTION_FUNCTION add_clearair STR_VAR table = "" BEGIN
+    COPY_EXISTING "clearair.2da" "override"
+        //Loop.
+        LPF get_table_row_count STR_VAR table = "%table%" RET row_count = count END
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "%table%"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT resource $"row"("resource")
+                TEXT_SPRINT label $"row"("label")
+                TEXT_SPRINT clearair $"row"("clearair")
+                TEXT_SPRINT destination $"row"("destination")
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Sanitize.
+                    PATCH_IF NOT (IS_AN_INT "%clearair%") BEGIN
+                        PATCH_FAIL "add_clearair: clearair flag '%clearair%' for resource '%resource%' is not an integer."
+                    END ELSE BEGIN
+                        PATCH_IF NOT ((0 == clearair) OR (1 == clearair)) BEGIN
+                            PATCH_FAIL "add_clearair: clearair flag '%clearair%' for resource '%resource%' is not a boolean."
+                        END
+                    END
+
+                    PATCH_IF (1 == clearair) BEGIN
+                        //Compute destination.
+                        LPF encode_table_reference STR_VAR
+                            value = "%destination%"
+                        RET destination = return END
+
+                        LPF append_clearair STR_VAR
+                            projectile = "%destination%"
+                            label = "%label%"
+                        END
+                    END
+                END
+            END
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
 DEFINE_ACTION_FUNCTION add_projectiles STR_VAR
     table = ""
     resources_dir = ""
@@ -94,7 +141,7 @@ BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "resource,install,label,patch,override,destination"
+        fields = "resource,install,label,clearair,patch,override,destination"
     RET_ARRAY resources = table END
 
     //Loop.
@@ -117,11 +164,9 @@ BEGIN
 
             ACTION_IF NOT (install = 0) BEGIN
                 //Compute destination.
-                ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
-                    LAF encode_table_reference STR_VAR
-                        value = "%destination%"
-                    RET destination = return END
-                END
+                LAF encode_table_reference STR_VAR
+                    value = "%destination%"
+                RET destination = return END
 
                 //Sanitize.
                 LAF sanitize_resource STR_VAR
@@ -149,4 +194,7 @@ BEGIN
             END
         END
     END
+
+    //Add clearair entries.
+    LAF add_clearair STR_VAR table = "resources" END
 END
