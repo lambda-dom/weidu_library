@@ -85,15 +85,3 @@ note(s):
 `get_opcode_field INT_VAR offset STR_VAR field RET value`
 
 `set_opcode_field INT_VAR offset STR_VAR field value`
-
-# E. Opcodes as arrays.
-
-The next set of functions treats opcodes as arrays.
-
-`get_zero_opcode RET_ARRAY array`
-
-Return the opcode `array` with all fields zero-out out, except `target` (set to `projectile`) and `probability1` set to `100`.
-
-`get_opcode_array INT_VAR offset RET_ARRAY array`
-
-Get opcode `array` at `offset`.
