@@ -54,6 +54,10 @@ DEFINE_DIMORPHIC_FUNCTION get_component_tra_main RET file BEGIN
     OUTER_TEXT_SPRINT file "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/main.tra"
 END
 
+DEFINE_DIMORPHIC_FUNCTION get_component_external_dir RET dir BEGIN
+    OUTER_TEXT_SPRINT dir "weidu_external/%MOD_FOLDER%/%COMPONENT_NAME%"
+END
+
 
 //Action functions.
 DEFINE_ACTION_FUNCTION install_subcomponent STR_VAR subcomponent = "" tra = "*" BEGIN

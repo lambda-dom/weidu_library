@@ -45,6 +45,10 @@ Return the (full path of the) dir where the tra files used by the component can 
 
 Return the (full path of the) main tra of the component. Currently, this is `%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/setup.tra`.
 
+`get_component_external_dir RET dir`
+
+Return the (full path of the) dir where external data is placed. Currently, this is `weidu_external/data/%MOD_FOLDER%/%COMPONENT_NAME%`.
+
 # C. Action functions.
 
 note(s):
