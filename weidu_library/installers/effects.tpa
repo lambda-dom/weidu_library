@@ -1,6 +1,10 @@
 //Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/effects.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/installers.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/sectypes.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
@@ -114,7 +118,59 @@ DEFINE_ACTION_FUNCTION create_effects STR_VAR table = "" tra = "*" patches = "*"
                 row = array
             END
 
+            LAF split_array_with_fields STR_VAR
+                fields = "resource,install,patch,override,destination"
+                array = "row"
+            RET_ARRAY split remainder END
+
             WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                OUTER_TEXT_SPRINT resource $"split"("resource")
+                OUTER_TEXT_SPRINT install $"split"("install")
+                OUTER_TEXT_SPRINT patch $"split"("patch")
+                OUTER_TEXT_SPRINT override $"split"("override")
+                OUTER_TEXT_SPRINT destination $"split"("destination")
+
+                ACTION_IF NOT (install = 0) BEGIN
+                    //Compute destination.
+                    ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
+                        LAF encode_table_reference STR_VAR
+                            value = "%destination%"
+                        RET destination = return END
+                    END
+
+                    //Sanitize.
+                    LAF sanitize_resource STR_VAR
+                        override = "%override%"
+                        destination = "%destination%.eff"
+                        resource = "%resource%"
+                    END
+
+                    CREATE EFF "%destination%"
+                        //Write defaults.
+                        LPF set_effect_field STR_VAR
+                            field = "probability1"
+                            value = "100"
+                        END
+
+                        PHP_EACH "remainder" AS field => value BEGIN
+                            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                                TEXT_SPRINT encoder $"effect_encoders"("%field%")
+                            END
+
+                            LPF "%encoder%" STR_VAR value = "%value%" RET return END
+                            PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                                LPF set_effect_field STR_VAR
+                                    field = "%field%"
+                                    value = "%return%"
+                                END
+                            END
+                        END
+
+                        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF "%patch%" STR_VAR destination = "%destination%" END
+                        END
+                END
             END
         END
     END

@@ -73,9 +73,17 @@ note(s):
 
 Return a new associative array with pairs `key => value` with keys the elements of the list of `keys` and values their indices.
 
+# D. Splits and merges.
+
+`split_array_with_fields STR_VAR fields array RET_ARRAY split remainder`
+
+Split `array` into `split` and `remainder`where `split` contains all pairs `key => value` with `key` in the `,`-separated string list `fields` and remainder contains the rest of the pairs.
+
 `merge_arrays STR_VAR arrays RET_ARRAY array`
 
-Merge `arrays` passed by name as a `|`-separated stringified list. If there are common keys, the last one wins.
+Merge `arrays` passed by name as a `,`-separated stringified list. If there are common keys, the last one wins.
+
+# E. Builders.
 
 `load_array INT_VAR col = 1 STR_VAR table RET_ARRAY array`
 
