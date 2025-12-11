@@ -40,7 +40,7 @@ is that it will automatically return `default` if `key` is not in `array` instea
 VARIABLE_IS_SET $array("%key%")
 ```
 
-will return a false positive if the variable `array_%key%` is set. This means that `get_array_element` is linear in the size of the array, since it has to loop through it to find the correct value. To make matters worse, the only way to break out of the loop early when a match is found, is by raising an exception and then catch it.
+will return a false positive if the variable `array_%key%` is set. This means that `get_array_element` is linear in the size of the array, since it has to loop through it to find the correct value. To make matters worse, the only way to break out of the loop early when a match is found, is by raising an exception and catching it.
 
 `is_key_in_array STR_VAR array = "" key = "" RET bool`
 
@@ -57,7 +57,7 @@ note(s):
 
 Return the `list` of all `key`'s of `array` whose value matches `value`. Returns the empty list if no match is found.
 
-# C. Builders.
+# C. From lists to arrays.
 
 note(s):
 * all functions in this section have action and patch variants.
