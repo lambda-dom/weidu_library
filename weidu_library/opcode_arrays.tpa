@@ -172,3 +172,11 @@ DEFINE_DIMORPHIC_FUNCTION get_zero_opcode RET_ARRAY array BEGIN
         special         => "#num:0"
     END
 END
+
+DEFINE_DIMORPHIC_FUNCTION get_equipped_zero_opcode RET_ARRAY array BEGIN
+    LAF get_zero_opcode RET_ARRAY array END
+
+    //Equipped fields.
+    OUTER_TEXT_SPRINT $"array"("target") "self"
+    OUTER_TEXT_SPRINT $"array"("timing") "equipped"
+END

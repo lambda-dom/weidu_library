@@ -27,6 +27,7 @@ Support libraries: libraries providing basic functionality supporting everything
 * [Items](./libraries/items.md): handle item .itm files.
 * [Lists](./libraries/lists.md): manipulate lists.
 * [Opcodes](./libraries/opcodes.md): opcode patching.
+* [Opcode arrays](./libraries/opcode_arrays.md): opcodes as array values with references.
 * [Projectiles](./libraries/projectiles.md): handle projectile .pro files.
 * [References](./libraries/references.md): inline resource references, especially in installer tables.
 * [Sectypes](./libraries/sectypes.md): add and edit sectypes.

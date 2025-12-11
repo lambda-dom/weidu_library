@@ -24,3 +24,7 @@ Return the opcode `array` with all fields zero-out out, except `target` (set to 
 
 note(s):
 * this is both a patch and action function.
+
+`get_equipped_zero_opcode RET_ARRAY array`
+
+Return the opcode `array` zero-out with timing mode equipped and target self.
