@@ -6,15 +6,19 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
 //Installers.
-DEFINE_ACTION_FUNCTION install_animations STR_VAR table = "" resources_dir = "" patches = "*" BEGIN
+DEFINE_ACTION_FUNCTION install_vvcs STR_VAR table = "" resources_dir = "" patches = "*" BEGIN
     //Sanitize.
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "install_animations: patches file '%patches%' does not exist."
+            FAIL "install_vvcs: patches file '%patches%' does not exist."
         END
 
         //Include patches file.
         INCLUDE "%patches%"
+    END
+
+    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
+        FAIL "install_vvcs: resources directory '%resources_dir%' does not exist."
     END
 
     //Load table
@@ -32,18 +36,13 @@ DEFINE_ACTION_FUNCTION install_animations STR_VAR table = "" resources_dir = "" 
             row = array
         END
 
-        LAF split_array_with_fields STR_VAR
-            fields = "resource,install,patch,override,destination"
-            array = "row"
-        RET_ARRAY split remainder END
-
         WITH_SCOPE BEGIN
             //Inject names in local scope.
-            OUTER_TEXT_SPRINT resource $"split"("resource")
-            OUTER_TEXT_SPRINT install $"split"("install")
-            OUTER_TEXT_SPRINT patch $"split"("patch")
-            OUTER_TEXT_SPRINT override $"split"("override")
-            OUTER_TEXT_SPRINT destination $"split"("destination")
+            OUTER_TEXT_SPRINT resource $"row"("resource")
+            OUTER_TEXT_SPRINT install $"row"("install")
+            OUTER_TEXT_SPRINT patch $"row"("patch")
+            OUTER_TEXT_SPRINT override $"row"("override")
+            OUTER_TEXT_SPRINT destination $"row"("destination")
 
             ACTION_IF NOT (install = 0) BEGIN
                 //Compute destination.
@@ -63,14 +62,14 @@ DEFINE_ACTION_FUNCTION install_animations STR_VAR table = "" resources_dir = "" 
                 COPY "%resources_dir%/%resource%.vvc" "override/%destination%.vvc"
                     PATCH_WITH_SCOPE BEGIN
                         //Inject names in local scope.
-                        TEXT_SPRINT animation $"remainder"("animation")
+                        TEXT_SPRINT animation $"row"("animation")
 
                         LPF encode_table_reference STR_VAR
                             value = "%animation%"
                         RET animation_res = return END
 
                         PATCH_IF NOT (FILE_EXISTS_IN_GAME "%animation_res%.bam") BEGIN
-                            PATCH_FAIL "install_animations: '%animation_res%.bam' for vvc '%resource%' does not exist in game."
+                            PATCH_FAIL "install_vvcs: '%animation_res%.bam' for vvc '%resource%' does not exist in game."
                         END
                         
                         LPF set_vvc_field STR_VAR
