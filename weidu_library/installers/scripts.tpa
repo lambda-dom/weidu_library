@@ -1,11 +1,12 @@
 //Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/components.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/installers.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
 //Installer.
-DEFINE_ACTION_FUNCTION install_tables STR_VAR
+DEFINE_ACTION_FUNCTION install_scripts STR_VAR
     table = ""
     resources_dir = ""
     tra = "*"
@@ -14,7 +15,7 @@ BEGIN
     //Sanitize.
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "install_tables: patches file '%patches%' does not exist."
+            FAIL "install_scripts: patches file '%patches%' does not exist."
         END
 
         //Include patches file.
@@ -28,11 +29,11 @@ BEGIN
 
     //Existence checks.
     ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
-        FAIL "install_tables: tra file '%tra%' does not exist."
+        FAIL "install_scripts: tra file '%tra%' does not exist."
     END
 
     ACTION_IF NOT (DIRECTORY_EXISTS "%destination_dir%") BEGIN
-        FAIL "install_tables: destination directory '%destination_dir%' does not exist."
+        FAIL "install_scripts: destination directory '%destination_dir%' does not exist."
     END
 
     //Load table
@@ -71,16 +72,23 @@ BEGIN
                     ACTION_IF ("%destination_dir%" STRING_EQUAL_CASE "override") BEGIN
                         LAF sanitize_resource STR_VAR
                             override = "%override%"
-                            destination = "%destination%.2da"
+                            destination = "%destination%.bcs"
                             resource = "%resource%"
                         END
                     END
 
-                    COPY "%resources_dir%/%resource%.2da" "%destination_dir%/%destination%.2da"
+                    //Have to first copy the script because COMPILE does not allow renaming.
+                    LAF get_component_external_dir RET temp_dir = dir END
+                    OUTER_TEXT_SPRINT temp_dir "%temp_dir%/resources/baf"
+                    COPY "%resources_dir%/%resource%.baf" "%temp_dir%/%destination%.baf"
+
+                    //Compile script.
+                    COMPILE "%temp_dir%/%destination%.baf"
                         PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
-                            LPF "%patch%" STR_VAR destination = "%destination%" END
+                            LPF "%patch%" STR_VAR
+                                destination = "%destination%"
+                            END
                         END
-                    PRETTY_PRINT_2DA
                 END
             END
         END
