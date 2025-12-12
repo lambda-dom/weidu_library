@@ -1,32 +1,32 @@
 2DA V1.0
 *
-                    arg1        arg2        arg3        patch
-poison_damage       amount      dicenumber  dicesize    patch_damage
-fire_damage         amount      dicenumber  dicesize    patch_damage
-cold_damage         amount      dicenumber  dicesize    patch_damage
-electricity_damage  amount      dicenumber  dicesize    patch_damage
-acid_damage         amount      dicenumber  dicesize    patch_damage
-magic_damage        amount      dicenumber  dicesize    patch_damage
-vampiric_damage     amount      dicenumber  dicesize    patch_damage    
-poisoning           duration    amount      *           poisoning
-bleeding            duration    amount      *           splash_damage
-acid_splash         duration    amount      *           splash_damage
-paralyze            duration    *           *           patch_duration
-unconsciousness     duration    *           *           patch_duration
-entangle            duration    *           *           patch_duration
-web                 duration    *           *           patch_duration
-panic               duration    *           *           patch_duration
-confusion           duration    *           *           patch_duration
-blind               duration    *           *           patch_duration
-stun                duration    *           *           patch_duration
-sleep               duration    *           *           patch_duration
-slow                duration    *           *           patch_duration
-hold_creature       duration    ids         id          hold_creature
-charm               duration    general     mode        charm
-slow_movement_rate  duration    amount      *           slow_movement_rate
-cripple             duration    amount      *           cripple
-level_drain         duration    amount      *           level_drain
-drain_strength      duration    amount      *           drain_strength
-knockback           duration    amount      *           knockback
-dispel_magic        *           *           *           *
-kill_target         *           *           *           *
+                    name    description     arg1        arg2        arg3        patch               patch_description
+poison_damage       10      11              amount      dicenumber  dicesize    patch_damage        *
+vampiric_damage     20      21              amount      dicenumber  dicesize    patch_damage        *
+fire_damage         *       *               amount      dicenumber  dicesize    patch_damage        *
+cold_damage         *       *               amount      dicenumber  dicesize    patch_damage        *
+electricity_damage  *       *               amount      dicenumber  dicesize    patch_damage        *
+acid_damage         *       *               amount      dicenumber  dicesize    patch_damage        *
+magic_damage        *       *               amount      dicenumber  dicesize    patch_damage        *
+poisoning           100     101             duration    amount      *           poisoning           *
+bleeding            110     111             duration    amount      *           splash_damage       *
+acid_splash         120     121             duration    amount      *           splash_damage       *
+unconsciousness     200     201             duration    *           *           patch_duration      *
+paralyze            210     211             duration    *           *           patch_duration      *
+entangle            220     221             duration    *           *           patch_duration      *
+web                 225     226             duration    *           *           patch_duration      *
+panic               230     231             duration    *           *           patch_duration      *
+confusion           240     241             duration    *           *           patch_duration      *
+blind               250     251             duration    *           *           patch_duration      *
+stun                260     261             duration    *           *           patch_duration      *
+sleep               270     271             duration    *           *           patch_duration      *
+slow                280     281             duration    *           *           patch_duration      *
+charm               290     291             duration    general     mode        charm               *
+hold_creature       *       *               duration    ids         id          hold_creature       *
+slow_movement_rate  300     301             duration    amount      *           slow_movement_rate  *
+cripple             310     311             duration    amount      *           cripple             *
+level_drain         320     321             duration    amount      *           level_drain         *
+drain_strength      330     331             duration    amount      *           drain_strength      *
+knockback           340     341             duration    amount      *           knockback           *
+dispel_magic        400     401             *           *           *           *                   *
+kill_target         410     411             *           *           *           *                   *

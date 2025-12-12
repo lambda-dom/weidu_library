@@ -7,7 +7,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 //Installer.
 DEFINE_ACTION_FUNCTION install_tables STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     destination_dir = "override"
     tra = "*"
     patches = "*"
@@ -32,8 +32,8 @@ BEGIN
         FAIL "install_tables: tra file '%tra%' does not exist."
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_tables: resources directory '%resources_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_tables: resources directory '%dir%' does not exist."
     END
 
     ACTION_IF NOT (DIRECTORY_EXISTS "%destination_dir%") BEGIN
@@ -79,7 +79,7 @@ BEGIN
                         END
                     END
 
-                    COPY "%resources_dir%/%resource%.2da" "%destination_dir%/%destination%.2da"
+                    COPY "%dir%/%resource%.2da" "%destination_dir%/%destination%.2da"
                         PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                             LPF "%patch%" STR_VAR destination = "%destination%" END
                         END

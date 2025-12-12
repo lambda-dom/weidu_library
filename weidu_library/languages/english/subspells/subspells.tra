@@ -52,7 +52,7 @@
 
 
 //Duration and amount spells.
-@300 = ~"Slower"~
+@300 = "Slower"
 @301 = "Victim's movement rate is decreased by %arg2% for %arg1% round(s). Incorporeal creatures like Elementals and flying creatures like Wyverns and Dragons are immune to slowing."
 
 @310 = "Crippled"
