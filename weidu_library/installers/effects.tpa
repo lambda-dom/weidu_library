@@ -103,7 +103,7 @@ DEFINE_ACTION_FUNCTION create_effects STR_VAR table = "" tra = "*" patches = "*"
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "resource,install,opcode,target,parameter1,parameter2,parameter3,parameter4,power,timing,duration,probability1,probability2,dicenumber,dicesize,savingthrow,savebonus,resist_dispel,special,resource,resource2,resource3,projectile,school,sectype,patch,override,destination"
+        fields = "effect,install,opcode,target,parameter1,parameter2,parameter3,parameter4,power,timing,duration,probability1,probability2,dicenumber,dicesize,savingthrow,savebonus,resist_dispel,special,resource,resource2,resource3,projectile,school,sectype,patch,override,destination"
     RET_ARRAY resources = table END
 
     WITH_TRA "%tra%" BEGIN
@@ -117,13 +117,13 @@ DEFINE_ACTION_FUNCTION create_effects STR_VAR table = "" tra = "*" patches = "*"
             END
 
             LAF split_array_with_fields STR_VAR
-                fields = "resource,install,patch,override,destination"
+                fields = "effect,install,patch,override,destination"
                 array = "row"
             RET_ARRAY split remainder END
 
             WITH_SCOPE BEGIN
                 //Inject names in local scope.
-                OUTER_TEXT_SPRINT resource $"split"("resource")
+                OUTER_TEXT_SPRINT effect $"split"("effect")
                 OUTER_TEXT_SPRINT install $"split"("install")
                 OUTER_TEXT_SPRINT patch $"split"("patch")
                 OUTER_TEXT_SPRINT override $"split"("override")
@@ -139,11 +139,11 @@ DEFINE_ACTION_FUNCTION create_effects STR_VAR table = "" tra = "*" patches = "*"
                     LAF sanitize_resource STR_VAR
                         override = "%override%"
                         destination = "%destination%.eff"
-                        resource = "%resource%"
+                        resource = "%effect%"
                     END
 
                     CREATE EFF "%destination%"
-                        //Write defaults.
+                        //Write fields.
                         LPF set_effect_field STR_VAR
                             field = "probability1"
                             value = "100"
