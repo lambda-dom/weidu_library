@@ -5,6 +5,19 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/opcodes.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
 
 
+//Subspell descriptions.
+DEFINE_DIMORPHIC_FUNCTION patch_subspell_description INT_VAR
+    description = 0
+STR_VAR
+    arg1 = ""
+    arg2 = ""
+    arg3 = ""
+RET tlk_ref BEGIN
+    //Variables are expanded automatically.
+    OUTER_SET tlk_ref = RESOLVE_STR_REF ((AT description))
+END
+
+
 //Subspell patches.
 DEFINE_PATCH_FUNCTION patch_damage STR_VAR arg1 = "" arg2 = "" arg3 = "" BEGIN
     //Sanitize arguments.

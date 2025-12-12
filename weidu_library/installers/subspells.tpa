@@ -69,6 +69,7 @@ BEGIN
                 //Inject names in local scope.
                 OUTER_TEXT_SPRINT symbol $"row"("symbol")
                 OUTER_TEXT_SPRINT install $"row"("install")
+                OUTER_TEXT_SPRINT patch $"row"("patch")
                 OUTER_TEXT_SPRINT override $"row"("override")
                 OUTER_TEXT_SPRINT destination $"row"("destination")
 
@@ -153,10 +154,9 @@ BEGIN
                                 arg1 = "%arg1%"
                                 arg2 = "%arg2%"
                                 arg3 = "%arg3%"
-                            RET desc_text = text END
+                            RET tlk_ref END
 
-                            desc_tlk = RESOLVE_STR_REF ("%desc_text%")
-                            LPF set_spell_field STR_VAR field = "description" value = "%desc_tlk%" END
+                            LPF set_spell_field STR_VAR field = "description" value = "%tlk_ref%" END
                         END
 
                         //Fill school and sectype.
