@@ -7,7 +7,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 //Installer.
 DEFINE_ACTION_FUNCTION install_icons STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     patches = "*"
 BEGIN
     //Sanitize.
@@ -20,8 +20,8 @@ BEGIN
         INCLUDE "%patches%"
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_icons: resources directory '%resources_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_icons: resources directory '%dir%' does not exist."
     END
 
     //Load table
@@ -60,7 +60,7 @@ BEGIN
                     resource = "%resource%"
                 END
 
-                COPY "%resources_dir%/%resource%.bam" "override/%destination%.bam"
+                COPY "%dir%/%resource%.bam" "override/%destination%.bam"
                     PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                         LPF "%patch%" STR_VAR destination = "%destination%" END
                     END

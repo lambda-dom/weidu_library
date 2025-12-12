@@ -8,7 +8,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 //Installer.
 DEFINE_ACTION_FUNCTION copy_projectiles STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     patches = "*"
 BEGIN
     //Sanitize.
@@ -21,8 +21,8 @@ BEGIN
         INCLUDE "%patches%"
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "copy_projectiles: resources directory '%resources_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "copy_projectiles: resources directory '%dir%' does not exist."
     END
 
     //Load table
@@ -63,7 +63,7 @@ BEGIN
                     resource = "%resource%"
                 END
 
-                COPY "%resources_dir%/%resource%.pro" "override/%destination%.pro"
+                COPY "%dir%/%resource%.pro" "override/%destination%.pro"
                     PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                         LPF "%patch%" STR_VAR destination = "%destination%" END
                     END
@@ -121,7 +121,7 @@ END
 
 DEFINE_ACTION_FUNCTION add_projectiles STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     patches = "*"
 BEGIN
     //Sanitize.
@@ -134,8 +134,8 @@ BEGIN
         INCLUDE "%patches%"
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "add_projectiles: resources directory '%resources_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "add_projectiles: resources directory '%dir%' does not exist."
     END
 
     //Load table
@@ -178,7 +178,7 @@ BEGIN
                 //Have to first copy the projectile because ADD does not allow renaming.
                 LAF get_component_external_dir RET temp_dir = dir END
                 OUTER_TEXT_SPRINT temp_dir "%temp_dir%/resources/pro"
-                COPY "%resources_dir%/%resource%.pro" "%temp_dir%/%destination%.pro"
+                COPY "%dir%/%resource%.pro" "%temp_dir%/%destination%.pro"
                     PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                         LPF "%patch%" STR_VAR
                             destination = "%destination%"

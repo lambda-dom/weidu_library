@@ -12,7 +12,6 @@ LAF load_array STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/spells/encoders.2da"
 RET_ARRAY spell_encoders = array END
 
-
 //Tables and arrays.
 LAF load_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/school_defaults.2da"
@@ -42,7 +41,6 @@ LAF array_from_table STR_VAR
     key = "school"
     value = "opposite"
 RET_ARRAY opposites = array END
-
 
 
 //Encoders.
@@ -174,7 +172,7 @@ END
 //Installer.
 DEFINE_ACTION_FUNCTION install_spells STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     patches = "*"
 BEGIN
     //Sanitize.
@@ -197,8 +195,8 @@ BEGIN
         FAIL "copy_creatures: tra file '%tra%' does not exist."
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_spells: resources directory '%resources_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_spells: resources directory '%dir%' does not exist."
     END
 
     //Load table
@@ -243,7 +241,7 @@ BEGIN
                         resource = "%resource%"
                     END
 
-                    COPY "%resources_dir%/%resource%.spl" "override/%destination%.spl"
+                    COPY "%dir%/%resource%.spl" "override/%destination%.spl"
                         //Correct self-references.
                         LPF ALTER_EFFECT INT_VAR
                             silent = 1
