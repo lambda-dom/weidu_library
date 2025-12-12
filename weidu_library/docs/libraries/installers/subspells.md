@@ -19,9 +19,9 @@ Installer for subspells via copying and standardized patching with resource info
 
 This is the standard implementation of subspell cloning; a call to `install_subspells` with arguments:
 
-* master_table: the [subspells master table](../../../resources/2da/installers/subspells/subspells.2da)
-
 * resources_dir: dir where subspells to clone can be found, with value `%WEIDU_LIBRARY_DIR%/resources/spl/subspells`
+
+* master_table: the [subspells master table](../../../resources/2da/installers/subspells/subspells.2da)
 
 * master_tra: the [tra file](../../../languages/english/subspells/subspells.tra) containing the generators of spell descriptions.
 

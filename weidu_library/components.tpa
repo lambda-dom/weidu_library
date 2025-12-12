@@ -22,11 +22,11 @@ DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT_NAME = "" BEGIN
     END
 
     //Main tra file.
-    ACTION_IF NOT (FILE_EXISTS "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%/main.tra") BEGIN
-        FAIL "install_component: main component tra file '%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%/main.tra' does not exist."
+    ACTION_IF NOT (FILE_EXISTS "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/main.tra") BEGIN
+        FAIL "install_component: main component tra file '%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/main.tra' does not exist."
     END
 
-    WITH_TRA "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%/main.tra" BEGIN
+    WITH_TRA "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/main.tra" BEGIN
         WITH_SCOPE BEGIN
             INCLUDE "%MOD_FOLDER%/components/%COMPONENT_NAME%/main.tpa"
         END
@@ -55,7 +55,7 @@ DEFINE_DIMORPHIC_FUNCTION get_component_tra_main RET file BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_component_external_dir RET dir BEGIN
-    OUTER_TEXT_SPRINT dir "weidu_external/%MOD_FOLDER%/%COMPONENT_NAME%"
+    OUTER_TEXT_SPRINT dir "weidu_external/data/%MOD_FOLDER%/%COMPONENT_NAME%"
 END
 
 
