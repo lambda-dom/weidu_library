@@ -69,7 +69,7 @@ Note that value is the empty string; if anything follows the colon, the function
 Treats `value` as an integer literal and returns it. Format is:
 
 ```
-#int:<numeric literal>
+#num:<numeric literal>
 ```
 
 Both decimal and hex literals are accepted.

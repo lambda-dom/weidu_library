@@ -152,13 +152,13 @@ DEFINE_ACTION_FUNCTION create_effects STR_VAR table = "" tra = "*" patches = "*"
                         PHP_EACH "remainder" AS field => value BEGIN
                             PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
                                 TEXT_SPRINT encoder $"effect_encoders"("%field%")
-                            END
 
-                            LPF "%encoder%" STR_VAR value = "%value%" RET return END
-                            PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
-                                LPF set_effect_field STR_VAR
-                                    field = "%field%"
-                                    value = "%return%"
+                                LPF "%encoder%" STR_VAR value = "%value%" RET return END
+                                PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                                    LPF set_effect_field STR_VAR
+                                        field = "%field%"
+                                        value = "%return%"
+                                    END
                                 END
                             END
                         END
