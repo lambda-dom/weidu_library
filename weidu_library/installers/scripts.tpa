@@ -62,19 +62,15 @@ BEGIN
 
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
-                    ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
-                        LAF encode_table_reference STR_VAR
-                            value = "%destination%"
-                        RET destination = return END
-                    END
+                    LAF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
 
                     //Sanitize.
-                    ACTION_IF ("%destination_dir%" STRING_EQUAL_CASE "override") BEGIN
-                        LAF sanitize_resource STR_VAR
-                            override = "%override%"
-                            destination = "%destination%.bcs"
-                            resource = "%resource%"
-                        END
+                    LAF sanitize_resource STR_VAR
+                        override = "%override%"
+                        destination = "%destination%.bcs"
+                        resource = "%resource%"
                     END
 
                     //Have to first copy the script because COMPILE does not allow renaming.
