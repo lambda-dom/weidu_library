@@ -98,6 +98,28 @@ BEGIN
                                     field = "%field%"
                                     value = "%return%"
                                 END
+
+                                //Set defaults.
+                                PATCH_IF "%field%" STRING_EQUAL_CASE "name" BEGIN
+                                    LPF set_cre_field STR_VAR
+                                        field = "tooltip"
+                                        value = "%return%"
+                                    END
+                                END
+
+                                PATCH_IF "%field%" STRING_EQUAL_CASE "hps" BEGIN
+                                    LPF set_cre_field STR_VAR
+                                        field = "max_hps"
+                                        value = "%return%"
+                                    END
+                                END
+
+                                PATCH_IF "%field%" STRING_EQUAL_CASE "ac" BEGIN
+                                    LPF set_cre_field STR_VAR
+                                        field = "ac_effective"
+                                        value = "%return%"
+                                    END
+                                END
                             END
                         END
 

@@ -8,6 +8,14 @@ file(s):
 
 # A. Anatomy of an installer library.
 
+An installer for resources of a given type has, up to some details, the general form:
+
+`install_resources STR_VAR table resources_dir patches = "*" tra = "*"`
+
+Installer for resources of a given type with resource information in `table`. `patches` is an optional file to be `INCLUDED` containing patching functions referenced by name in `table` and `tra` is an optional tra file and `resources_dir` is the directory wehere the resources are located.
+
+For each type of resource there is a template example for the structure of the .2da table located in `%WEIDU_LIBRARY_DIR%/resources/2da/installers/templates`. All these tables share the first and the last fields, with a (mostly) common meaning to them: `resource` is a symbolic name for the resource to be installed, usually just the file basename. `install` is a flag to selectively enable or disable installing for debugging purposes. `patch` is a resource patcher, a function with signature `STR_VAR destination = "*"` that *must* be in scope, and `destination` is a (computed) resource reference that will serve as the destination file basename. These patchers can be brought into scope by passing the appropriate file in the `patches` argument of the installer. Finally, `override` is a debugging flag that controls what to do if a same-named resource already exists: if `0` then overriding is not allowed and if the resource already the function FAIL's, if `1` overriding is allowed. On the other hand if the `override` is `2` then the overriden resource *must* already exist otherwise the function FAIL's.
+
 # B. Available installers.
 
 * [Creatures](./installers/creatures.md): installer for creature `.cre` files.
