@@ -22,7 +22,7 @@ For each type of resource there is a template example for the structure of the .
 * [Dialogs](./installers/dialogs.md): compile dialog `.d` files.
 * [Effects](./installers/effects.md): installers for effect `.eff` files.
 * [Icons](./installers/icons.md): installer for icon `.bam` files.
-* [Items](./installers/items.md): installer for `.itm` spells.
+* [Items](./installers/items.md): installer for `.itm` items.
 * [Projectiles](./installers/projectiles.md): installers for projectile `.pro` files.
 * [Scripts](./installers/scripts.md): compile script `.baf` files.
 * [Sounds](./installers/sounds.md): installer for sounds (`.wav` files).
