@@ -183,7 +183,7 @@ DEFINE_ACTION_FUNCTION add_spell_symbols STR_VAR table = "" patches = "*" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "symbol:install:type:level:patch"
+        fields = "symbol,install,type,level,patch"
     RET_ARRAY resources = table END
 
     LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
@@ -225,7 +225,7 @@ DEFINE_ACTION_FUNCTION alias_spell_symbols STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "symbol:install:aliased"
+        fields = "symbol,install,aliased"
     RET_ARRAY resources = table END
 
     COPY_EXISTING "spell.ids" "override"
@@ -258,7 +258,7 @@ DEFINE_ACTION_FUNCTION change_spell_symbols STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "symbol:install:type:level"
+        fields = "symbol,install,type,level"
     RET_ARRAY resources = table END
 
     LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
@@ -297,7 +297,7 @@ DEFINE_ACTION_FUNCTION replace_spell_symbols STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "new:install:old"
+        fields = "new,install,old"
     RET_ARRAY resources = table END
 
     COPY_EXISTING "spell.ids" "override"
@@ -330,7 +330,7 @@ DEFINE_ACTION_FUNCTION deprecate_spell_symbols STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "symbol:install"
+        fields = "symbol,install"
     RET_ARRAY resources = table END
 
     COPY_EXISTING "spell.ids" "override"
@@ -359,7 +359,7 @@ DEFINE_ACTION_FUNCTION assign_spell_symbol_holes STR_VAR table = "" BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "symbol:install:type:level:id"
+        fields = "symbol,install,type,level,id"
     RET_ARRAY resources = table END
 
     COPY_EXISTING "spell.ids" "override"
