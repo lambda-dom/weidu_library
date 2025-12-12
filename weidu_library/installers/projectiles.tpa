@@ -72,7 +72,7 @@ BEGIN
     END
 END
 
-DEFINE_ACTION_FUNCTION add_clearair STR_VAR table = "" BEGIN
+DEFINE_ACTION_FUNCTION add_clearair_from_table STR_VAR table = "" BEGIN
     COPY_EXISTING "clearair.2da" "override"
         //Loop.
         LPF get_table_row_count STR_VAR table = "%table%" RET row_count = count END
@@ -94,10 +94,10 @@ DEFINE_ACTION_FUNCTION add_clearair STR_VAR table = "" BEGIN
                 PATCH_IF NOT (install = 0) BEGIN
                     //Sanitize.
                     PATCH_IF NOT (IS_AN_INT "%clearair%") BEGIN
-                        PATCH_FAIL "add_clearair: clearair flag '%clearair%' for resource '%resource%' is not an integer."
+                        PATCH_FAIL "add_clearair_from_table: clearair '%clearair%' for resource '%resource%' not an integer."
                     END ELSE BEGIN
                         PATCH_IF NOT ((0 == clearair) OR (1 == clearair)) BEGIN
-                            PATCH_FAIL "add_clearair: clearair flag '%clearair%' for resource '%resource%' is not a boolean."
+                            PATCH_FAIL "add_clearair_from_table: clearair '%clearair%' for resource '%resource%' not a boolean."
                         END
                     END
 
@@ -196,5 +196,16 @@ BEGIN
     END
 
     //Add clearair entries.
-    LAF add_clearair STR_VAR table = "resources" END
+    LAF add_clearair_from_table STR_VAR table = "resources" END
+END
+
+DEFINE_ACTION_FUNCTION add_clearair STR_VAR table = "" BEGIN
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,label,clearair,patch,override,destination"
+    RET_ARRAY resources = table END
+
+    //Add clearair entries.
+    LAF add_clearair_from_table STR_VAR table = "resources" END
 END
