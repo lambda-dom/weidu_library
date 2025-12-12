@@ -1,7 +1,6 @@
 2DA V1.0
 *
                         extension   template            module              writer                  handler                 fields
-creature                cre         creatures           creatures.tpa       copy_creature           *                       name:power:first_class:second_class:third_class:str:str_bonus:dex:con:int:wis:chr:hps:ac:thac0:apr:saves_death:saves_wand:saves_polymorph:saves_breath:saves_spell:resist_magic:resist_fire:resist_cold:resist_electricity:resist_acid:resist_slash:resist_crush:resist_pierce:resist_missile:ea:general:race:class:specific:gender:align:script_default:script_override
 patch_item              itm         items               items.tpa           patch_item              item_post_processing    name:description:id_name:id_description:type:proficiency:flags:inventory_icon:ground_icon:description_icon:price:stack:lore:weight:enchantment:exclusion:ability1:ability2:ability3
 copy_item               itm         items               items.tpa           copy_item               item_post_processing    name:description:id_name:id_description:type:proficiency:flags:inventory_icon:ground_icon:description_icon:price:stack:lore:weight:enchantment:exclusion:ability1:ability2:ability3
 copy_item_simplified    itm         items               items.tpa           copy_item               *                       name:description:type:proficiency:flags:inventory_icon:ground_icon:description_icon:stack:weight:enchantment
