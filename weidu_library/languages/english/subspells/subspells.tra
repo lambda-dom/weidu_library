@@ -1,100 +1,80 @@
-//Currently not in use.
-//Poison damage.
-@10 = ~Poison~
-@11 = ~Inflicts %arg1% point(s) of poison damage on any living creature.~
+//Damage spells.
+@10 = "Poison"
+@11 = "Inflicts %arg1% point(s) of poison damage on any living creature."
 
-//Vampiric.
-@20 = ~Vampiric~
-@21 = ~Living creatures are drained of %arg1% point(s).~
+@20 = "Vampiric"
+@21 = "Living creatures are drained of %arg1% point(s)."
 
 
 //Splash damage spells.
-//Poisoning.
-@100 = ~Poisoning~
-@101 = ~Every %arg2% second(s) for %arg1% round(s), living creatures suffer 1 point of poison damage. This effect is not dispellable and is cumulative with itself.~
+@100 = "Poisoning"
+@101 = "Every %arg2% second(s) for %arg1% round(s), living creatures suffer 1 point of poison damage. This effect is not dispellable and is cumulative with itself."
 
-//Bleeding.
-@110 = ~Bleeding~
-@111 = ~When hit and every round thereafter for %arg1% round(s), living creatures suffer %arg2% point(s) of piercing damage. The effect is not dispellable.~
+@110 = "Bleeding"
+@111 = "When hit and every round thereafter for %arg1% round(s), living creatures suffer %arg2% point(s) of piercing damage. The effect is not dispellable."
 
-//Acid Splash.
-@120 = ~Acid Splash~
-@121 = ~When hit and every round thereafter for %arg1% round(s), targets suffer %arg2% point(s) of acid damage. The effect is not dispellable.~
+@120 = "Acid Splash"
+@121 = "When hit and every round thereafter for %arg1% round(s), targets suffer %arg2% point(s) of acid damage. The effect is not dispellable."
 
 //Duration spells.
-//Unconsciousness.
-@200 = ~Unconsciousness~
-@201 = ~Victim is knocked down unconscious for %arg1% round(s), awaking before the end of this period if it takes any damage. Incorporeal creatures like Elementals and non-living creatures are immune to the effect.~
+@200 = "Unconsciousness"
+@201 = "Victim is knocked down unconscious for %arg1% round(s), awaking before the end of this period if it takes any damage. Incorporeal creatures like Elementals and non-living creatures are immune to the effect."
 
-//Paralyze.
-@210 = ~Paralyze~
-@211 = ~Paralyzes the victim for %arg1% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to paralyzation.~
+@210 = "Paralyze"
+@211 = "Paralyzes the victim for %arg1% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to paralyzation."
 
-//Entangle.
-@220 = ~Entangle~
-@221 = ~Entangles the victim for %arg1% round(s). Incorporeal creatures like Elementals, flying creatures like Wyverns and Giant creatures are immune to entangle.~
+@220 = "Entangle"
+@221 = "Entangles the victim for %arg1% round(s). Incorporeal creatures like Elementals, flying creatures like Wyverns and Giant creatures are immune to entangle."
 
-@225 = ~Web~
-@226 = ~Webs the victim for %arg1% round(s). Incorporeal creatures like Elementals, flying creatures like Wyverns and Giant creatures are immune to entangle.~
+@225 = "Web"
+@226 = "Webs the victim for %arg1% round(s). Incorporeal creatures like Elementals, flying creatures like Wyverns and Giant creatures are immune to entangle."
 
-//Panic.
-@230 = ~Panic~
-@231 = ~Victim panics for %arg1% round(s). Undead and illusionary creatures are immune to fear.~
+@230 = "Panic"
+@231 = "Victim panics for %arg1% round(s). Undead and illusionary creatures are immune to fear."
 
-//Confusion.
-@240 = ~Confusion~
-@241 = ~Victim is confused for %arg1% round(s).~
+@240 = "Confusion"
+@241 = "Victim is confused for %arg1% round(s)."
 
-//Blind.
-@250 = ~Blind~
-@251 = ~Victim is blinded for %arg1% round(s).~
+@250 = "Blind"
+@251 = "Victim is blinded for %arg1% round(s)."
 
-//Stun.
-@260 = ~Stun~
-@261 = ~Victim is stunned for %arg1% round(s).~
+@260 = "Stun"
+@261 = "Victim is stunned for %arg1% round(s)."
 
-//Sleep.
-@270 = ~Sleep~
-@271 = ~Victim is afflicted with magical sleep for %arg1% round(s), awaking before the end of this period if it takes any damage. Dragons, incorporeal creatures like Elementals and non-living creatures are immune to the effect. Elves and Half-elves are especially resistant to magically-induced sleep.~
+@270 = "Sleep"
+@271 = "Victim is afflicted with magical sleep for %arg1% round(s), awaking before the end of this period if it takes any damage. Dragons, incorporeal creatures like Elementals and non-living creatures are immune to the effect. Elves and Half-elves are especially resistant to magically-induced sleep."
 
-//Slow.
-@280 = ~Slow~
-@281 = ~Victim is slowed for %arg1% round(s). Two instances of this same spell refresh.~
+@280 = "Slow"
+@281 = "Victim is slowed for %arg1% round(s). Two instances of this same spell refresh."
 
-//Charm humanoid.
-@290 = ~Charm~
-@291 = ~Creature of general type '%arg2%' is charmed for %arg1% round(s) in mode '%arg3%'.~
+@290 = "Charm"
+@291 = "Creature of general type '%arg2%' is charmed for %arg1% round(s) in mode '%arg3%'."
+
 
 //Duration and amount spells.
-//Slow movement rate.
-@300 = ~Slower~
-@301 = ~Victim's movement rate is decreased by %arg2% for %arg1% round(s). Incorporeal creatures like Elementals and flying creatures like Wyverns and Dragons are immune to slowing.~
+@300 = ~"Slower"~
+@301 = "Victim's movement rate is decreased by %arg2% for %arg1% round(s). Incorporeal creatures like Elementals and flying creatures like Wyverns and Dragons are immune to slowing."
 
-//Crippled.
-@310 = ~Crippled~
-@311 = ~Victim's movement rate is decreased by %arg2% per cent for %arg1% round(s). Incorporeal creatures like Elementals and flying creatures like Wyverns and Dragons are immune to the effect.~
+@310 = "Crippled"
+@311 = "Victim's movement rate is decreased by %arg2% per cent for %arg1% round(s). Incorporeal creatures like Elementals and flying creatures like Wyverns and Dragons are immune to the effect."
 
-//Level drain.
-@320 = ~Level drained~
-@321 = ~Victim loses %arg2% level(s) for %arg1% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to level drain. The effect is cumulative.~
+@320 = "Level drained"
+@321 = "Victim loses %arg2% level(s) for %arg1% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to level drain. The effect is cumulative."
 
-//Drain strength.
-@330 = ~Drain Strength~
-@331 = ~Victim is weakened, losing %arg2% points of strenth for %arg1% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to the effect. The effect is cumulative.~
+@330 = "Drain Strength"
+@331 = "Victim is weakened, losing %arg2% points of strenth for %arg1% round(s). Incorporeal creatures like Elementals and non-living creatures are immune to the effect. The effect is cumulative."
 
-//Knockback.
-@340 = ~Knockback~
-@341 = ~Victim is knocked back with a strength of %arg2%, suffering unconsciouness for %arg1% round(s). Creatures like dragons and giants are immune.~
+@340 = "Knockback"
+@341 = "Victim is knocked back with a strength of %arg2%, suffering unconsciouness for %arg1% round(s). Creatures like dragons and giants are immune."
 
 
 //Argument-less spells.
-//Dispel magic.
-@400 = ~Dispel Magic~
-@401 = ~Dispels all magic effects. Does not bypass or remove protections such as Dispelling Screen.~
+@400 = "Dispel Magic"
+@401 = "Dispels all magic effects. Does not bypass or remove protections such as Dispelling Screen."
 
-//Kill target.
-@410 = ~Kill Target~
-@411 = ~Victim is instantly killed.~
+@410 = "Kill Target"
+@411 = "Victim is instantly killed."
+
 
 //Strings for display string [139] opcodes: relay info to the user.
 @1000 = "Stunned"

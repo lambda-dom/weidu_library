@@ -9,7 +9,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 //Spell encoders.
 LAF load_array STR_VAR
-    table = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/effects/encoders.2da"
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/spells/encoders.2da"
 RET_ARRAY spell_encoders = array END
 
 
@@ -187,6 +187,16 @@ BEGIN
         INCLUDE "%patches%"
     END
 
+    //Normalize tra.
+    ACTION_IF ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/resources/tra/empty.tra"
+    END
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "copy_creatures: tra file '%tra%' does not exist."
+    END
+
     ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
         FAIL "install_spells: resources directory '%resources_dir%' does not exist."
     END
@@ -197,70 +207,72 @@ BEGIN
         fields = "resource,install,name,description,type,level,flags,school,sectype,book_icon,ability_icon,projectile,range,speed,patch,override,destination"
     RET_ARRAY resources = table END
 
-    //Loop.
-    LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
-    OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
-        LAF get_row_from_table INT_VAR row = i STR_VAR
-            table = "resources"
-        RET_ARRAY
-            row = array
-        END
+    WITH_TRA "%tra%" BEGIN
+        //Loop.
+        LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+            LAF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
 
-        LAF split_array_with_fields STR_VAR
-            fields = "resource,install,patch,override,destination"
-            array = "row"
-        RET_ARRAY split remainder END
+            LAF split_array_with_fields STR_VAR
+                fields = "resource,install,patch,override,destination"
+                array = "row"
+            RET_ARRAY split remainder END
 
-        WITH_SCOPE BEGIN
-            //Inject names in local scope.
-            OUTER_TEXT_SPRINT resource $"split"("resource")
-            OUTER_TEXT_SPRINT install $"split"("install")
-            OUTER_TEXT_SPRINT patch $"split"("patch")
-            OUTER_TEXT_SPRINT override $"split"("override")
-            OUTER_TEXT_SPRINT destination $"split"("destination")
+            WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                OUTER_TEXT_SPRINT resource $"split"("resource")
+                OUTER_TEXT_SPRINT install $"split"("install")
+                OUTER_TEXT_SPRINT patch $"split"("patch")
+                OUTER_TEXT_SPRINT override $"split"("override")
+                OUTER_TEXT_SPRINT destination $"split"("destination")
 
-            ACTION_IF NOT (install = 0) BEGIN
-                //Compute destination.
-                LAF encode_table_reference STR_VAR
-                    value = "%destination%"
-                RET destination = return END
+                ACTION_IF NOT (install = 0) BEGIN
+                    //Compute destination.
+                    LAF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
 
-                //Sanitize.
-                LAF sanitize_resource STR_VAR
-                    override = "%override%"
-                    destination = "%destination%.spl"
-                    resource = "%resource%"
-                END
-
-                COPY "%resources_dir%/%resource%.spl" "override/%destination%.spl"
-                    //Correct self-references.
-                    LPF ALTER_EFFECT INT_VAR
-                        silent = 1
-                    STR_VAR
-                        match_resource = "self#res"
-                        resource = "%destination%"
+                    //Sanitize.
+                    LAF sanitize_resource STR_VAR
+                        override = "%override%"
+                        destination = "%destination%.spl"
+                        resource = "%resource%"
                     END
 
-                    LPF write_spell_defaults STR_VAR fields = "remainder" END
-                    PHP_EACH "remainder" AS field => value BEGIN
-                        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
-                            //Get encoder.
-                            TEXT_SPRINT encoder $"spell_encoders"("%field%")
+                    COPY "%resources_dir%/%resource%.spl" "override/%destination%.spl"
+                        //Correct self-references.
+                        LPF ALTER_EFFECT INT_VAR
+                            silent = 1
+                        STR_VAR
+                            match_resource = "self#res"
+                            resource = "%destination%"
+                        END
 
-                            //Write value.
-                            LPF "%encoder%" STR_VAR value = "%value%" RET return END
-                            PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
-                                LPF set_spell_field STR_VAR
-                                    field = "%field%"
-                                    value = "%return%"
+                        LPF write_spell_defaults STR_VAR fields = "remainder" END
+                        PHP_EACH "remainder" AS field => value BEGIN
+                            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                                //Get encoder.
+                                TEXT_SPRINT encoder $"spell_encoders"("%field%")
+
+                                //Write value.
+                                LPF "%encoder%" STR_VAR value = "%value%" RET return END
+                                PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                                    LPF set_spell_field STR_VAR
+                                        field = "%field%"
+                                        value = "%return%"
+                                    END
                                 END
                             END
                         END
-                    END
 
-                    PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
-                        LPF "%patch%" STR_VAR destination = "%destination%" END
-                    END
+                        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF "%patch%" STR_VAR destination = "%destination%" END
+                        END
+                END
             END
         END
     END
