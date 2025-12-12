@@ -10,11 +10,15 @@ file(s):
 
 # B. Available installers.
 
-* [Icons](./installers/icons.md): installer for icon `.bam` files.
+* [Creatures](./installers/creatures.md): installer for creature `.cre` files.
+* [Dialogs](./installers/dialogs.md): compile dialog `.d` files.
 * [Effects](./installers/effects.md): installers for effect `.eff` files.
+* [Icons](./installers/icons.md): installer for icon `.bam` files.
 * [Projectiles](./installers/projectiles.md): installers for projectile `.pro` files.
+* [Scripts](./installers/scripts.md): compile script `.baf` files.
 * [Sounds](./installers/sounds.md): installer for sounds (`.wav` files).
 * [Tables](./installers/tables.md): installer for table `.2da` files.
+* [Vvcs](./installers/vvcs.md): installer for animation `.vvc` files.
 
 # C. Managing references.
 

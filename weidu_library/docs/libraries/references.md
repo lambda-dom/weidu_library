@@ -146,4 +146,6 @@ The next set of encoders have no format associated and are mainly used as value 
 
 `encode_script_ref STR_VAR value RET return`
 
+`encode_dialog_ref STR_VAR value RET return`
+
 These encoders parse a resource reference for a resource of the apprpriate type, do an extra existence check and return the value.

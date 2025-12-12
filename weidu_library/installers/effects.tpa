@@ -133,11 +133,9 @@ DEFINE_ACTION_FUNCTION create_effects STR_VAR table = "" tra = "*" patches = "*"
 
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
-                    ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
-                        LAF encode_table_reference STR_VAR
-                            value = "%destination%"
-                        RET destination = return END
-                    END
+                    LAF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
 
                     //Sanitize.
                     LAF sanitize_resource STR_VAR

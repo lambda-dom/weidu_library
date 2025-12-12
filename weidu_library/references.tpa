@@ -182,3 +182,12 @@ DEFINE_DIMORPHIC_FUNCTION encode_script_ref STR_VAR value = "" RET return BEGIN
         FAIL "encode_script_ref: script '%return%.bcs' does not exist in game."
     END
 END
+
+DEFINE_DIMORPHIC_FUNCTION encode_dialog_ref STR_VAR value = "" RET return BEGIN
+    LAF encode_table_reference STR_VAR value = "%value%" RET return END
+
+    //Sanitize.
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.dlg") BEGIN
+        FAIL "encode_dialog_ref: script '%return%.dlg' does not exist in game."
+    END
+END
