@@ -4,7 +4,7 @@ Library of encoder converters from a human-readable format into binary more prop
 
 file(s):
 
-* [Source code](../../internal/encoders.tpa)
+* [Source code](../../encoders.tpa)
 
 Other encoders are available in other modules. This is necessary to avoid circular imports.
 

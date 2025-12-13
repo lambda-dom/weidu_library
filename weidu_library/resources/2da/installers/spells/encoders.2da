@@ -1,0 +1,12 @@
+name            encode_tra_ref
+description     encode_tra_ref
+type            encode_spell_type
+level           encode_spell_level
+flags           encode_spell_flags_mask
+school          encode_spell_school
+sectype         encode_spell_sectype
+book_icon       encode_bam_ref
+ability_icon    encode_ability_icon
+projectile      encode_projectile_header
+range           encode_spell_range
+speed           encode_spell_speed

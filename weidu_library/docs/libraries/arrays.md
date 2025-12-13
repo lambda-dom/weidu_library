@@ -40,7 +40,7 @@ is that it will automatically return `default` if `key` is not in `array` instea
 VARIABLE_IS_SET $array("%key%")
 ```
 
-will return a false positive if the variable `array_%key%` is set. This means that `get_array_element` is linear in the size of the array, since it has to loop through it to find the correct value. To make matters worse, the only way to break out of the loop early when a match is found, is by raising an exception and then catch it.
+will return a false positive if the variable `array_%key%` is set. This means that `get_array_element` is linear in the size of the array, since it has to loop through it to find the correct value. To make matters worse, the only way to break out of the loop early when a match is found, is by raising an exception and catching it.
 
 `is_key_in_array STR_VAR array = "" key = "" RET bool`
 
@@ -57,7 +57,7 @@ note(s):
 
 Return the `list` of all `key`'s of `array` whose value matches `value`. Returns the empty list if no match is found.
 
-# C. Builders.
+# C. From lists to arrays.
 
 note(s):
 * all functions in this section have action and patch variants.
@@ -73,9 +73,17 @@ note(s):
 
 Return a new associative array with pairs `key => value` with keys the elements of the list of `keys` and values their indices.
 
+# D. Splits and merges.
+
+`split_array_with_fields STR_VAR fields array RET_ARRAY split remainder`
+
+Split `array` into `split` and `remainder`where `split` contains all pairs `key => value` with `key` in the `,`-separated string list `fields` and remainder contains the rest of the pairs.
+
 `merge_arrays STR_VAR arrays RET_ARRAY array`
 
-Merge `arrays` passed by name as a `|`-separated stringified list. If there are common keys, the last one wins.
+Merge `arrays` passed by name as a `,`-separated stringified list. If there are common keys, the last one wins.
+
+# E. Builders.
 
 `load_array INT_VAR col = 1 STR_VAR table RET_ARRAY array`
 

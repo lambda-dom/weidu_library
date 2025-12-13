@@ -1,0 +1,211 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/installers.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/projectiles.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Installer.
+DEFINE_ACTION_FUNCTION copy_projectiles STR_VAR
+    table = ""
+    dir = ""
+    patches = "*"
+BEGIN
+    //Sanitize.
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "copy_projectiles: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "copy_projectiles: resources directory '%dir%' does not exist."
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,patch,override,destination"
+    RET_ARRAY resources = table END
+
+    //Loop.
+    LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+    OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+        LAF get_row_from_table INT_VAR row = i STR_VAR
+            table = "resources"
+        RET_ARRAY
+            row = array
+        END
+
+        WITH_SCOPE BEGIN
+            //Inject names in local scope.
+            OUTER_TEXT_SPRINT resource $"row"("resource")
+            OUTER_TEXT_SPRINT install $"row"("install")
+            OUTER_TEXT_SPRINT patch $"row"("patch")
+            OUTER_TEXT_SPRINT override $"row"("override")
+            OUTER_TEXT_SPRINT destination $"row"("destination")
+
+            ACTION_IF NOT (install = 0) BEGIN
+                //Compute destination.
+                ACTION_IF NOT ("%destination%" STRING_EQUAL_CASE "*") BEGIN
+                    LAF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
+                END
+
+                //Sanitize.
+                LAF sanitize_resource STR_VAR
+                    override = "%override%"
+                    destination = "%destination%.pro"
+                    resource = "%resource%"
+                END
+
+                COPY "%dir%/%resource%.pro" "override/%destination%.pro"
+                    PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                        LPF "%patch%" STR_VAR destination = "%destination%" END
+                    END
+            END
+        END
+    END
+END
+
+DEFINE_ACTION_FUNCTION add_clearair_from_table STR_VAR table = "" BEGIN
+    COPY_EXISTING "clearair.2da" "override"
+        //Loop.
+        LPF get_table_row_count STR_VAR table = "%table%" RET row_count = count END
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "%table%"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT resource $"row"("resource")
+                TEXT_SPRINT label $"row"("label")
+                TEXT_SPRINT clearair $"row"("clearair")
+                TEXT_SPRINT destination $"row"("destination")
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Sanitize.
+                    PATCH_IF NOT (IS_AN_INT "%clearair%") BEGIN
+                        PATCH_FAIL "add_clearair_from_table: clearair '%clearair%' for resource '%resource%' not an integer."
+                    END ELSE BEGIN
+                        PATCH_IF NOT ((0 == clearair) OR (1 == clearair)) BEGIN
+                            PATCH_FAIL "add_clearair_from_table: clearair '%clearair%' for resource '%resource%' not a boolean."
+                        END
+                    END
+
+                    PATCH_IF (1 == clearair) BEGIN
+                        //Compute destination.
+                        LPF encode_table_reference STR_VAR
+                            value = "%destination%"
+                        RET destination = return END
+
+                        LPF append_clearair STR_VAR
+                            projectile = "%destination%"
+                            label = "%label%"
+                        END
+                    END
+                END
+            END
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+DEFINE_ACTION_FUNCTION add_projectiles STR_VAR
+    table = ""
+    dir = ""
+    patches = "*"
+BEGIN
+    //Sanitize.
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "add_projectiles: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "add_projectiles: resources directory '%dir%' does not exist."
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,label,clearair,patch,override,destination"
+    RET_ARRAY resources = table END
+
+    //Loop.
+    LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+    OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+        LAF get_row_from_table INT_VAR row = i STR_VAR
+            table = "resources"
+        RET_ARRAY
+            row = array
+        END
+
+        WITH_SCOPE BEGIN
+            //Inject names in local scope.
+            OUTER_TEXT_SPRINT resource $"row"("resource")
+            OUTER_TEXT_SPRINT install $"row"("install")
+            OUTER_TEXT_SPRINT label $"row"("label")
+            OUTER_TEXT_SPRINT patch $"row"("patch")
+            OUTER_TEXT_SPRINT override $"row"("override")
+            OUTER_TEXT_SPRINT destination $"row"("destination")
+
+            ACTION_IF NOT (install = 0) BEGIN
+                //Compute destination.
+                LAF encode_table_reference STR_VAR
+                    value = "%destination%"
+                RET destination = return END
+
+                //Sanitize.
+                LAF sanitize_resource STR_VAR
+                    override = "%override%"
+                    destination = "%destination%.pro"
+                    resource = "%resource%"
+                END
+
+                //Have to first copy the projectile because ADD does not allow renaming.
+                LAF get_component_external_dir RET temp_dir = dir END
+                OUTER_TEXT_SPRINT temp_dir "%temp_dir%/resources/pro"
+                COPY "%dir%/%resource%.pro" "%temp_dir%/%destination%.pro"
+                    PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                        LPF "%patch%" STR_VAR
+                            destination = "%destination%"
+                        END
+                    END
+
+                //Add projectile.
+                LAF add_projectile STR_VAR
+                    projectile = "%destination%"
+                    dir = "%temp_dir%"
+                    label = "%label%"
+                RET _ = id END
+            END
+        END
+    END
+
+    //Add clearair entries.
+    LAF add_clearair_from_table STR_VAR table = "resources" END
+END
+
+DEFINE_ACTION_FUNCTION add_clearair STR_VAR table = "" BEGIN
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,label,clearair,patch,override,destination"
+    RET_ARRAY resources = table END
+
+    //Add clearair entries.
+    LAF add_clearair_from_table STR_VAR table = "resources" END
+END

@@ -1,0 +1,143 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/installers.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/items.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Spell encoders.
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/items/encoders.2da"
+RET_ARRAY item_encoders = array END
+
+
+//Auxiliary encoders.
+DEFINE_PATCH_FUNCTION encode_item_inventory_icon STR_VAR value = "" RET return BEGIN
+    LPF encode_bam_ref STR_VAR value = "%value%" RET return END
+    //Write icon to header.
+    LPF set_item_field STR_VAR field = "inventory_icon" value = "%return%" END
+    //Write icon to melee and ranged headers.
+    LPF get_item_header_count RET headers_count = count END
+    FOR (i = 0; i < headers_count; ++i) BEGIN
+        LPF get_item_header_field INT_VAR header = i STR_VAR field = "type" RET type = value END
+        PATCH_IF (type = 1) OR (type = 2) BEGIN
+            LPF set_item_header_field INT_VAR header = i STR_VAR field = "icon" value = "%return%" END
+        END
+    END
+    TEXT_SPRINT return "*"
+END
+
+DEFINE_PATCH_FUNCTION encode_item_flags_mask STR_VAR value = "" RET return BEGIN
+    LPF encode_item_flags STR_VAR value = "%value%" RET lhand = return END
+    LPF set_item_field STR_VAR field = "flags" value = "%value%" END
+    TEXT_SPRINT return "*"
+END
+
+
+//Installer.
+DEFINE_ACTION_FUNCTION install_items STR_VAR
+    table = ""
+    dir = ""
+    tra = "*"
+    patches = "*"
+BEGIN
+    //Sanitize.
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "install_items: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    //Normalize tra.
+    ACTION_IF ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/resources/tra/empty.tra"
+    END
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "copy_creatures: tra file '%tra%' does not exist."
+    END
+
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_items: resources directory '%dir%' does not exist."
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,name,description,id_name,id_description,type,proficiency,flags,inventory_icon,ground_icon,description_icon,price,stack,lore,weight,enchantment,patch,override,destination"
+    RET_ARRAY resources = table END
+
+    WITH_TRA "%tra%" BEGIN
+        //Loop.
+        LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+            LAF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            LAF split_array_with_fields STR_VAR
+                fields = "resource,install,patch,override,destination"
+                array = "row"
+            RET_ARRAY split remainder END
+
+            WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                OUTER_TEXT_SPRINT resource $"split"("resource")
+                OUTER_TEXT_SPRINT install $"split"("install")
+                OUTER_TEXT_SPRINT patch $"split"("patch")
+                OUTER_TEXT_SPRINT override $"split"("override")
+                OUTER_TEXT_SPRINT destination $"split"("destination")
+
+                ACTION_IF NOT (install = 0) BEGIN
+                    //Compute destination.
+                    LAF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
+
+                    //Sanitize.
+                    LAF sanitize_resource STR_VAR
+                        override = "%override%"
+                        destination = "%destination%.itm"
+                        resource = "%resource%"
+                    END
+
+                    COPY "%dir%/%resource%.itm" "override/%destination%.itm"
+                        //Correct self-references.
+                        LPF ALTER_EFFECT INT_VAR
+                            silent = 1
+                        STR_VAR
+                            match_resource = "self#res"
+                            resource = "%destination%"
+                        END
+
+                        PHP_EACH "remainder" AS field => value BEGIN
+                            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                                //Get encoder.
+                                TEXT_SPRINT encoder $"item_encoders"("%field%")
+
+                                //Write value.
+                                LPF "%encoder%" STR_VAR value = "%value%" RET return END
+                                PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                                    LPF set_item_field STR_VAR
+                                        field = "%field%"
+                                        value = "%return%"
+                                    END
+                                END
+                            END
+                        END
+
+                        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF "%patch%" STR_VAR destination = "%destination%" END
+                        END
+                END
+            END
+        END
+    END
+END

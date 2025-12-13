@@ -1,0 +1,5 @@
+2DA V1.0
+*
+
+        opcode          parameter1  parameter2  resource    special
+name    ac_damage_type  #num:0      #num:0      #nul:       #num:0

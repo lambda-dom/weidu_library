@@ -60,6 +60,9 @@ The `array` of [pairs](../../resources/2da/opcodes/ids.2da) `ids => id` of ids f
 
 The next set of functions convert a value in a human-readable format like an opcode type, to their corresponding numeric id, usually to be written out in binary format. If validation is also needed, use the encoder versions in the [Encoders module](./encoders.md).
 
+note(s):
+* all functions in this section have action and patch variants.
+
 `get_opcode_type_id STR_VAR value RET id`
 
 `get_opcode_target_id STR_VAR value RET id`
@@ -75,6 +78,9 @@ The next set of functions convert a value in a human-readable format like an opc
 # D. Readers and writers.
 
 Specializations of the generic reader and writer for opcodes.
+
+note(s):
+* all functions in this section are patch functions.
 
 `get_opcode_field INT_VAR offset STR_VAR field RET value`
 

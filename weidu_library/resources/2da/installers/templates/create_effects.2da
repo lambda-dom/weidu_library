@@ -1,4 +1,4 @@
 2DA V1.0
 *
-        install opcode          target  param1  param2  param3  param4  power   timing  duration    prob1   prob2   dice    size    saveflags   bonus   res_dis special resource    resource2   resource3   projectile  school  sectype patch   override    destination
-effect  1       ac_damage_type  self    0       0       *       *       0       limited 60          100     0       0       0       000000000   0       natural *       *           *           *           *           *       *       *       0           *
+        install opcode          target  param1  param2  param3  param4  power   timing  duration    prob1   prob2   dice    size    savingthrow savebonus       res_dis special resource    resource2   resource3   projectile  school  sectype patch   override    destination
+effect  1       ac_damage_type  self    #num:0  #num:0  *       *       0       limited 60          100     0       0       0       #num:0      0               natural #num:0  #nul:       *           *           *           *       *       *       0           *

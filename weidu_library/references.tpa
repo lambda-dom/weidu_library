@@ -37,7 +37,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return B
     //Available formats.
     ACTION_DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
         "lit" => "encode_resource_literal"
-        "int" => "encode_int_literal"
+        "num" => "encode_num_literal"
         "nul" => "encode_empty_string"
         "spl" => "encode_spell_res"
         "suf" => "encode_spell_suffix"
@@ -85,9 +85,9 @@ DEFINE_DIMORPHIC_FUNCTION encode_resource_literal STR_VAR value = "" RET return 
     END
 END
 
-DEFINE_DIMORPHIC_FUNCTION encode_int_literal STR_VAR value = "" RET return BEGIN
+DEFINE_DIMORPHIC_FUNCTION encode_num_literal STR_VAR value = "" RET return BEGIN
     ACTION_IF NOT (IS_AN_INT value) BEGIN
-        FAIL "encode_int_literal: value '%value%' is not an integer literal."
+        FAIL "encode_num_literal: value '%value%' is not an integer literal."
     END
 
     //Implicit number conversion.
@@ -180,5 +180,14 @@ DEFINE_DIMORPHIC_FUNCTION encode_script_ref STR_VAR value = "" RET return BEGIN
     //Sanitize.
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.bcs") BEGIN
         FAIL "encode_script_ref: script '%return%.bcs' does not exist in game."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_dialog_ref STR_VAR value = "" RET return BEGIN
+    LAF encode_table_reference STR_VAR value = "%value%" RET return END
+
+    //Sanitize.
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.dlg") BEGIN
+        FAIL "encode_dialog_ref: script '%return%.dlg' does not exist in game."
     END
 END

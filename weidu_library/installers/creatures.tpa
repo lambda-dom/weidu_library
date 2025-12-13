@@ -1,0 +1,133 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/creatures.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/installers.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Arrays.
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/creatures/encoders.2da"
+RET_ARRAY creature_encoders = array END
+
+
+//Installer.
+DEFINE_ACTION_FUNCTION install_creatures STR_VAR
+    table = ""
+    dir = ""
+    tra = "*"
+    patches = "*"
+BEGIN
+    //Sanitize.
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "install_creatures: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    //Normalize tra.
+    ACTION_IF ("%tra%" STRING_EQUAL_CASE "*") BEGIN
+        OUTER_TEXT_SPRINT tra "%WEIDU_LIBRARY_DIR%/resources/tra/empty.tra"
+    END
+
+    //Existence checks.
+    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
+        FAIL "install_creatures: tra file '%tra%' does not exist."
+    END
+
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_creatures: resources directory '%dir%' does not exist."
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,name,power,first_class,second_class,third_class,str,str_bonus,dex,con,int,wis,chr,hps,ac,thac0,apr,saves_death,saves_wand,saves_polymorph,saves_breath,saves_spell,resist_magic,resist_fire,resist_cold,resist_electricity,resist_acid,resist_slash,resist_crush,resist_pierce,resist_missile,ea,general,race,class,specific,gender,align,script_default,script_override,dialog,patch,override,destination"
+    RET_ARRAY resources = table END
+
+    WITH_TRA "%tra%" BEGIN
+        //Loop.
+        LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+            LAF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            LAF split_array_with_fields STR_VAR
+                fields = "resource,install,patch,override,destination"
+                array = "row"
+            RET_ARRAY split remainder END
+
+            WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                OUTER_TEXT_SPRINT resource $"split"("resource")
+                OUTER_TEXT_SPRINT install $"split"("install")
+                OUTER_TEXT_SPRINT patch $"split"("patch")
+                OUTER_TEXT_SPRINT override $"split"("override")
+                OUTER_TEXT_SPRINT destination $"split"("destination")
+
+                ACTION_IF NOT (install = 0) BEGIN
+                    //Compute destination.
+                    LAF encode_table_reference STR_VAR
+                        value = "%destination%"
+                    RET destination = return END
+
+                    //Sanitize.
+                    LAF sanitize_resource STR_VAR
+                        override = "%override%"
+                        destination = "%destination%.cre"
+                        resource = "%resource%"
+                    END
+
+                    COPY "%dir%/%resource%.cre" "override/%destination%.cre"
+                        PHP_EACH "remainder" AS field => value BEGIN
+                            PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                                TEXT_SPRINT encoder $"creature_encoders"("%field%")
+                                LPF "%encoder%" STR_VAR value = "%value%" RET return END
+
+                                PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
+                                    LPF set_cre_field STR_VAR
+                                        field = "%field%"
+                                        value = "%return%"
+                                    END
+
+                                    //Set defaults.
+                                    PATCH_IF "%field%" STRING_EQUAL_CASE "name" BEGIN
+                                        LPF set_cre_field STR_VAR
+                                            field = "tooltip"
+                                            value = "%return%"
+                                        END
+                                    END
+
+                                    PATCH_IF "%field%" STRING_EQUAL_CASE "hps" BEGIN
+                                        LPF set_cre_field STR_VAR
+                                            field = "max_hps"
+                                            value = "%return%"
+                                        END
+                                    END
+
+                                    PATCH_IF "%field%" STRING_EQUAL_CASE "ac" BEGIN
+                                        LPF set_cre_field STR_VAR
+                                            field = "ac_effective"
+                                            value = "%return%"
+                                        END
+                                    END
+                                END
+                            END
+                        END
+
+                        PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                            LPF "%patch%" STR_VAR destination = "%destination%" END
+                        END
+                END
+            END
+        END
+    END
+END

@@ -1,5 +1,5 @@
 //Installers.
-DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT = "" root = "*" BEGIN
+DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT_NAME = "" BEGIN
     //Clear on entry.
     CLEAR_ARRAYS
     CLEAR_CODES
@@ -12,53 +12,50 @@ DEFINE_ACTION_FUNCTION install_component STR_VAR COMPONENT = "" root = "*" BEGIN
     END
 
     //Check component name validity.
-    ACTION_IF NOT (("%COMPONENT%" STRING_MATCHES_REGEXP "[a-z][a-z0-9_-]+") = 0) THEN BEGIN
-        FAIL "install_component: string '%COMPONENT%' is not a valid component name: cannot have spaces, must be lower-cased, etc."
+    ACTION_IF NOT (("%COMPONENT_NAME%" STRING_MATCHES_REGEXP "[a-z][a-z0-9_-]+") = 0) THEN BEGIN
+        FAIL "install_component: string '%COMPONENT_NAME%' is not a valid component name: cannot have spaces, must be lower-cased, etc."
     END
 
     //Main component file.
-    OUTER_TEXT_SPRINT COMPONENT_ROOT "%COMPONENT%"
-    ACTION_IF NOT ("*" STRING_EQUAL_CASE "%root%") BEGIN
-        OUTER_TEXT_SPRINT COMPONENT_ROOT "%root%"
-    END
-
-    OUTER_TEXT_SPRINT main "%MOD_FOLDER%/components/%COMPONENT%/main.tpa"
-    ACTION_IF NOT (FILE_EXISTS "%main%") BEGIN
-        FAIL "install_component: main component file '%main%' does not exist."
+    ACTION_IF NOT (FILE_EXISTS "%MOD_FOLDER%/components/%COMPONENT_NAME%/main.tpa") BEGIN
+        FAIL "install_component: main component file '%MOD_FOLDER%/components/%COMPONENT_NAME%/main.tpa' does not exist."
     END
 
     //Main tra file.
-    OUTER_TEXT_SPRINT tra "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%/main.tra"
-    ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
-        FAIL "install_component: main component tra file '%tra%' does not exist."
+    ACTION_IF NOT (FILE_EXISTS "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/main.tra") BEGIN
+        FAIL "install_component: main component tra file '%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/main.tra' does not exist."
     END
 
-    WITH_TRA "%tra%" BEGIN
+    WITH_TRA "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/main.tra" BEGIN
         WITH_SCOPE BEGIN
-            INCLUDE "%main%"
+            INCLUDE "%MOD_FOLDER%/components/%COMPONENT_NAME%/main.tpa"
         END
     END
 END
 
 //Component functions.
 DEFINE_DIMORPHIC_FUNCTION get_component_root RET dir BEGIN
-    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/components/%COMPONENT%"
+    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/components/%COMPONENT_NAME%"
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_component_main RET file BEGIN
-    OUTER_TEXT_SPRINT file "%MOD_FOLDER%/components/%COMPONENT%/main.tpa"
+    OUTER_TEXT_SPRINT file "%MOD_FOLDER%/components/%COMPONENT_NAME%/main.tpa"
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_component_resources_dir RET dir BEGIN
-    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/components/%COMPONENT_ROOT%/resources"
+    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/components/%COMPONENT_NAME%/resources"
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_component_tra_dir RET dir BEGIN
-    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_ROOT%"
+    OUTER_TEXT_SPRINT dir "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%"
 END
 
 DEFINE_DIMORPHIC_FUNCTION get_component_tra_main RET file BEGIN
-    OUTER_TEXT_SPRINT file "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT%/main.tra"
+    OUTER_TEXT_SPRINT file "%MOD_FOLDER%/languages/%LANGUAGE%/%COMPONENT_NAME%/main.tra"
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_component_external_dir RET dir BEGIN
+    OUTER_TEXT_SPRINT dir "weidu_external/data/%MOD_FOLDER%/%COMPONENT_NAME%"
 END
 
 

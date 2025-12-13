@@ -27,9 +27,9 @@ note(s):
 
 Return `list` of string `value` as element repeated `times`. Function FAIL's if `times` is negative and returns the empty list if `times` is 0.
 
-`list_from_string STR_VAR string separator = ":" RET count RET_ARRAY list`
+`list_from_string STR_VAR string separator = "," RET count RET_ARRAY list`
 
-Creates a `list` from a `separator`-separated `string`. `separator` must be 1-character long, otherwise function FAIL's, and the elements are stripped of whitespace.
+Creates a `list` from a `separator`-separated `string`. `separator` must be 1-character long, otherwise function FAIL's, and the element strings are stripped of surrounding whitespace.
 
 # C. Folds.
 

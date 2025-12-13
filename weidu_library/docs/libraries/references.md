@@ -69,7 +69,7 @@ Note that value is the empty string; if anything follows the colon, the function
 Treats `value` as an integer literal and returns it. Format is:
 
 ```
-#int:<numeric literal>
+#num:<numeric literal>
 ```
 
 Both decimal and hex literals are accepted.
@@ -145,5 +145,7 @@ The next set of encoders have no format associated and are mainly used as value 
 `encode_projectile_ref STR_VAR value RET return`
 
 `encode_script_ref STR_VAR value RET return`
+
+`encode_dialog_ref STR_VAR value RET return`
 
 These encoders parse a resource reference for a resource of the apprpriate type, do an extra existence check and return the value.

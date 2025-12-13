@@ -116,6 +116,7 @@ DEFINE_DIMORPHIC_FUNCTION get_ids_file_id STR_VAR file = "" RET id BEGIN
     END
 END
 
+
 //Readers and writers.
 DEFINE_PATCH_FUNCTION get_opcode_field INT_VAR offset = 0 STR_VAR field = "" RET value BEGIN
     LPF get_field_at INT_VAR

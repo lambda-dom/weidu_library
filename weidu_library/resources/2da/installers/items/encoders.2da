@@ -1,0 +1,15 @@
+name                encode_tra_ref
+description         encode_tra_ref
+id_name             encode_tra_ref
+id_description      encode_tra_ref
+type                encode_item_category
+proficiency         encode_item_proficiency
+flags               encode_item_flags_mask
+inventory_icon      encode_item_inventory_icon
+ground_icon         encode_bam_ref
+description_icon    encode_bam_ref
+price               encode_positive
+stack               encode_positive
+lore                encode_positive
+weight              encode_positive
+enchantment         encode_positive
