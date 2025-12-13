@@ -27,10 +27,10 @@ END
 //Listing.
 DEFINE_DIMORPHIC_FUNCTION get_chars STR_VAR value = "" RET count RET_ARRAY list BEGIN
     ACTION_DEFINE_ARRAY list BEGIN END
+    OUTER_SET count = STRING_LENGTH "%value%"
 
     OUTER_PATCH "%value%" BEGIN
         //Initialize.
-        count = STRING_LENGTH "%value%"
         TEXT_SPRINT buffer "_"
         TEXT_SPRINT char ""
 
