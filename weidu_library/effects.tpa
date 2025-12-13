@@ -13,7 +13,26 @@ END
 //Tables.
 LAF load_offsets_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/effects/offsets.2da"
-RET_ARRAY effect_offsets = table END
+RET_ARRAY table_eff_offsets = table END
+
+//Indexes.
+LAF array_from_table STR_VAR
+    table = "table_eff_offsets"
+    key = "field"
+    value = "offset"
+RET_ARRAY eff_offsets = array END
+
+LAF array_from_table STR_VAR
+    table = "table_eff_offsets"
+    key = "field"
+    value = "reader"
+RET_ARRAY eff_readers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_eff_offsets"
+    key = "field"
+    value = "writer"
+RET_ARRAY eff_writers = array END
 
 
 //Readers and writers.
@@ -22,7 +41,8 @@ DEFINE_PATCH_FUNCTION get_effect_field STR_VAR field = "" RET value BEGIN
         offset = 0
     STR_VAR
         field = "%field%"
-        offsets = "effect_offsets"
+        offsets = "eff_offsets"
+        readers = "eff_readers"
     RET value END
 END
 
@@ -31,7 +51,8 @@ DEFINE_PATCH_FUNCTION set_effect_field STR_VAR field = "" value = "" BEGIN
         offset = 0
     STR_VAR
         field = "%field%"
-        offsets = "effect_offsets"
+        offsets = "eff_offsets"
+        writers = "eff_writers"
         value = "%value%"
     END
 END

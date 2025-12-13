@@ -22,11 +22,11 @@ All tables and arrays are loaded on `INCLUDE`-ing.
 
 ## B. 1. Tables.
 
-`spell_offsets`
+`table_spl_offsets`
 
 [Table](../../resources/2da/spells/offsets.2da) of spell offsets.
 
-`spell_header_offsets`
+`table_spl_header_offsets`
 
 [Table](../../resources/2da/spells/header_offsets.2da) of spell header offsets. The field names are the same as in WeiDU macros like `ALTER_SPELL_HEADER`.
 

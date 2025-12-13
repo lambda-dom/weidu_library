@@ -10,11 +10,11 @@ file(s):
 
 ## A. 1. Tables.
 
-`item_offsets`
+`table_itm_offsets`
 
 [Table](../../resources/2da/items/offsets.2da) of item offsets.
 
-`item_header_offsets`
+`table_itm_header_offsets`
 
 [Table](../../resources/2da/items/header_offsets.2da) of item header offsets. The field names are the same as in WeiDU macros like `ALTER_SPELL_HEADER`.
 

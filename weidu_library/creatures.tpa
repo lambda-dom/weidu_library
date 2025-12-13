@@ -1,13 +1,34 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/generic.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
 //Constants.
 //Tables.
 LAF load_offsets_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/creatures/offsets.2da"
-RET_ARRAY cre_offsets = table END
+RET_ARRAY table_cre_offsets = table END
+
+//Indexes.
+LAF array_from_table STR_VAR
+    table = "table_cre_offsets"
+    key = "field"
+    value = "offset"
+RET_ARRAY cre_offsets = array END
+
+LAF array_from_table STR_VAR
+    table = "table_cre_offsets"
+    key = "field"
+    value = "reader"
+RET_ARRAY cre_readers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_cre_offsets"
+    key = "field"
+    value = "writer"
+RET_ARRAY cre_writers = array END
+
 
 //Arrays.
 LAF load_array STR_VAR
@@ -53,6 +74,7 @@ DEFINE_PATCH_FUNCTION get_cre_field STR_VAR field = "" RET value BEGIN
     STR_VAR
         field = "%field%"
         offsets = "cre_offsets"
+        readers = "cre_readers"
     RET value END
 END
 
@@ -62,6 +84,7 @@ DEFINE_PATCH_FUNCTION set_cre_field STR_VAR field = "" value = "" BEGIN
     STR_VAR
         field = "%field%"
         offsets = "cre_offsets"
+        writers = "cre_writers"
         value = "%value%"
     END
 END

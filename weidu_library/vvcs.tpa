@@ -13,7 +13,26 @@ END
 //Tables.
 LAF load_offsets_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/vvcs/offsets.2da"
-RET_ARRAY vvc_offsets = table END
+RET_ARRAY table_vvc_offsets = table END
+
+//Indexes.
+LAF array_from_table STR_VAR
+    table = "table_vvc_offsets"
+    key = "field"
+    value = "offset"
+RET_ARRAY vvc_offsets = array END
+
+LAF array_from_table STR_VAR
+    table = "table_vvc_offsets"
+    key = "field"
+    value = "reader"
+RET_ARRAY vvc_readers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_vvc_offsets"
+    key = "field"
+    value = "writer"
+RET_ARRAY vvc_writers = array END
 
 
 //Readers and writers.
@@ -23,6 +42,7 @@ DEFINE_PATCH_FUNCTION get_vvc_field STR_VAR field = "" RET value BEGIN
     STR_VAR
         field = "%field%"
         offsets = "vvc_offsets"
+        readers = "vvc_readers"
     RET value END
 END
 
@@ -32,6 +52,7 @@ DEFINE_PATCH_FUNCTION set_vvc_field STR_VAR field = "" value = "" BEGIN
     STR_VAR
         field = "%field%"
         offsets = "vvc_offsets"
+        writers = "vvc_writers"
         value = "%value%"
     END
 END
