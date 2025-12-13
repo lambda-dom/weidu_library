@@ -136,6 +136,21 @@ Returns the numeric id of a sectype. Function FAIL's if `value` is not a valid s
 #sct:<sectype>
 ```
 
+## B. 7. Resource extension.
+
+`encode_resource_extension STR_VAR value RET return`
+
+Returns a resource reference, checking its in-game existence. Associated format is:
+
+```
+#ext:<ext>:<resource reference>
+```
+
+`<ext>` is a 3-letter resource extension (e.g. `bam`) and `<resource reference>` is a resource reference parsed with a call to `encode_table_reference`.
+
+note(s):
+* this format is used in the (rare) case where a column contains resource references but their type can vary and one needs existence validation.
+
 # C. Other resource encoders.
 
 The next set of encoders have no format associated and are mainly used as value sanitizers.
