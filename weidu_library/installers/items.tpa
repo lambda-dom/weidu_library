@@ -15,9 +15,8 @@ RET_ARRAY item_encoders = array END
 //Auxiliary encoders.
 DEFINE_PATCH_FUNCTION encode_item_inventory_icon STR_VAR value = "" RET return BEGIN
     LPF encode_bam_ref STR_VAR value = "%value%" RET return END
-
     //Write icon to header.
-    LPF set_item_field STR_VAR field = "inventory_icon" value = "%value%" END
+    LPF set_item_field STR_VAR field = "inventory_icon" value = "%return%" END
     //Write icon to melee and ranged headers.
     LPF get_item_header_count RET headers_count = count END
     FOR (i = 0; i < headers_count; ++i) BEGIN
@@ -39,7 +38,7 @@ END
 //Installer.
 DEFINE_ACTION_FUNCTION install_items STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     tra = "*"
     patches = "*"
 BEGIN
@@ -63,8 +62,8 @@ BEGIN
         FAIL "copy_creatures: tra file '%tra%' does not exist."
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_items: resources directory '%resources_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_items: resources directory '%dir%' does not exist."
     END
 
     //Load table
@@ -96,6 +95,8 @@ BEGIN
                 OUTER_TEXT_SPRINT override $"split"("override")
                 OUTER_TEXT_SPRINT destination $"split"("destination")
 
+                PRINT "install_items: processing '%resource%'"
+
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
                     LAF encode_table_reference STR_VAR
@@ -109,7 +110,7 @@ BEGIN
                         resource = "%resource%"
                     END
 
-                    COPY "%resources_dir%/%resource%.itm" "override/%destination%.itm"
+                    COPY "%dir%/%resource%.itm" "override/%destination%.itm"
                         //Correct self-references.
                         LPF ALTER_EFFECT INT_VAR
                             silent = 1

@@ -173,7 +173,7 @@ DEFINE_ACTION_FUNCTION add_spell_symbols STR_VAR table = "" patches = "*" BEGIN
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         //Sanitize.
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "install_resources: patches file '%patches%' does not exist."
+            FAIL "add_spell_symbols: patches file '%patches%' does not exist."
         END
 
         //Include patches file.

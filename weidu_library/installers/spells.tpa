@@ -173,6 +173,7 @@ END
 DEFINE_ACTION_FUNCTION install_spells STR_VAR
     table = ""
     dir = ""
+    tra = "*"
     patches = "*"
 BEGIN
     //Sanitize.
@@ -192,7 +193,7 @@ BEGIN
 
     //Existence checks.
     ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
-        FAIL "copy_creatures: tra file '%tra%' does not exist."
+        FAIL "install_spells: tra file '%tra%' does not exist."
     END
 
     ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN

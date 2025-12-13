@@ -259,7 +259,7 @@ END
 DEFINE_PATCH_FUNCTION delete_hlas STR_VAR table = "" BEGIN
     LPF load_table STR_VAR
         file = "%table%"
-        fields = "hla:install"
+        fields = "hla,install"
     RET_ARRAY hlas = table END
 
     //Loop.
@@ -304,7 +304,7 @@ END
 DEFINE_PATCH_FUNCTION add_hlas STR_VAR table = "" BEGIN
     LPF load_table STR_VAR
         file = "%table%"
-        fields = "hla:install:num_allowed:prerequisite"
+        fields = "hla,install,num_allowed,prerequisite"
     RET_ARRAY hlas = table END
 
     //Loop.
