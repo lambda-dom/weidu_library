@@ -7,9 +7,7 @@ Top-level libraries:
 High-level libraries:
 
 * [Blocks](./libraries/blocks.md): patch in standardized blocks of opcodes.
-* [Spell symbols](./libraries/symbols.md): library to interact with the spell symbolic names of `spell.ids`.
 * [Installers](./libraries/installers.md): library to install various kinds of resources.
-* [Subspells](./libraries/subspells.md): library to install subspells via cloning.
 * [Kits](./libraries/kits.md): library to patch classes and kits.
 * [HLAs](./libraries/hlas.md): library to patch hla tables.
 * [Patchers](./libraries/patchers.md): library of patchers of all kinds that have found no better place.
@@ -27,10 +25,11 @@ Support libraries: libraries providing basic functionality supporting everything
 * [Items](./libraries/items.md): handle item .itm files.
 * [Lists](./libraries/lists.md): manipulate lists.
 * [Opcodes](./libraries/opcodes.md): opcode patching.
-* [Opcode arrays](./libraries/opcode_arrays.md): opcodes as array values with references.
+* [Opcode arrays](./libraries/opcode_arrays.md): opcodes as arrays with table references.
 * [Projectiles](./libraries/projectiles.md): handle projectile .pro files.
-* [References](./libraries/references.md): inline resource references, especially in installer tables.
+* [References](./libraries/references.md): inline resource references (and other values) in (installer) tables.
 * [Sectypes](./libraries/sectypes.md): add and edit sectypes.
 * [Spells](./libraries/spells.md): handle spell .spl files.
+* [Spell symbols](./libraries/symbols.md): library to interact with the spell symbolic names of `spell.ids`.
 * [Strings](./libraries/strings.md): string manipulation functions.
 * [Tables](./libraries/tables.md): construct and manipulate tables.
