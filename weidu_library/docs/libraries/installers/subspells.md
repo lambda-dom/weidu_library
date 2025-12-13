@@ -26,3 +26,6 @@ This is the standard implementation of subspell cloning; a call to `clone_subspe
 * master_tra: the [tra file](../../../languages/english/subspells/subspells.tra) containing the generators of spell descriptions.
 
 * master_patches: the [patches file](../../../installers/subspells/patches.tpa) containing the patches referenced by name in the master table.
+
+note(s):
+* If you want to provide a name and a description different from the automatically generated one, you must do so in the patch provided in `patches`.
