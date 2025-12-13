@@ -187,7 +187,7 @@ DEFINE_ACTION_FUNCTION install_subspells STR_VAR table = "" patches = "*" BEGIN
     LAF clone_subspells STR_VAR
         table = "%table%"
         master_table = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/subspells/subspells.2da"
-        resources_dir = "%WEIDU_LIBRARY_DIR%/resources/spl/subspells"
+        dir = "%WEIDU_LIBRARY_DIR%/resources/spl/subspells"
         master_tra = "%WEIDU_LIBRARY_DIR%/languages/%LANGUAGE%/subspells/subspells.tra"
         master_patches = "%WEIDU_LIBRARY_DIR%/installers/subspells/patches.tpa"
         patches = "%patches%"
