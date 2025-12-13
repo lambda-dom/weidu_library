@@ -17,7 +17,7 @@ Return the integer `id` associated to `value` in ids resource `ids`. If `ids` is
 
 note(s):
 * casing of `id` or `ids` are irrelevant.
-* in the case of non-existent `ids`, WeiDU logs an error.
+* in the case of non-existent `ids` file, WeiDU logs an error.
 
 `get_ids_from_id INT_VAR id STR_VAR ids RET value`
 
@@ -25,4 +25,4 @@ Return the symbolic `value` associated to the numeric `id` in the `ids` file. If
 
 note(s):
 * casing of `ids` is irrelevant.
-* in the case of non-existent `ids`, WeiDU logs an error.
+* in the case of non-existent `ids` file, WeiDU logs an error.

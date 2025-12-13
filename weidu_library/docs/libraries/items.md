@@ -36,6 +36,9 @@ Size in bytes of an item header.
 
 # C. Item functions.
 
+note(s):
+* all functions in these sections are patch functions.
+
 ## C. 1. Main header.
 
 Basic read functions that return the values of fields that should not be read directly.
@@ -63,9 +66,6 @@ Return `count` of equipped opcodes in the item.
 Return `offset` of `index` equipped, or global, opcode. If index out of bounds, return -1.
 
 ## C. 3. Item header functions.
-
-note(s):
-* all functions in these sections are patch functions.
 
 `get_item_header_offset INT_VAR header = 0 RET offset`
 
@@ -101,7 +101,14 @@ Specializations of the generic reader and writer for items.
 
 `get_item_category_id STR_VAR category RET id`
 
+Get the numeric id of an item type or category as existing in `itemcat.ids`.
+
 `get_item_proficiency_id STR_VAR proficiency RET id`
+
+Get the numeric id of a weapon proficiency as existing in `wprof.ids`.
+
+note(s):
+* The names in `wprof.ids` are prefixed by `PROFICIENCY`; this is taken into account, so strip from the passed `proficiency`.
 
 # F. Patching `itemexcl.2da`.
 
