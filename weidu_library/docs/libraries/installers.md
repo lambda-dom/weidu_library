@@ -28,6 +28,7 @@ For each type of resource there is a template example for the structure of the .
 * [Sounds](./installers/sounds.md): installer for sounds (`.wav` files).
 * [Spells](./installers/spells.md): installer for `.spl` spells.
 * [Subpells](./installers/subspells.md): installer for subspells via cloning.
+* [Symbols](./installers/symbols.md): various installers for doing surgery in `spell.ids`.
 * [Tables](./installers/tables.md): installer for table `.2da` files.
 * [Vvcs](./installers/vvcs.md): installer for animation `.vvc` files.
 

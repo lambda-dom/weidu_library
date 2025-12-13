@@ -17,20 +17,20 @@ note(s):
 
 `alias_spell_symbols STR_VAR table`
 
-Action function that replaces spell symbols in `spell.ids` using a table with the format of [Replace spell symbols table](../../resources/2da/templates/spell_symbols/alias_symbols.2da).
+Action function that replaces spell symbols in `spell.ids` using a table with the format of [Replace spell symbols table](../../../resources/2da/installers/templates/symbols/alias_symbols.2da).
 
 `change_spell_symbols STR_VAR table`
 
-Change spell symbols in `spell.ids` using a table that must have the format of [Change spell symbols table](../../resources/2da/templates/spell_symbols/change_symbols.2da).
+Change spell symbols in `spell.ids` using a table that must have the format of [Change spell symbols table](../../../resources/2da/installers/templates/symbols/change_symbols.2da).
 
 `replace_spell_symbols STR_VAR table`
 
-Action function that replaces spell symbols in `spell.ids` using a table with the format of [Replace spell symbols table](../../resources/2da/templates/spell_symbols/replace_symbols.2da).
+Action function that replaces spell symbols in `spell.ids` using a table with the format of [Replace spell symbols table](../../../resources/2da/installers/templates/symbols/replace_symbols.2da).
 
 `deprecate_spell_symbols STR_VAR table`
 
-Action function that deprecates spell symbols in `spell.ids` using a table with the format of [Deprecate spell symbols table](../../resources/2da/templates/spell_symbols/deprecate_symbols.2da).
+Action function that deprecates spell symbols in `spell.ids` using a table with the format of [Deprecate spell symbols table](../../../resources/2da/installers/templates/symbols/deprecate_symbols.2da).
 
 `assign_spell_symbol_holes STR_VAR table`
 
-Action function that replaces spell symbol holes in `spell.ids` (unassigned slots) using a table with the format of [Replace spell symbol holes table](../../resources/2da/templates/spell_symbols/assign_symbol_holes.2da).
+Action function that replaces spell symbol holes in `spell.ids` (unassigned slots) using a table with the format of [Replace spell symbol holes table](../../../resources/2da/installers/templates/symbols/assign_symbol_holes.2da).
