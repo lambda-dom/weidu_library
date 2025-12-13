@@ -1,5 +1,6 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/binary.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/generic.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
@@ -41,6 +42,27 @@ DEFINE_DIMORPHIC_FUNCTION get_creature_size RET size BEGIN
     OUTER_SET size = 0x02d3
 END
 
+
+//Kit reader and writer.
+DEFINE_PATCH_FUNCTION read_cre_kit INT_VAR offset = 0 RET value BEGIN
+    READ_SHORT offset short1
+    READ_SHORT (offset + 2) short2
+    value = short2 + (short1 << 16)
+END
+
+DEFINE_PATCH_FUNCTION write_cre_kit INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT (IS_AN_INT "%value%") BEGIN
+        PATCH_FAIL "write_long: value '%value%' is not an integer numeric value."
+    END
+    PATCH_IF NOT (0 <= value) BEGIN
+        PATCH_FAIL "write_long: value '%value%' must be positive."
+    END
+
+    short1 = value BAND 0xff
+    short2 = (value BAND 0xff00) >> 16
+    WRITE_SHORT offset short2
+    WRITE_SHORT (offset + 2) short1
+END
 
 //Basic functions.
 DEFINE_PATCH_FUNCTION get_cre_known_spell_count RET count BEGIN
