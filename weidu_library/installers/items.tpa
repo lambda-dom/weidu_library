@@ -95,8 +95,6 @@ BEGIN
                 OUTER_TEXT_SPRINT override $"split"("override")
                 OUTER_TEXT_SPRINT destination $"split"("destination")
 
-                PRINT "install_items: processing '%resource%'"
-
                 ACTION_IF NOT (install = 0) BEGIN
                     //Compute destination.
                     LAF encode_table_reference STR_VAR

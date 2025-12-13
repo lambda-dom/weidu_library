@@ -14,16 +14,16 @@ RET_ARRAY creature_encoders = array END
 
 
 //Installer.
-DEFINE_ACTION_FUNCTION copy_creatures STR_VAR
+DEFINE_ACTION_FUNCTION install_creatures STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     tra = "*"
     patches = "*"
 BEGIN
     //Sanitize.
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "copy_creatures: patches file '%patches%' does not exist."
+            FAIL "install_creatures: patches file '%patches%' does not exist."
         END
 
         //Include patches file.
@@ -37,11 +37,11 @@ BEGIN
 
     //Existence checks.
     ACTION_IF NOT (FILE_EXISTS "%tra%") BEGIN
-        FAIL "copy_creatures: tra file '%tra%' does not exist."
+        FAIL "install_creatures: tra file '%tra%' does not exist."
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "copy_creatures: resources directory '%resources_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_creatures: resources directory '%dir%' does not exist."
     END
 
     //Load table
@@ -86,38 +86,38 @@ BEGIN
                         resource = "%resource%"
                     END
 
-                    COPY "%resources_dir%/%resource%.cre" "override/%destination%.cre"
+                    COPY "%dir%/%resource%.cre" "override/%destination%.cre"
                         PHP_EACH "remainder" AS field => value BEGIN
                             PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
                                 TEXT_SPRINT encoder $"creature_encoders"("%field%")
-                            END
+                                LPF "%encoder%" STR_VAR value = "%value%" RET return END
 
-                            LPF "%encoder%" STR_VAR value = "%value%" RET return END
-                            PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
-                                LPF set_cre_field STR_VAR
-                                    field = "%field%"
-                                    value = "%return%"
-                                END
-
-                                //Set defaults.
-                                PATCH_IF "%field%" STRING_EQUAL_CASE "name" BEGIN
+                                PATCH_IF NOT ("%return%" STRING_EQUAL_CASE "*") BEGIN
                                     LPF set_cre_field STR_VAR
-                                        field = "tooltip"
+                                        field = "%field%"
                                         value = "%return%"
                                     END
-                                END
 
-                                PATCH_IF "%field%" STRING_EQUAL_CASE "hps" BEGIN
-                                    LPF set_cre_field STR_VAR
-                                        field = "max_hps"
-                                        value = "%return%"
+                                    //Set defaults.
+                                    PATCH_IF "%field%" STRING_EQUAL_CASE "name" BEGIN
+                                        LPF set_cre_field STR_VAR
+                                            field = "tooltip"
+                                            value = "%return%"
+                                        END
                                     END
-                                END
 
-                                PATCH_IF "%field%" STRING_EQUAL_CASE "ac" BEGIN
-                                    LPF set_cre_field STR_VAR
-                                        field = "ac_effective"
-                                        value = "%return%"
+                                    PATCH_IF "%field%" STRING_EQUAL_CASE "hps" BEGIN
+                                        LPF set_cre_field STR_VAR
+                                            field = "max_hps"
+                                            value = "%return%"
+                                        END
+                                    END
+
+                                    PATCH_IF "%field%" STRING_EQUAL_CASE "ac" BEGIN
+                                        LPF set_cre_field STR_VAR
+                                            field = "ac_effective"
+                                            value = "%return%"
+                                        END
                                     END
                                 END
                             END
