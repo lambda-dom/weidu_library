@@ -12,6 +12,8 @@ note(s):
 
 `read_byte INT_VAR offset RET value`
 
+`read_byte_signed INT_VAR offset RET value`
+
 `read_short INT_VAR offset RET value`
 
 `read_short_signed INT_VAR offset RET value`
