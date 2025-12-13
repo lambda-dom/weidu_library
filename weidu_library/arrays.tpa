@@ -137,6 +137,30 @@ DEFINE_DIMORPHIC_FUNCTION merge_arrays STR_VAR arrays = "" RET_ARRAY array BEGIN
 END
 
 //Builders.
+DEFINE_DIMORPHIC_FUNCTION array_from_string STR_VAR string = "" RET count RET_ARRAY array BEGIN
+    LAF list_from_string STR_VAR
+        string = "%string%"
+    RET count RET_ARRAY pairs = list END
+
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+    OUTER_TEXT_SPRINT regexp "^\([^=]+\)=\([^=]+\)$"
+
+    ACTION_PHP_EACH "pairs" AS _ => pair BEGIN
+        OUTER_INNER_PATCH "%pair%" BEGIN
+            //Sanitize.
+            PATCH_IF NOT ("%pair%" STRING_EQUAL_CASE "%MATCH0%") THEN BEGIN
+                PATCH_FAIL "array_from_string: string '%pair%' is nor a well-formed assignment pair."
+            END
+
+            REPLACE_EVALUATE "%regexp%" BEGIN
+                LPF strip_right STR_VAR value = "%MATCH1%" RET key = string END
+                LPF strip_left STR_VAR value = "%MATCH2%" RET value = string END
+                TEXT_SPRINT $array("%key%") "%value%"
+            END ~~
+        END
+    END
+END
+
 DEFINE_DIMORPHIC_FUNCTION load_array INT_VAR col = 1 STR_VAR table = "" RET_ARRAY array BEGIN
     //Existence check.
     ACTION_IF NOT (FILE_EXISTS "%table%") BEGIN

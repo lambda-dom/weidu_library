@@ -85,6 +85,10 @@ Merge `arrays` passed by name as a `,`-separated stringified list. If there are 
 
 # E. Builders.
 
+`array_from_string STR_VAR string RET count RET_ARRAY array`
+
+Builds an `array` from a `,`-separated `string` list of pairs `key = value`. Both `key` and `value` must not contain the characters `,` and `=` and should not contain any whitespace as there is a strong chance to mangle parsing (surrounding whitespace is fine).
+
 `load_array INT_VAR col = 1 STR_VAR table RET_ARRAY array`
 
 Builds an array from the `table` file (full path) and a column index. The keys are the values in the first column and the values are the values in the `col` column. This function implicitly assumes the keys are unique.
