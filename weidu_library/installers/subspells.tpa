@@ -8,9 +8,9 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
 //Installer.
-DEFINE_ACTION_FUNCTION install_subspells STR_VAR
+DEFINE_ACTION_FUNCTION clone_subspells STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     master_table = ""
     master_tra = ""
     master_patches = ""
@@ -18,26 +18,26 @@ DEFINE_ACTION_FUNCTION install_subspells STR_VAR
 BEGIN
     //Existence checks.
     ACTION_IF NOT (FILE_EXISTS "%master_table%") BEGIN
-        FAIL "install_subspells: table '%master_table%' of subspells to clone not found."
+        FAIL "clone_subspells: table '%master_table%' of subspells to clone not found."
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_subspells: dir '%resources_dir%' of subspells to clone does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "clone_subspells: dir '%dir%' of subspells to clone does not exist."
     END
 
     ACTION_IF NOT (FILE_EXISTS "%master_tra%") BEGIN
-        FAIL "install_subspells: tra file '%master_tra%' of subspell descriptions does not exist."
+        FAIL "clone_subspells: tra file '%master_tra%' of subspell descriptions does not exist."
     END
 
     ACTION_IF NOT (FILE_EXISTS "%master_patches%") BEGIN
-        FAIL "install_subspells: master patches file '%master_patches%' does not exist."
+        FAIL "clone_subspells: master patches file '%master_patches%' does not exist."
     END ELSE BEGIN
         INCLUDE "%master_patches%"
     END
 
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
-            FAIL "install_subspells: patches file '%patches%' for subspells '%table%' does not exist."
+            FAIL "clone_subspells: patches file '%patches%' for subspells '%table%' does not exist."
         END
 
         INCLUDE "%patches%"
@@ -102,7 +102,7 @@ BEGIN
                     RET index END
 
                     ACTION_IF (0 - 1 = index) BEGIN
-                        FAIL "install_subspells: subspell '%subspell%' does not exist in table '%subspells_table%'."
+                        FAIL "clone_subspells: subspell '%subspell%' does not exist in table '%subspells_table%'."
                     END
 
                     LAF get_row_from_table INT_VAR
@@ -119,21 +119,20 @@ BEGIN
 
                     //Sanitize.
                     ACTION_IF NOT (IS_AN_INT name) BEGIN
-                        FAIL "install_subspells: name '%name%' in master '%master_table%' must be an integer tra reference."
+                        FAIL "clone_subspells: name '%name%' in master '%master_table%' must be an integer tra reference."
                     END
 
                     ACTION_IF NOT (IS_AN_INT description) BEGIN
-                        FAIL "install_subspells: description '%description%' in master '%master_table%' must be an integer tra reference."
+                        FAIL "clone_subspells: description '%description%' in master '%master_table%' must be an integer tra reference."
                     END
 
                     //Set source and sanitize.
-                    OUTER_TEXT_SPRINT source "%resources_dir%/%subspell%.spl"
-                    ACTION_IF NOT (FILE_EXISTS "%source%") BEGIN
-                        FAIL "install_subspells: resource '%source%' for subspell '%subspell%' to clone not found."
+                    ACTION_IF NOT (FILE_EXISTS "%dir%/%subspell%.spl") BEGIN
+                        FAIL "clone_subspells: resource '%dir%/%subspell%.spl' for subspell '%subspell%' to clone not found."
                     END
 
                     //Copy.
-                    COPY "%source%" "override/%destination%.spl"
+                    COPY "%dir%/%subspell%.spl" "override/%destination%.spl"
                         //Correct self-references.
                         LPF ALTER_EFFECT INT_VAR
                             silent = 1
@@ -155,7 +154,6 @@ BEGIN
                                 arg2 = "%arg2%"
                                 arg3 = "%arg3%"
                             RET tlk_ref END
-
                             LPF set_spell_field STR_VAR field = "description" value = "%tlk_ref%" END
                         END
 
@@ -175,7 +173,7 @@ BEGIN
                             LPF "%master_patch%" STR_VAR arg1 = "%arg1%" arg2 = "%arg2%" arg3 = "%arg3%" END
                         END
 
-                        //Call master table patch.
+                        //Call subspells patch.
                         PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                             LPF "%patch%" STR_VAR destination = "%destination%" END
                         END
@@ -185,8 +183,8 @@ BEGIN
     END
 END
 
-DEFINE_ACTION_FUNCTION clone_subspells STR_VAR table = "" patches = "*" BEGIN
-    LAF install_subspells STR_VAR
+DEFINE_ACTION_FUNCTION install_subspells STR_VAR table = "" patches = "*" BEGIN
+    LAF clone_subspells STR_VAR
         table = "%table%"
         master_table = "%WEIDU_LIBRARY_DIR%/resources/2da/installers/subspells/subspells.2da"
         resources_dir = "%WEIDU_LIBRARY_DIR%/resources/spl/subspells"
