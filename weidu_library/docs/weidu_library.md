@@ -7,7 +7,7 @@ Top-level libraries:
 High-level libraries:
 
 * [Blocks](./libraries/blocks.md): patch in standardized blocks of opcodes.
-* [Spell symbols](./libraries/spell_symbols.md): library to interact with the spell symbolic names of `spell.ids`.
+* [Spell symbols](./libraries/symbols.md): library to interact with the spell symbolic names of `spell.ids`.
 * [Installers](./libraries/installers.md): library to install various kinds of resources.
 * [Subspells](./libraries/subspells.md): library to install subspells via cloning.
 * [Kits](./libraries/kits.md): library to patch classes and kits.

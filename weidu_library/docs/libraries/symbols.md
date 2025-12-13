@@ -48,7 +48,7 @@ note(s):
 Deprecates spell `symbol` by replacing it with `symbol_DEPRECATED`. The spell resource is left untouched.
 
 note(s):
-* This function makes the spell `symbol` unavailable so any code that relies on its existence will fail. It also has the potential to break the injectivity rule as the underlying spell resource is now "free" for the taking.
+* This function makes the spell `symbol` unavailable so any code that relies on its existence will fail. It also has the potential to break the injectivity rule as the underlying spell resource is now free.
 
 `assign_spell_symbol_hole INT_VAR level id STR_VAR symbol type`
 
