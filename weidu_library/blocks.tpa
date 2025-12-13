@@ -20,7 +20,7 @@ BEGIN
     //Load table.
     LPF load_table STR_VAR
         file = "%table%"
-        fields = "opcode:parameter1:parameter2:resource"
+        fields = "opcode,parameter1,parameter2,resource"
     RET_ARRAY opcodes_table = table END
 
     //Loop (backwards).
@@ -106,7 +106,7 @@ DEFINE_PATCH_FUNCTION append_item_block_with_table STR_VAR table = "" BEGIN
     //Load table.
     LPF load_table STR_VAR
         file = "%table%"
-        fields = "opcode:parameter1:parameter2:resource"
+        fields = "opcode,parameter1,parameter2,resource"
     RET_ARRAY opcodes_table = table END
 
     //Loop.
@@ -187,7 +187,7 @@ BEGIN
     //Load table.
     LPF load_table STR_VAR
         file = "%table%"
-        fields = "opcode:parameter1:parameter2:resource"
+        fields = "opcode,parameter1,parameter2,resource"
     RET_ARRAY opcodes_table = table END
 
     //Loop.
