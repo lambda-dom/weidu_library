@@ -1,0 +1,64 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/spell_symbols.tpa"
+
+
+//Table interface.
+DEFINE_ACTION_FUNCTION install_symbols STR_VAR table = "" patches = "*" BEGIN
+    OUTER_TEXT_SPRINT blank "%WEIDU_LIBRARY_DIR%/resources/spl/blank"
+
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS "%blank%.spl") BEGIN
+        FAIL "install_symbols: blank spell '%blank%.spl' not found. "
+    END
+
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        //Sanitize.
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "install_symbols: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "symbol,install,type,level,patch"
+    RET_ARRAY resources = table END
+
+    //Loop.
+    LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+    OUTER_FOR (i = 0; i < row_count; ++i) BEGIN
+        LAF get_row_from_table INT_VAR row = i STR_VAR
+            table = "resources"
+        RET_ARRAY
+            row = array
+        END
+
+        WITH_SCOPE BEGIN
+            //Inject names in local scope.
+            OUTER_TEXT_SPRINT symbol $"row"("symbol")
+            OUTER_TEXT_SPRINT install $"row"("install")
+            OUTER_TEXT_SPRINT type $"row"("type")
+            OUTER_TEXT_SPRINT level $"row"("level")
+            OUTER_TEXT_SPRINT patch $"row"("patch")
+
+            ACTION_IF NOT (install = 0) BEGIN
+                //Sanitize.
+                ACTION_IF NOT (IS_AN_INT level) BEGIN
+                    FAIL "add_spell_symbols: level '%level%' of row '%i%' is not an integer."
+                END
+
+                LAF add_spell_symbol INT_VAR
+                    level = level
+                STR_VAR
+                    symbol = "%symbol%"
+                    type = "%type%"
+                    resource = "%blank%"
+                    patch = "%patch%"
+                END
+            END
+        END
+    END
+END
