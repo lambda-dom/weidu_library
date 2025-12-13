@@ -64,7 +64,7 @@ biography               0x01cc  read_long           write_long
 morale_break            0x0240  read_byte           write_byte
 racial_enemy            0x0241  read_byte           write_byte
 morale_recovery         0x0242  read_short          write_short
-kit                     0x0244  read_long           write_long
+kit                     0x0244  read_long_be        write_long_be
 script_override         0x0248  read_resource       write_resource
 script_class            0x0250  read_resource       write_resource
 script_race             0x0258  read_resource       write_resource
