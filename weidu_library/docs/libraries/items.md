@@ -105,10 +105,9 @@ Get the numeric id of an item type or category as existing in `itemcat.ids`.
 
 `get_item_proficiency_id STR_VAR proficiency RET id`
 
-Get the numeric id of a weapon proficiency as existing in `wprof.ids`.
-
 note(s):
 * The names in `wprof.ids` are prefixed by `PROFICIENCY`; this is taken into account, so strip from the passed `proficiency`.
+* `none` is alliased to `0`.
 
 # F. Patching `itemexcl.2da`.
 

@@ -18,12 +18,12 @@ Set all the fields of an opcode at `offset` using the opcode `array`.
 
 # B. Constructing values.
 
+note(s):
+* functions in this section have both patch and action versions.
+
 `get_zero_opcode RET_ARRAY array`
 
 Return the opcode `array` with all fields zero-out out, except `target` (set to `projectile`) and `probability1` set to `100`.
-
-note(s):
-* this is both a patch and action function.
 
 `get_equipped_zero_opcode RET_ARRAY array`
 
