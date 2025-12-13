@@ -31,7 +31,3 @@ note(s):
 `add_sectype INT_VAR tra_ref STR_VAR sectype RET id`
 
 A wrapper around the `ADD_SECTYPE` WeiDU macro. Add `sectype` with `tra_ref` associated removal string and return the corresponding numeric id.
-
-`add_sectypes STR_VAR table tra = "*"`
-
-Batch addition of sectypes using `table`. The table must conform to [Template Sectype Addition](../../resources/2da/sectypes/sectypes.2da)
