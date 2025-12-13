@@ -52,7 +52,4 @@ note(s):
 
 `assign_spell_symbol_hole INT_VAR level id STR_VAR symbol type`
 
-Assign a hole in `spell.ids` (unassigned slot) to the spell symbol `symbol`. The function fails if `level` or `id` are out of bounds, `type` is not a valid spell type or `symbol` already exists in `spell.ids`.
-
-note(s):
-* This is a slow operation.
+Assign a hole in `spell.ids` (unassigned slot) to the spell symbol `symbol`. The function fails if `level` or `id` are out of bounds, `type` is not a valid spell type, the slot is already assigned or `symbol` already exists in `spell.ids`.

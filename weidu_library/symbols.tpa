@@ -1,6 +1,7 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/ids.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
@@ -136,23 +137,20 @@ DEFINE_PATCH_FUNCTION assign_spell_symbol_hole INT_VAR level = 0 id = 0 STR_VAR 
         PATCH_FAIL "assign_spell_symbol_hole: '%id%' must be an integer in the [0-99] range."
     END
 
-    LPF get_array_element STR_VAR
-        array = "add_types"
-        key = "%type%"
-    RET type_id = value END
-    PATCH_IF (0 - 1 = type_id) BEGIN
+    TEXT_SPRINT type_id $"add_types"("%type%")
+    PATCH_IF NOT (IS_AN_INT type_id) BEGIN
         PATCH_FAIL "assign_spell_symbol_hole: '%type%' is not a valid spell type."
+    END
+
+    spell_id = (1000 * type_id) + (100 * level) + id
+    LPF get_ids_from_id INT_VAR id = spell_id STR_VAR ids = "spell" RET row = value END
+    PATCH_IF NOT (0 - 1 = row) BEGIN
+        PATCH_FAIL "assign_spell_symbol_hole: numeric id '%spell_id%' for symbol '%symbol%' already exists in 'spell.ids'."
     END
 
     LPF get_spell_res STR_VAR spell = "%symbol%" RET exists = resource END
     PATCH_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
         PATCH_FAIL "assign_spell_symbol_hole: symbol '%symbol%' already exists in 'spell.ids'."
-    END
-
-    spell_id = (1000 * type_id) + (100 * level) + id
-    LPF find_row_index STR_VAR key = "%spell_id%" RET row = index END
-    PATCH_IF NOT (0 - 1 = row) BEGIN
-        PATCH_FAIL "assign_spell_symbol_hole: numeric id for symbol '%symbol%' already exists in 'spell.ids'."
     END
 
     //Add spell symbol.
