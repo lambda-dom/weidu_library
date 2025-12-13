@@ -32,13 +32,13 @@ DEFINE_PATCH_FUNCTION find_row_index INT_VAR col = 0 start = 0 STR_VAR key = "" 
     //Sanity bounds check.
     COUNT_2DA_COLS cols
     PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
-        PATCH_FAIL "find_row_index: column index '%col%' out of bounds."
+        PATCH_FAIL "find_row_index: column index '%col%' out of bounds [0, %cols%]."
     END
 
     COUNT_2DA_ROWS cols row_count
     //Sanitize start.
     PATCH_IF NOT ((0 <= start) AND (start < row_count)) BEGIN
-        PATCH_FAIL "find_row_index: argument start: '%start%' out of bounds."
+        PATCH_FAIL "find_row_index: argument start: '%start%' out of bounds [0, %row_count%]."
     END
 
     //Read table.
@@ -56,7 +56,7 @@ DEFINE_PATCH_FUNCTION find_row_index_from_end INT_VAR col = 0 end = (0 - 1) STR_
     //Sanity bounds check.
     COUNT_2DA_COLS cols
     PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
-        PATCH_FAIL "find_row_index_from_end: column index '%col%' out of bounds."
+        PATCH_FAIL "find_row_index_from_end: column index '%col%' out of bounds [0, %cols%]."
     END
 
     COUNT_2DA_ROWS cols row_count
@@ -66,7 +66,7 @@ DEFINE_PATCH_FUNCTION find_row_index_from_end INT_VAR col = 0 end = (0 - 1) STR_
     END
 
     PATCH_IF NOT ((0 <= end) AND (end < row_count)) BEGIN
-        PATCH_FAIL "find_row_index_from_end: row '%end%' out of bounds."
+        PATCH_FAIL "find_row_index_from_end: row '%end%' out of bounds [0, %row_count%[."
     END
 
     //Read table.
@@ -84,7 +84,7 @@ DEFINE_PATCH_FUNCTION find_all_rows INT_VAR col = 0 STR_VAR key = "" RET_ARRAY i
     //Sanity bounds check.
     COUNT_2DA_COLS cols
     PATCH_IF NOT ((0 <= col) AND (col <= cols)) BEGIN
-        PATCH_FAIL "find_all_rows: column index '%col%' out of bounds."
+        PATCH_FAIL "find_all_rows: column index '%col%' out of bounds [0, %cols%]."
     END
 
     DEFINE_ARRAY indexes BEGIN END

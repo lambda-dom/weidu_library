@@ -15,8 +15,8 @@ High-level libraries:
 Support libraries: libraries providing basic functionality supporting everything else.
 
 * [2da](./libraries/2da.md): functions to search and patch through .2da table files.
-* [Binary](./libraries/binary.md): low-level library of binary readers and writers.
 * [Arrays](./libraries/arrays.md): manipulate (associative) arrays.
+* [Binary](./libraries/binary.md): low-level library of binary readers and writers.
 * [Creatures](./libraries/creatures.md): handle creature .cre files.
 * [Encoders](./libraries/encoders.md): library of encoders.
 * [Effects](./libraries/effects.md): handle effect .eff files.
