@@ -35,6 +35,12 @@ LPF "%function%" STR_VAR value = "%value%" RET return
 
 Note the signature of the called function: one argument named `value` and the return value named `return` -- the signature of an *encoder*. The available formats are detailed in the formats section.
 
+# A. 1. Available formats.
+
+`reference_encoders`
+
+Array of `format => encoder` pairs.
+
 # B. Formats.
 
 The following functions are the available encoders. There is usually no need to call them directly, rather call them indirectly with `encode_table_reference`.

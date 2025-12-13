@@ -4,6 +4,22 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/projectiles.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 
 
+//Arrays.
+//Available formats.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY reference_encoders BEGIN
+    "lit" => "encode_resource_literal"
+    "num" => "encode_num_literal"
+    "nul" => "encode_empty_string"
+    "spl" => "encode_spell_res"
+    "suf" => "encode_spell_suffix"
+    "afx" => "encode_spell_affix"
+    "lbl" => "encode_missile_res"
+    "sct" => "encode_spell_sectype"
+    "opc" => "encode_opcode_type"
+    "ext" => "encode_resource_extension"
+END
+
+
 //Auxiliary functions.
 DEFINE_DIMORPHIC_FUNCTION replace_affixes STR_VAR spell = "" prefix = "" suffix = "" RET resource BEGIN
     //Sanitize.
@@ -34,20 +50,6 @@ END
 
 //Main function.
 DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return BEGIN
-    //Available formats.
-    ACTION_DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
-        "lit" => "encode_resource_literal"
-        "num" => "encode_num_literal"
-        "nul" => "encode_empty_string"
-        "spl" => "encode_spell_res"
-        "suf" => "encode_spell_suffix"
-        "afx" => "encode_spell_affix"
-        "lbl" => "encode_missile_res"
-        "sct" => "encode_spell_sectype"
-        "opc" => "encode_opcode_type"
-        "ext" => "encode_resource_extension"
-    END
-
     OUTER_TEXT_SPRINT regexp "^#\([a-zA-Z0-9][a-zA-Z0-9_-]*\):\(.*\)$"
     //Sanitize.
     ACTION_IF NOT (("%value%" STRING_MATCHES_REGEXP "%regexp%") = 0) THEN BEGIN
@@ -64,7 +66,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return B
 
     //Get encoder's name.
     LAF get_array_element STR_VAR
-        array = "encoders"
+        array = "reference_encoders"
         key = "%name%"
     RET encoder = value END
 
