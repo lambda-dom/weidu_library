@@ -20,6 +20,10 @@ note(s):
 
 `read_long INT_VAR offset RET value`
 
+`read_long_be INT_VAR offset RET value`
+
+Read a long in big-endian format.
+
 `read_long_signed INT_VAR offset RET value`
 
 `read_resource INT_VAR offset RET value`
@@ -40,6 +44,10 @@ note(s):
 `write_short_signed INT_VAR offset STR_VAR value`
 
 `write_long INT_VAR offset STR_VAR value`
+
+`write_long_be INT_VAR offset STR_VAR value`
+
+Write a long in big-endian format.
 
 `write_long_signed INT_VAR offset STR_VAR value`
 
