@@ -33,6 +33,8 @@ note(s):
 
 `write_byte INT_VAR offset STR_VAR value`
 
+`write_byte_signed INT_VAR offset STR_VAR value`
+
 `write_short INT_VAR offset STR_VAR value`
 
 `write_short_signed INT_VAR offset STR_VAR value`
