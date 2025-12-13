@@ -16,7 +16,7 @@ The size of a (area effect) projectile in bytes.
 
 ## B. 1. Tables.
 
-`projectile_offsets`
+`table_pro_offsets`
 
 [Table](../../resources/2da/projectiles/offsets.2da) of projectile field offsets.
 

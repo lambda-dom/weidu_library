@@ -10,7 +10,7 @@ file(s):
 
 ## A. 1. Tables.
 
-`cre_offsets`
+`table_cre_offsets`
 
 The [Table](../../resources/2da/creatures/offsets.2da) of cre offsets.
 

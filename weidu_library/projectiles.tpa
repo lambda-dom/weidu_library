@@ -14,7 +14,26 @@ END
 //Tables.
 LAF load_offsets_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/projectiles/offsets.2da"
-RET_ARRAY projectile_offsets = table END
+RET_ARRAY table_pro_offsets = table END
+
+//Indexes.
+LAF array_from_table STR_VAR
+    table = "table_pro_offsets"
+    key = "field"
+    value = "offset"
+RET_ARRAY pro_offsets = array END
+
+LAF array_from_table STR_VAR
+    table = "table_pro_offsets"
+    key = "field"
+    value = "reader"
+RET_ARRAY pro_readers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_pro_offsets"
+    key = "field"
+    value = "writer"
+RET_ARRAY pro_writers = array END
 
 
 //Readers and writers.
@@ -23,7 +42,8 @@ DEFINE_PATCH_FUNCTION get_projectile_field STR_VAR field = "" RET value BEGIN
         offset = 0
     STR_VAR
         field = "%field%"
-        offsets = "projectile_offsets"
+        offsets = "pro_offsets"
+        readers = "pro_readers"
     RET value END
 END
 
@@ -32,7 +52,8 @@ DEFINE_PATCH_FUNCTION set_projectile_field STR_VAR field = "" value = "" BEGIN
         offset = 0
     STR_VAR
         field = "%field%"
-        offsets = "projectile_offsets"
+        offsets = "pro_offsets"
+        writers = "pro_writers"
         value = "%value%"
     END
 END

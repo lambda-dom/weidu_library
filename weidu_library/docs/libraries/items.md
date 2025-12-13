@@ -10,11 +10,11 @@ file(s):
 
 ## A. 1. Tables.
 
-`item_offsets`
+`table_itm_offsets`
 
 [Table](../../resources/2da/items/offsets.2da) of item offsets.
 
-`item_header_offsets`
+`table_itm_header_offsets`
 
 [Table](../../resources/2da/items/header_offsets.2da) of item header offsets. The field names are the same as in WeiDU macros like `ALTER_SPELL_HEADER`.
 
@@ -35,6 +35,9 @@ Size in bytes of the main item block.
 Size in bytes of an item header.
 
 # C. Item functions.
+
+note(s):
+* all functions in these sections are patch functions.
 
 ## C. 1. Main header.
 
@@ -63,9 +66,6 @@ Return `count` of equipped opcodes in the item.
 Return `offset` of `index` equipped, or global, opcode. If index out of bounds, return -1.
 
 ## C. 3. Item header functions.
-
-note(s):
-* all functions in these sections are patch functions.
 
 `get_item_header_offset INT_VAR header = 0 RET offset`
 
@@ -101,7 +101,13 @@ Specializations of the generic reader and writer for items.
 
 `get_item_category_id STR_VAR category RET id`
 
+Get the numeric id of an item type or category as existing in `itemcat.ids`.
+
 `get_item_proficiency_id STR_VAR proficiency RET id`
+
+note(s):
+* The names in `wprof.ids` are prefixed by `PROFICIENCY`; this is taken into account, so strip from the passed `proficiency`.
+* `none` is alliased to `0`.
 
 # F. Patching `itemexcl.2da`.
 

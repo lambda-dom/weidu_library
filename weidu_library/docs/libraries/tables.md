@@ -58,3 +58,6 @@ Return `index` of (first) row of `table` containing `key` in column `field`, -1 
 `array_from_table STR_VAR table key value RET_ARRAY array`
 
 Builds an (associative) array from the `table`. The keys are the values in column `key` and the associated values are the values in the column `value`.
+
+note(s):
+* merges non-unique `key`'s.

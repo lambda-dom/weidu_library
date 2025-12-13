@@ -17,11 +17,49 @@ END
 //Tables.
 LAF load_offsets_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/offsets.2da"
-RET_ARRAY spell_offsets = table END
+RET_ARRAY table_spl_offsets = table END
 
 LAF load_offsets_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/header_offsets.2da"
-RET_ARRAY spell_header_offsets = table END
+RET_ARRAY table_spl_header_offsets = table END
+
+//Indexes.
+LAF array_from_table STR_VAR
+    table = "table_spl_offsets"
+    key = "field"
+    value = "offset"
+RET_ARRAY spl_offsets = array END
+
+LAF array_from_table STR_VAR
+    table = "table_spl_offsets"
+    key = "field"
+    value = "reader"
+RET_ARRAY spl_readers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_spl_offsets"
+    key = "field"
+    value = "writer"
+RET_ARRAY spl_writers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_spl_header_offsets"
+    key = "field"
+    value = "offset"
+RET_ARRAY spl_header_offsets = array END
+
+LAF array_from_table STR_VAR
+    table = "table_spl_header_offsets"
+    key = "field"
+    value = "reader"
+RET_ARRAY spl_header_readers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_spl_header_offsets"
+    key = "field"
+    value = "writer"
+RET_ARRAY spl_header_writers = array END
+
 
 //Arrays.
 LAF load_array STR_VAR
@@ -158,7 +196,8 @@ DEFINE_PATCH_FUNCTION get_spell_field STR_VAR field = "" RET value BEGIN
         offset = 0
     STR_VAR
         field = "%field%"
-        offsets = "spell_offsets"
+        offsets = "spl_offsets"
+        readers = "spl_readers"
     RET value END
 END
 
@@ -167,7 +206,8 @@ DEFINE_PATCH_FUNCTION set_spell_field STR_VAR field = "" value = "" BEGIN
         offset = 0
     STR_VAR
         field = "%field%"
-        offsets = "spell_offsets"
+        offsets = "spl_offsets"
+        writers = "spl_writers"
         value = "%value%"
     END
 END
@@ -186,7 +226,8 @@ DEFINE_PATCH_FUNCTION get_spell_header_field INT_VAR header = 0 STR_VAR field = 
         offset = offset
     STR_VAR
         field = "%field%"
-        offsets = "spell_header_offsets"
+        offsets = "spl_header_offsets"
+        readers = "spl_header_readers"
     RET value END
 END
 
@@ -204,7 +245,8 @@ DEFINE_PATCH_FUNCTION set_spell_header_field INT_VAR header = 0 STR_VAR field = 
         offset = offset
     STR_VAR
         field = "%field%"
-        offsets = "spell_header_offsets"
+        offsets = "spl_header_offsets"
+        writers = "spl_header_writers"
         value = "%value%"
     END
 END

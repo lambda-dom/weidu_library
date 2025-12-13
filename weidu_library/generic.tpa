@@ -13,38 +13,26 @@ END
 
 
 //Generic reader and writer.
-DEFINE_PATCH_FUNCTION get_field_at INT_VAR offset = 0 STR_VAR field = "" offsets = "" RET value BEGIN
-    TEXT_SPRINT key "%field%"
-    LPF find_table_row STR_VAR
-        table = "%offsets%"
-        field = "field"
-        key = "%key%"
-    RET index END
+DEFINE_PATCH_FUNCTION get_field_at INT_VAR offset = 0 STR_VAR field = "" offsets = "" readers = "" RET value BEGIN
+    fx_offset = $"%offsets%"("%field%")
 
     //Sanitize.
-    PATCH_IF (0 - 1 = index) BEGIN
-        PATCH_FAIL "get_field_at: field '%field%' is not a valid field of table '%offsets%'."
+    PATCH_IF NOT (IS_AN_INT fx_offset) BEGIN
+        PATCH_FAIL "get_field_at: field '%field%' is not a valid field of array '%offsets%'."
     END
 
-    field_offset = $"%offsets%"("%index%" "offset")
-    TEXT_SPRINT reader $"%offsets%"("%index%" "reader")
-    LPF "%reader%" INT_VAR offset = (offset + field_offset) RET value END
+    TEXT_SPRINT reader $"%readers%"("%field%")
+    LPF "%reader%" INT_VAR offset = (offset + fx_offset) RET value END
 END
 
-DEFINE_PATCH_FUNCTION set_field_at INT_VAR offset = 0 STR_VAR field = "" value = "" offsets = "" BEGIN
-    TEXT_SPRINT key "%field%"
-    LPF find_table_row STR_VAR
-        table = "%offsets%"
-        field = "field"
-        key = "%key%"
-    RET index END
+DEFINE_PATCH_FUNCTION set_field_at INT_VAR offset = 0 STR_VAR field = "" value = "" offsets = "" writers = "" BEGIN
+    fx_offset = $"%offsets%"("%field%")
 
     //Sanitize.
-    PATCH_IF (0 - 1 = index) BEGIN
-        PATCH_FAIL "set_field_at: field '%field%' is not a valid field of table '%offsets%'."
+    PATCH_IF NOT (IS_AN_INT fx_offset) BEGIN
+        PATCH_FAIL "set_field_at: field '%field%' is not a valid field of array '%offsets%'."
     END
 
-    field_offset = $"%offsets%"("%index%" "offset")
-    TEXT_SPRINT writer $"%offsets%"("%index%" "writer")
-    LPF "%writer%" INT_VAR offset = (offset + field_offset) STR_VAR value = "%value%" END
+    TEXT_SPRINT writer $"%writers%"("%field%")
+    LPF "%writer%" INT_VAR offset = (offset + fx_offset) STR_VAR value = "%value%" END
 END

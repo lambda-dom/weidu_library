@@ -35,11 +35,17 @@ Return an array of all row indices with `col` entry matching `key`.
 
 # B. Patchers.
 
+note(s):
+* all functions in this section are patch functions for table `.2da` files, and other files with the same tabular structure like `.ids` files.
+
 `append_row STR_VAR key default = "*"`
 
 Append a row to the 2da file with first column `key` and all the others `default`.
 
 # C. Higher-order patchers.
+
+note(s):
+* all functions in this section are patch functions for table `.2da` files, and other files with the same tabular structure like `.ids` files.
 
 `patch_table_entries STR_VAR patcher`
 

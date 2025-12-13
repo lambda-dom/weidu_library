@@ -18,7 +18,7 @@ All tables and arrays below are loaded on `INCLUDE`-ing.
 
 ## B. 1. Tables.
 
-`opcode_offsets`
+`table_opc_offsets`
 
 The [table](../../resources/2da/opcodes/offsets.2da) of relative opcode offsets. The field names are the same as in WeiDU macros like `ADD_ITEM_EQEFFECT`.
 

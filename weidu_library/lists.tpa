@@ -25,12 +25,12 @@ DEFINE_DIMORPHIC_FUNCTION repeat_string INT_VAR times = 1 STR_VAR value = "" RET
 END
 
 DEFINE_DIMORPHIC_FUNCTION list_from_string STR_VAR string = "" separator = "," RET count RET_ARRAY list BEGIN
-    //Sanitize separator.
-    OUTER_TEXT_SPRINT regexp "%separator%"
-    ACTION_IF NOT (1 = STRING_LENGTH "%regexp%") BEGIN
+    //Sanitize.
+    ACTION_IF NOT (1 = STRING_LENGTH "%separator%") BEGIN
         FAIL "list_from_string: separator '%separator%' must be 1-character long."
     END
 
+    OUTER_TEXT_SPRINT regexp "%separator%"
     ACTION_DEFINE_ARRAY list BEGIN END
     OUTER_SET count = 0
     OUTER_TEXT_SPRINT tail "%string%"

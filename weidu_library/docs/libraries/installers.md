@@ -25,6 +25,7 @@ For each type of resource there is a template example for the structure of the .
 * [Items](./installers/items.md): installer for `.itm` items.
 * [Projectiles](./installers/projectiles.md): installers for projectile `.pro` files.
 * [Scripts](./installers/scripts.md): compile script `.baf` files.
+* [Sectypes](./installers/sectypes.md): installer for new sectypes.
 * [Sounds](./installers/sounds.md): installer for sounds (`.wav` files).
 * [Spells](./installers/spells.md): installer for `.spl` spells.
 * [Subpells](./installers/subspells.md): installer for subspells via cloning.

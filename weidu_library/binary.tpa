@@ -19,6 +19,14 @@ DEFINE_PATCH_FUNCTION read_long INT_VAR offset = 0 RET value BEGIN
     READ_LONG offset value
 END
 
+DEFINE_PATCH_FUNCTION read_long_be INT_VAR offset = 0 RET value BEGIN
+    LPF read_byte INT_VAR offset = offset RET byte0 = value END
+    LPF read_byte INT_VAR offset = offset + 1 RET byte1 = value END
+    LPF read_byte INT_VAR offset = offset + 2 RET byte2 = value END
+    LPF read_byte INT_VAR offset = offset + 3 RET byte3 = value END
+    value = byte3 + (byte2 << 8) + (byte1 << 16) + (byte0 << 24)
+END
+
 DEFINE_PATCH_FUNCTION read_long_signed INT_VAR offset = 0 RET value BEGIN
     READ_SLONG offset value
 END
@@ -80,6 +88,24 @@ DEFINE_PATCH_FUNCTION write_long INT_VAR offset = 0 STR_VAR value = "" BEGIN
         PATCH_FAIL "write_long: value '%value%' must be positive."
     END
     WRITE_LONG offset value
+END
+
+DEFINE_PATCH_FUNCTION write_long_be INT_VAR offset = 0 STR_VAR value = "" BEGIN
+    PATCH_IF NOT (IS_AN_INT "%value%") BEGIN
+        PATCH_FAIL "write_long_be: value '%value%' is not an integer numeric value."
+    END
+    PATCH_IF NOT (0 <= value) BEGIN
+        PATCH_FAIL "write_long_be: value '%value%' must be positive."
+    END
+
+    byte0 = value BAND 0xff
+    byte1 = (value BAND (0xff << 8)) >> 8
+    byte2 = (value BAND (0xff << 16)) >> 16
+    byte3 = (value BAND (0xff << 16)) >> 24
+    LPF write_byte INT_VAR offset = offset STR_VAR value = "%byte3%" END
+    LPF write_byte INT_VAR offset = offset + 1 STR_VAR value = "%byte2%" END
+    LPF write_byte INT_VAR offset = offset + 2 STR_VAR value = "%byte1%" END
+    LPF write_byte INT_VAR offset = offset + 3 STR_VAR value = "%byte0%" END
 END
 
 DEFINE_PATCH_FUNCTION write_long_signed INT_VAR offset = 0 STR_VAR value = "" BEGIN

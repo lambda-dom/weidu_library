@@ -10,11 +10,49 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/opcodes.tpa"
 //Tables.
 LAF load_offsets_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/items/offsets.2da"
-RET_ARRAY item_offsets = table END
+RET_ARRAY table_itm_offsets = table END
 
 LAF load_offsets_table STR_VAR
     file = "%WEIDU_LIBRARY_DIR%/resources/2da/items/header_offsets.2da"
-RET_ARRAY item_header_offsets = table END
+RET_ARRAY table_itm_header_offsets = table END
+
+//Indexes.
+LAF array_from_table STR_VAR
+    table = "table_itm_offsets"
+    key = "field"
+    value = "offset"
+RET_ARRAY itm_offsets = array END
+
+LAF array_from_table STR_VAR
+    table = "table_itm_offsets"
+    key = "field"
+    value = "reader"
+RET_ARRAY itm_readers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_itm_offsets"
+    key = "field"
+    value = "writer"
+RET_ARRAY itm_writers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_itm_header_offsets"
+    key = "field"
+    value = "offset"
+RET_ARRAY itm_header_offsets = array END
+
+LAF array_from_table STR_VAR
+    table = "table_itm_header_offsets"
+    key = "field"
+    value = "reader"
+RET_ARRAY itm_header_readers = array END
+
+LAF array_from_table STR_VAR
+    table = "table_itm_header_offsets"
+    key = "field"
+    value = "writer"
+RET_ARRAY itm_header_writers = array END
+
 
 //Arrays.
 LAF load_array STR_VAR
@@ -119,7 +157,8 @@ DEFINE_PATCH_FUNCTION get_item_field STR_VAR field = "" RET value BEGIN
         offset = 0
     STR_VAR
         field = "%field%"
-        offsets = "item_offsets"
+        offsets = "itm_offsets"
+        readers = "itm_readers"
     RET value END
 END
 
@@ -128,7 +167,8 @@ DEFINE_PATCH_FUNCTION set_item_field STR_VAR field = "" value = "" BEGIN
         offset = 0
     STR_VAR
         field = "%field%"
-        offsets = "item_offsets"
+        offsets = "itm_offsets"
+        writers = "itm_writers"
         value = "%value%"
     END
 END
@@ -147,7 +187,8 @@ DEFINE_PATCH_FUNCTION get_item_header_field INT_VAR header = 0 STR_VAR field = "
         offset = offset
     STR_VAR
         field = "%field%"
-        offsets = "item_header_offsets"
+        offsets = "itm_header_offsets"
+        readers = "itm_header_readers"
     RET value END
 END
 
@@ -165,7 +206,8 @@ DEFINE_PATCH_FUNCTION set_item_header_field INT_VAR header = 0 STR_VAR field = "
         offset = offset
     STR_VAR
         field = "%field%"
-        offsets = "item_header_offsets"
+        offsets = "itm_header_offsets"
+        writers = "itm_header_writers"
         value = "%value%"
     END
 END

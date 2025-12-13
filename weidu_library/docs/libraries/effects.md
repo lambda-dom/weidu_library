@@ -18,7 +18,7 @@ Return the `size` of an opcode in bytes.
 
 All tables are loaded on `INCLUDE`-ing.
 
-`effect_offsets`
+`table_eff_offsets`
 
 [Table](../../resources/2da/effects/offsets.2da) of extended effect offsets. The field names are the same as in WeiDU macros like `ADD_EFFECT`.
 

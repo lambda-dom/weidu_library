@@ -4,6 +4,22 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/projectiles.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 
 
+//Arrays.
+//Available formats.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY reference_encoders BEGIN
+    "lit" => "encode_resource_literal"
+    "num" => "encode_num_literal"
+    "nul" => "encode_empty_string"
+    "spl" => "encode_spell_res"
+    "suf" => "encode_spell_suffix"
+    "afx" => "encode_spell_affix"
+    "lbl" => "encode_missile_res"
+    "sct" => "encode_spell_sectype"
+    "opc" => "encode_opcode_type"
+    "ext" => "encode_resource_extension"
+END
+
+
 //Auxiliary functions.
 DEFINE_DIMORPHIC_FUNCTION replace_affixes STR_VAR spell = "" prefix = "" suffix = "" RET resource BEGIN
     //Sanitize.
@@ -34,19 +50,6 @@ END
 
 //Main function.
 DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return BEGIN
-    //Available formats.
-    ACTION_DEFINE_ASSOCIATIVE_ARRAY encoders BEGIN
-        "lit" => "encode_resource_literal"
-        "num" => "encode_num_literal"
-        "nul" => "encode_empty_string"
-        "spl" => "encode_spell_res"
-        "suf" => "encode_spell_suffix"
-        "afx" => "encode_spell_affix"
-        "lbl" => "encode_missile_res"
-        "sct" => "encode_spell_sectype"
-        "opc" => "encode_opcode_type"
-    END
-
     OUTER_TEXT_SPRINT regexp "^#\([a-zA-Z0-9][a-zA-Z0-9_-]*\):\(.*\)$"
     //Sanitize.
     ACTION_IF NOT (("%value%" STRING_MATCHES_REGEXP "%regexp%") = 0) THEN BEGIN
@@ -63,7 +66,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return B
 
     //Get encoder's name.
     LAF get_array_element STR_VAR
-        array = "encoders"
+        array = "reference_encoders"
         key = "%name%"
     RET encoder = value END
 
@@ -105,17 +108,17 @@ END
 DEFINE_DIMORPHIC_FUNCTION encode_spell_suffix STR_VAR value = "" RET return BEGIN
     OUTER_TEXT_SPRINT regexp "^\([a-zA-Z0-9]\):\([a-zA-Z0-9_]+\)$"
 
-    //Sanitize.
-    ACTION_IF NOT (0 = ("%value%" STRING_MATCHES_REGEXP "%regexp%")) BEGIN
-        FAIL "encode_spell_suffix: string '%value%' does not have a valid format."
-    END
-
     //Generate name.
     OUTER_PATCH "%value%" BEGIN
         REPLACE_EVALUATE CASE_INSENSITIVE "%regexp%" BEGIN
             TEXT_SPRINT suffix "%MATCH1%"
             TEXT_SPRINT spell "%MATCH2%"
         END ~~
+    END
+
+    //Sanitize.
+    ACTION_IF NOT (1 = (STRING_LENGTH "%suffix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
     END
 
     LAF encode_spell_res STR_VAR value = "%spell%" RET return END   
@@ -129,11 +132,6 @@ END
 DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
     OUTER_TEXT_SPRINT regexp "^\([a-zA-Z0-9][a-zA-Z0-9]\):\([a-zA-Z0-9]\):\([a-zA-Z0-9_]+\)$"
 
-    //Sanitize.
-    ACTION_IF NOT (0 = ("%value%" STRING_MATCHES_REGEXP "%regexp%")) BEGIN
-        FAIL "encode_spell_suffix: string '%value%' does not have a valid format."
-    END
-
     //Generate name.
     OUTER_PATCH "%value%" BEGIN
         REPLACE_EVALUATE CASE_INSENSITIVE "%regexp%" BEGIN
@@ -143,7 +141,12 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
         END ~~
     END
 
-    LAF encode_spell_res STR_VAR value = "%spell%" RET return END   
+    //Sanitize.
+    ACTION_IF NOT (2 = (STRING_LENGTH "%prefix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
+    END
+
+    LAF encode_spell_res STR_VAR value = "%spell%" RET return END
     LAF replace_affixes STR_VAR
         spell = "%return%"
         prefix = "%prefix%"
@@ -151,6 +154,30 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
     RET return = resource END
 END
 
+DEFINE_DIMORPHIC_FUNCTION encode_resource_extension STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT regexp "^\([a-zA-Z][a-zA-Z][a-zA-Z]\):\(.+\)$"
+
+    //Generate name.
+    OUTER_PATCH "%value%" BEGIN
+        REPLACE_EVALUATE CASE_INSENSITIVE "%regexp%" BEGIN
+            TEXT_SPRINT prefix "%MATCH1%"
+            TEXT_SPRINT suffix "%MATCH2%"
+        END ~~
+    END
+
+    //Sanitize.
+    ACTION_IF NOT (3 = (STRING_LENGTH "%prefix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
+    END
+
+    LAF encode_table_reference STR_VAR value = "%suffix%" RET return END
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.%prefix%") BEGIN
+        FAIL "encode_resource_extension: resource '%return%.%prefix%' for table reference '%value%' does not exist."
+    END
+END
+
+
+//Fixed extension encoders.
 DEFINE_DIMORPHIC_FUNCTION encode_bam_ref STR_VAR value = "" RET return BEGIN
     LAF encode_table_reference STR_VAR value = "%value%" RET return END
 
