@@ -1,19 +1,144 @@
 //Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Constants.
+//Tables.
+LAF load_table STR_VAR
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/naming/namespaces.2da"
+    fields = "class,abbrev,index"
+RET_ARRAY table_namespaces = table END
+
+//Indexes.
+LAF array_from_table STR_VAR
+    table = "table_namespaces"
+    key = "class"
+    value = "abbrev"
+RET_ARRAY namespace_abbrevs = array END
+
+LAF array_from_table STR_VAR
+    table = "table_namespaces"
+    key = "class"
+    value = "index"
+RET_ARRAY namespace_indices = array END
 
 
 //Basic functions.
 DEFINE_DIMORPHIC_FUNCTION initialize_namespaces BEGIN
     OUTER_TEXT_SPRINT dest_dir "weidu_external/data/weidu_library/resources/2da"
-    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%dest_dir%/spellext.2da") BEGIN
+    ACTION_IF NOT (FILE_EXISTS "%dest_dir%/spellext.2da") BEGIN
         OUTER_TEXT_SPRINT source_dir "%WEIDU_LIBRARY_DIR%/resources/2da/naming"
         COPY "%source_dir%/extended_namespaces.2da" "%dest_dir%/spellext.2da"
     END
 END
 
+DEFINE_DIMORPHIC_FUNCTION get_spell_namespaces_path RET path BEGIN
+    OUTER_TEXT_SPRINT path "weidu_external/data/weidu_library/resources/2da/spellext.2da"
+    ACTION_IF NOT (FILE_EXISTS "%dest_dir%/spellext.2da") BEGIN
+        FAIL "get_spell_namespaces: master namespaces table '%path%' does not exist."
+    END
+END
+
 DEFINE_DIMORPHIC_FUNCTION load_namespaces RET_ARRAY namespaces BEGIN
+    LAF get_namespaces_path RET path END
     LAF load_table STR_VAR
-        file = "weidu_external/data/weidu_library/resources/2da/spellext.2da"
-        fields = "spell,class,level,index"
+        file = "%path%"
+        fields = "spell,class,level,index,resource"
     RET_ARRAY namespaces = table END
+END
+
+
+//Patching functions.
+DEFINE_PATCH_FUNCTION add_spell INT_VAR level = 0 STR_VAR symbol = "" class = "" BEGIN
+    //Sanitize.
+    PATCH_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
+        PATCH_FAIL "add_spell: level '%level%' is not in the range [0,9]."
+    END
+
+    COUNT_2DA_COLS cols
+    PATCH_IF NOT (5 = cols) BEGIN
+        PATCH_FAIL "add_spell: expected 5 columns in namespaces table, got '%cols%'."
+    END
+
+    //Sanitize class.
+    TEXT_SPRINT class_id $"namespace_indices"("%class%")
+    PATCH_IF NOT (IS_AN_INT class_id) BEGIN
+        PATCH_FAIL "add_spell: invalid class '%class%'."
+    END
+
+    TEXT_SPRINT blank "%WEIDU_LIBRARY_DIR%/resources/spl/blank.spl"
+    PATCH_IF NOT (FILE_EXISTS "%blank%") BEGIN
+        PATCH_FAIL "add_spell: blank spell '%blank%' not found. "
+    END
+
+    //Sanitize symbol.
+    LPF find_row_index STR_VAR key = "%symbol%" RET row_index = index END
+    PATCH_IF NOT (0 - 1 = row_index) BEGIN
+        PATCH_FAIL "add_spell: symbol '%symbol%' already exists in table."
+    END
+
+    //Find last existing index.
+    last_index = 0
+    COUNT_2DA_ROWS cols rows
+    FOR (i = 0; i < rows; ++i) BEGIN
+        READ_2DA_ENTRY i 1 cols spl_class
+        READ_2DA_ENTRY i 2 cols spl_level
+        PATCH_IF ("%spl_name%" STRING_EQUAL_CASE "%class%") AND (level = spl_level) BEGIN
+            READ_2DA_ENTRY i 3 cols spl_index
+            PATCH_IF (last_index < spl_index) BEGIN
+                last_index = spl_index
+            END
+        END
+    END
+
+    //Find first free slot.
+    TEXT_SPRINT abbrev $"namespace_abbrevs"("%class%")
+    TEXT_SPRINT resource ""
+    found = 0 - 1
+    FOR (i = last_index; i <= 0xff AND found < 0; ++i) BEGIN
+        LPF encode_hexadecimal STR_VAR value = "%i%" RET index = return END
+
+        //Strip 0x and normalize to two characters.
+        len = STRING_LENGTH "%index%"
+        PATCH_IF len > 2 BEGIN
+            SNPRINT (0 - len + 2) index "%index%"
+        END
+        PATCH_IF (1 = STRING_LENGTH "%index%") BEGIN
+            TEXT_SPRINT index "0%index%"
+        END
+
+        TEXT_SPRINT resource "sp%abbrev%%level%%index%"
+        PATCH_IF NOT (FILE_EXISTS_IN_GAME "%resource%.spl") BEGIN
+            found = i
+        END
+    END
+
+    PATCH_IF (found = 0 - 1) BEGIN
+        PATCH_FAIL "add_spell: no free slot in namespace '%class%' and level '%level%' was found."
+    END
+
+    //Copy spell and insert row.
+    INNER_ACTION BEGIN
+        COPY "%blank%" "override/%resource%.spl"
+    END
+
+    INSERT_2DA_ROW rows cols "%symbol% %class% %level% %found% %resource%"
+END
+
+
+//Searchers.
+DEFINE_DIMORPHIC_FUNCTION get_namespace_spell_resource STR_VAR namespaces = "" symbol = "" RET resource BEGIN
+    LAF find_table_row STR_VAR
+        table = "%namespaces%"
+        field = "symbol"
+        key = "%symbol%"
+    RET row = index END
+
+    OUTER_TEXT_SPRINT resource "*"
+    ACTION_IF NOT (0 - 1 = row) BEGIN
+        OUTER_TEXT_SPRINT resource $"%namespaces%"("%row%" "symbol")
+    END
 END
