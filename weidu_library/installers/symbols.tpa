@@ -7,7 +7,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 DEFINE_ACTION_FUNCTION install_symbols STR_VAR table = "" patches = "*" BEGIN
     OUTER_TEXT_SPRINT blank "%WEIDU_LIBRARY_DIR%/resources/spl/blank"
 
-    //Existence check.
+    //Existence checks.
     ACTION_IF NOT (FILE_EXISTS "%blank%.spl") BEGIN
         FAIL "install_symbols: blank spell '%blank%.spl' not found. "
     END
@@ -48,7 +48,7 @@ DEFINE_ACTION_FUNCTION install_symbols STR_VAR table = "" patches = "*" BEGIN
             ACTION_IF NOT (install = 0) BEGIN
                 //Sanitize.
                 ACTION_IF NOT (IS_AN_INT level) BEGIN
-                    FAIL "add_spell_symbols: level '%level%' of row '%i%' is not an integer."
+                    FAIL "install_symbols: level '%level%' of row '%i%' is not an integer."
                 END
 
                 LAF add_spell_symbol INT_VAR
@@ -58,6 +58,12 @@ DEFINE_ACTION_FUNCTION install_symbols STR_VAR table = "" patches = "*" BEGIN
                     type = "%type%"
                     resource = "%blank%"
                     patch = "%patch%"
+                END
+
+                //Barf if no addition was made (e. g. not enough slots).
+                LAF get_spell_res STR_VAR spell = "%symbol%" RET exists = resource END
+                ACTION_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
+                    FAIL "install_symbols: addition of symbol '%symbol%' to 'spell.ids' failed."
                 END
             END
         END

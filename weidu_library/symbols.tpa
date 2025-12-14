@@ -26,12 +26,9 @@ BEGIN
         FAIL "add_spell_symbol: '%level%' must be in the [0-9] range."
     END
 
-    LAF get_array_element STR_VAR
-        array = "add_types"
-        key = "%type%"
-    RET id = value END
-    ACTION_IF (0 - 1 = id) BEGIN
-        FAIL "add_spell_symbol: '%type%' is not a valid spell type."
+    OUTER_TEXT_SPRINT id $"add_types"("%type%")
+    ACTION_IF NOT (IS_AN_INT id) BEGIN
+        FAIL "add_spell_symbol: '%type%' is not a valid add spell type."
     END
 
     LAF get_spell_res STR_VAR spell = "%symbol%" RET exists = resource END
@@ -56,11 +53,8 @@ DEFINE_ACTION_FUNCTION change_spell_symbol INT_VAR level = 0 STR_VAR symbol = ""
         FAIL "change_spell_symbol: '%level%' must be an integer in the [0-9] range."
     END
 
-    LAF get_array_element STR_VAR
-        array = "add_types"
-        key = "%type%"
-    RET id = value END
-    ACTION_IF (0 - 1 = id) BEGIN
+    OUTER_TEXT_SPRINT id $"add_types"("%type%")
+    ACTION_IF NOT (IS_AN_INT id) BEGIN
         FAIL "change_spell_symbol: '%type%' is not a valid spell type."
     END
 
@@ -74,7 +68,7 @@ DEFINE_ACTION_FUNCTION change_spell_symbol INT_VAR level = 0 STR_VAR symbol = ""
         FAIL "change_spell_symbol: resource '%resource%.spl' for '%symbol%' does not exist in game." 
     END
 
-    //Make original resource available and add it with new symbol.
+    //Make original resource available and add it 'to spell.ids' assigned to new symbol.
     COPY_EXISTING "%resource%.spl" "override/%resource%.spl"
     ADD_SPELL "override/%resource%.spl" id level "%symbol%"
 END

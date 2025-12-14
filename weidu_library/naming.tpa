@@ -1,0 +1,19 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION initialize_namespaces BEGIN
+    OUTER_TEXT_SPRINT dest_dir "weidu_external/data/weidu_library/resources/2da"
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%dest_dir%/spellext.2da") BEGIN
+        OUTER_TEXT_SPRINT source_dir "%WEIDU_LIBRARY_DIR%/resources/2da/naming"
+        COPY "%source_dir%/extended_namespaces.2da" "%dest_dir%/spellext.2da"
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION load_namespaces RET_ARRAY namespaces BEGIN
+    LAF load_table STR_VAR
+        file = "weidu_external/data/weidu_library/resources/2da/spellext.2da"
+        fields = "spell,class,level,index"
+    RET_ARRAY namespaces = table END
+END
