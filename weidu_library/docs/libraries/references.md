@@ -78,7 +78,7 @@ Treats `value` as an integer numeric literal and returns it. Format is:
 #num:<numeric literal>
 ```
 
-Both decimal and hex literals are accepted.
+Both (signed) decimal and hex literals are accepted.
 
 note(s):
 * this is useful mainly if the values in a given column can be either numbers or some other kind of object, and this provides a way to disambiguate. If all values must be integers (as checked by the table processing code) there is little point in using this format. One use case is the [Blocks library](./blocks.md) where the column values can have various interpretations depending on the value of another column (e.g. this is a (very) primitive form of dependent typing).
