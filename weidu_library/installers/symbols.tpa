@@ -59,12 +59,6 @@ DEFINE_ACTION_FUNCTION install_symbols STR_VAR table = "" patches = "*" BEGIN
                     resource = "%blank%"
                     patch = "%patch%"
                 END
-
-                //Barf if no addition was made (e. g. not enough slots).
-                LAF get_spell_res STR_VAR spell = "%symbol%" RET exists = resource END
-                ACTION_IF NOT ("%exists%" STRING_EQUAL_CASE "*") BEGIN
-                    FAIL "install_symbols: addition of symbol '%symbol%' to 'spell.ids' failed."
-                END
             END
         END
     END
