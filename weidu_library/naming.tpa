@@ -6,119 +6,148 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/lists.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
+//Basic functions.
+DEFINE_DIMORPHIC_FUNCTION get_master_namespaces RET path BEGIN
+    OUTER_TEXT_SPRINT path "weidu_external/data/weidu_library/master_namespaces.2da"
+END
+
+DEFINE_DIMORPHIC_FUNCTION get_extended_namespaces RET path BEGIN
+    OUTER_TEXT_SPRINT path "weidu_external/data/weidu_library/extended_namespaces.2da"
+END
+
+DEFINE_DIMORPHIC_FUNCTION initialize_extended_namespaces BEGIN
+    LAF get_master_namespaces RET destination = path END
+    ACTION_IF NOT (FILE_EXISTS "%destination%") BEGIN
+        OUTER_TEXT_SPRINT source "%WEIDU_LIBRARY_DIR%/resources/2da/naming/master_namespaces.2da"
+        COPY "%source%/" "%destination%"
+    END
+
+    LAF get_extended_namespaces RET destination = path END
+    ACTION_IF NOT (FILE_EXISTS "%destination%") BEGIN
+        OUTER_TEXT_SPRINT source "%WEIDU_LIBRARY_DIR%/resources/2da/naming/extended_namespaces.2da"
+        COPY "%source%/" "%destination%"
+    END
+END
+
+
+//Initialize: guarantee the tables exist.
+LAF initialize_extended_namespaces END
+
+
 //Constants.
+LAF get_master_namespaces RET path_master_namespaces = path END
+
+//Order: load table and indexes *after* initialization.
 //Tables.
 LAF load_table STR_VAR
-    file = "%WEIDU_LIBRARY_DIR%/resources/2da/naming/master_namespaces.2da"
-    fields = "class,abbrev,index"
+    file = "%master_namespaces_path%"
+    fields = "namespace,abbrev,index"
 RET_ARRAY master_namespaces = table END
 
 //Indexes.
 LAF array_from_table STR_VAR
     table = "master_namespaces"
-    key = "class"
+    key = "namespace"
     value = "abbrev"
 RET_ARRAY namespace_abbrevs = array END
 
 LAF array_from_table STR_VAR
     table = "master_namespaces"
-    key = "class"
+    key = "namespace"
     value = "index"
 RET_ARRAY namespace_indices = array END
 
 
-//Basic functions.
-DEFINE_DIMORPHIC_FUNCTION get_namespaces_resource RET resource BEGIN
-    OUTER_TEXT_SPRINT resource "extended_namespaces"
-END
-
-DEFINE_DIMORPHIC_FUNCTION initialize_namespaces BEGIN
-    LAF get_namespaces_resource RET resource END
-    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%resource%.2da") BEGIN
-        OUTER_TEXT_SPRINT dir "%WEIDU_LIBRARY_DIR%/resources/2da/naming"
-        ACTION_IF NOT (FILE_EXISTS "%dir%/%resource%.2da") BEGIN
-            FAIL "initialize_namespaces: table '%dir%/%resource%.2da' not found."
-        END
-
-        COPY "%dir%/%resource%.2da" "override"
-    END
+//Loaders.
+DEFINE_DIMORPHIC_FUNCTION load_master_namespaces RET_ARRAY namespaces BEGIN
+    LAF get_master_namespaces RET path END
+    LAF load_table STR_VAR
+        file = "%path%"
+        fields = "namespace,abbrev,index"
+    RET_ARRAY namespaces = table END
 END
 
 DEFINE_DIMORPHIC_FUNCTION load_namespaces RET_ARRAY namespaces BEGIN
-    //Intialize.
-    OUTER_TEXT_SPRINT fields_list "symbol,class,level,index,resource"
-    LAF list_from_string STR_VAR
-        string = "%fields_list%"
-    RET _ = count RET_ARRAY fields = list END
-    ACTION_DEFINE_ASSOCIATIVE_ARRAY namespaces BEGIN END
-
-    LAF get_namespaces_resource RET res_name = resource END
-    COPY_EXISTING "%res_name%.2da" "override"
-        COUNT_2DA_COLS cols
-
-        //Sanitize.
-        PATCH_IF NOT (5 = cols) BEGIN
-            PATCH_FAIL "load_namespaces: expected 5 columns, got '%cols%'."
-        END
-
-        READ_2DA_ENTRIES_NOW "namespaces#rows" cols
-        //Loop.
-        FOR (j = 0; j < cols; ++j) BEGIN
-            TEXT_SPRINT field $fields("%j%")
-            FOR (i = 0; i < namespaces#rows; ++i) BEGIN
-                READ_2DA_ENTRY_FORMER "namespaces#rows" i j value
-                TEXT_SPRINT $"namespaces"("%i%" "%field%") "%value%"
-            END
-        END
-
-        //Insert row count and fields.
-        TEXT_SPRINT $"namespaces"("table#count") "%namespaces#rows%"
-        TEXT_SPRINT $"namespaces"("table#fields") "%fields_list%"
+    LAF get_extended_namespaces RET path END
+    LAF load_table STR_VAR
+        file = "%path%"
+        fields = "symbol,namespace,level,index,resource"
+    RET_ARRAY namespaces = table END
 END
 
 
 //Patching functions.
+DEFINE_PATCH_FUNCTION add_extended_namespace STR_VAR namespace = "" abbreviation = "" BEGIN
+    COUNT_2DA_COLS cols
+    PATCH_IF NOT (3 = cols) BEGIN
+        PATCH_FAIL "add_extended_namespace: expected 3 columns in master table, got '%cols%'."
+    END
+
+    //Sanitize abbreviation.
+    PATCH_IF NOT (2 = STRING_LENGTH "%abbreviation%") BEGIN
+        PATCH_FAIL "add_extended_namespace: abbreviation '%abbreviation%' is not a 2-letter word."
+    END ELSE BEGIN
+        INNER_PATCH "%abbreviation%" BEGIN
+            REPLACE_EVALUATE "[a-z][a-z]" BEGIN
+                //Sanitize.
+                PATCH_IF NOT ("%abbreviation%" STRING_EQUAL_CASE "%MATCH0%") THEN BEGIN
+                    PATCH_FAIL "add_extended_namespace: abbreviation '%abbreviation%' is not a lower-cased 2-letter with no digits, etc."
+                END
+            END ""
+        END
+    END
+
+    //Guarantee uniqueness.
+    LPF find_row_index INT_VAR col = 1 STR_VAR key = "%abbreviation%" RET row_index = index END
+    PATCH_IF NOT (0 - 1 = row_index) BEGIN
+        PATCH_FAIL "add_extended_namespace: abbreviation '%abbreviation%' already exists in table."
+    END
+
+    LPF find_row_index STR_VAR key = "%symbol%" RET row_index = index END
+    PATCH_IF NOT (0 - 1 = row_index) BEGIN
+        PATCH_FAIL "add_extended_namespace: namespace '%namespace%' already exists in table."
+    END
+
+    COUNT_2DA_ROWS cols rows
+    INSERT_2DA_ROW rows cols "%namespace% %abbreviation% %rows%"
+END
+
 DEFINE_PATCH_FUNCTION add_extended_spell_symbol INT_VAR
     level = 0
 STR_VAR
     symbol = ""
-    class = ""
+    namespace = ""
     patch = "*"
 BEGIN
     //Sanitize.
     PATCH_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
-        PATCH_FAIL "add_spell: level '%level%' is not in the range [0,9]."
+        PATCH_FAIL "add_extended_spell_symbol: level '%level%' is not in the range [0,9]."
     END
 
     COUNT_2DA_COLS cols
     PATCH_IF NOT (5 = cols) BEGIN
-        PATCH_FAIL "add_spell: expected 5 columns in namespaces table, got '%cols%'."
+        PATCH_FAIL "add_extended_spell_symbol: expected 5 columns in namespaces table, got '%cols%'."
     END
 
     //Sanitize class.
-    TEXT_SPRINT class_id $"namespace_indices"("%class%")
+    TEXT_SPRINT namespace_id $"namespace_indices"("%namespace%")
     PATCH_IF NOT (IS_AN_INT class_id) BEGIN
-        PATCH_FAIL "add_spell: invalid class '%class%'."
-    END
-
-    TEXT_SPRINT blank "%WEIDU_LIBRARY_DIR%/resources/spl/blank.spl"
-    PATCH_IF NOT (FILE_EXISTS "%blank%") BEGIN
-        PATCH_FAIL "add_spell: blank spell '%blank%' not found. "
+        PATCH_FAIL "add_extended_spell_symbol: invalid namespace '%namespace%'."
     END
 
     //Sanitize symbol.
     LPF find_row_index STR_VAR key = "%symbol%" RET row_index = index END
     PATCH_IF NOT (0 - 1 = row_index) BEGIN
-        PATCH_FAIL "add_spell: symbol '%symbol%' already exists in table."
+        PATCH_FAIL "add_extended_spell_symbol: symbol '%symbol%' already exists in table."
     END
 
     //Find last existing index.
     last_index = 0
     COUNT_2DA_ROWS cols rows
     FOR (i = 0; i < rows; ++i) BEGIN
-        READ_2DA_ENTRY i 1 cols spl_class
+        READ_2DA_ENTRY i 1 cols spl_namespace
         READ_2DA_ENTRY i 2 cols spl_level
-        PATCH_IF ("%spl_name%" STRING_EQUAL_CASE "%class%") AND (level = spl_level) BEGIN
+        PATCH_IF ("%spl_namespace%" STRING_EQUAL_CASE "%namespace%") AND (spl_level = level) BEGIN
             READ_2DA_ENTRY i 3 cols spl_index
             PATCH_IF (last_index < spl_index) BEGIN
                 last_index = spl_index
@@ -127,10 +156,10 @@ BEGIN
     END
 
     //Find first free slot.
-    TEXT_SPRINT abbrev $"namespace_abbrevs"("%class%")
+    TEXT_SPRINT abbrev $"namespace_abbrevs"("%namespace%")
     TEXT_SPRINT resource ""
     found = 0 - 1
-    FOR (i = last_index; i <= 0xff AND found < 0; ++i) BEGIN
+    FOR (i = last_index; (i <= 0xff) AND (found < 0); ++i) BEGIN
         LPF encode_hexadecimal STR_VAR value = "%i%" RET index = return END
 
         //Strip 0x and normalize to two characters.
@@ -149,18 +178,25 @@ BEGIN
     END
 
     PATCH_IF (found = 0 - 1) BEGIN
-        PATCH_FAIL "add_spell: no free slot in namespace '%class%' and level '%level%' was found."
+        PATCH_FAIL "add_extended_spell_symbol: no free slot in namespace '%namespace%' and level '%level%' was found."
     END
 
-    //Copy spell and insert row.
-    INNER_ACTION BEGIN
-        COPY "%blank%" "override/%resource%.spl"
-            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
-                LPF "%patch%" STR_VAR destination = "%resource%" END
-            END
+    //Copy blank spell and insert row.
+    PATCH_WITH_SCOPE BEGIN
+        TEXT_SPRINT blank "%WEIDU_LIBRARY_DIR%/resources/spl/blank.spl"
+        PATCH_IF NOT (FILE_EXISTS "%blank%") BEGIN
+            PATCH_FAIL "add_extended_spell_symbol: blank spell '%blank%' not found. "
+        END
+
+        INNER_ACTION BEGIN
+            COPY "%blank%" "override/%resource%.spl"
+                PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                    LPF "%patch%" STR_VAR destination = "%resource%" END
+                END
+        END
     END
 
-    INSERT_2DA_ROW rows cols "%symbol% %class% %level% %found% %resource%"
+    INSERT_2DA_ROW rows cols "%symbol% %namespace% %level% %found% %resource%"
 END
 
 

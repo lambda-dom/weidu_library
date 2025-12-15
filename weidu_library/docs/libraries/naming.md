@@ -12,41 +12,60 @@ All tables and arrays below are loaded on `INCLUDE`-ing.
 
 ## A. 1. Tables.
 
+`path_master_namespaces`
+
+The cached path to the `master_namespaces` table file.
+
 `master_namespaces`
 
 The master [table](../../resources/2da/naming/master_namespaces.2da) of pairs `class => abbreviation`.
 
 note(s):
-* The master [table](../../resources/2da/naming/master_namespaces.2da) is *not* copied into `override` so adding new namespaces or changing abbreviations is not possible without changing the weidu_library source. This is such, at least for the time being, to avoid bootstrapping issues.
+* The master [table](../../resources/2da/naming/master_namespaces.2da) is indexed but if you make any changes to the table, the indexes will not reflect them. To avoid such a problem put all changes in a component and all readings in another component; this will guarantee the reloading of the table and the synching of the indexes.
 
-# B. Basic functions.
-
-note(s):
-* All functions in this section are action functions.
-
-`get_namespaces_resource RET resource`
-
-Return the in-game `resource` of the extended namespaces table (no extension).
-
-`initialize_namespaces`
-
-Make sure the master namespaces table exist, and if not, initialize it. This function is idempotent, so it is safe to call it more than once.
+# B. Initialization.
 
 note(s):
-* Currently this table is called `extended_namespaces.2da` and is assumed that no other mod is using such a resource (otherwise you will get errors).
+* All functions in this section have action and patch variants.
 
-`load_spell_namespaces RET_ARRAY namespaces`
+`get_master_namespaces RET path`
+
+Return the (full) `path` of the master namespaces table.
+
+`get_extended_namespaces RET path`
+
+Return the (full) `path` of the extended namespaces table.
+
+`initialize_extended_namespaces`
+
+Make sure the two required extended namespace tables exist, and if not, construct them. This function is idempotent, so it is safe to call it more than once.
+
+note(s):
+* Usually there is no need to call this function directly as it is as called on module `INCLUDE`-ing.
+
+# C. Loading and reading.
+
+`load_master_namespaces RET_ARRAY namespaces`
+
+Load the master namespaces table for reading.
+
+`load_extended_namespaces RET_ARRAY namespaces`
 
 Load the extended namespaces table for reading.
 
-# C. Patching functions.
+note(s):
+* See the notes above on `master_namespaces` for some footguns that need to be avoided with careful discipline.
+
+# D. Patching functions.
 
 note(s):
-* All functions in this section are patching functions for the extended `namespaces` table file (loaded by `load_spell_namespaces`).
+* All functions in this section are patching functions for the the relevant table files.
 
-`add_extended_spell_symbol INT_VAR level STR_VAR symbol class patch = "*"`
+`add_extended_namespace STR_VAR namespace abbreviation`
 
-# D. Searchers.
+`add_extended_spell_symbol INT_VAR level STR_VAR symbol namespace patch = "*"`
+
+# E. Searchers.
 
 `get_namespace_spell_resource STR_VAR namespaces symbol RET resource `
 

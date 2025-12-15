@@ -18,11 +18,11 @@ DEFINE_ACTION_FUNCTION install_extended_symbols STR_VAR table = "" patches = "*"
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "symbol,install,class,level,patch"
+        fields = "symbol,install,namespace,level,patch"
     RET_ARRAY resources = table END
 
-    LAF get_namespaces_resource RET res_name = resource END
-    COPY_EXISTING "%res_name%.2da" "override"
+    LAF get_extended_namespaces RET res_name = path END
+    COPY_EXISTING "%res_name%" "%res_name%"
         //Loop.
         LPF get_table_row_count STR_VAR table = "resources" RET row_count = count END
         FOR (i = 0; i < row_count; ++i) BEGIN
@@ -36,7 +36,7 @@ DEFINE_ACTION_FUNCTION install_extended_symbols STR_VAR table = "" patches = "*"
                 //Inject names in local scope.
                 TEXT_SPRINT symbol $"row"("symbol")
                 TEXT_SPRINT install $"row"("install")
-                TEXT_SPRINT class $"row"("class")
+                TEXT_SPRINT namespace $"row"("namespace")
                 TEXT_SPRINT level $"row"("level")
                 TEXT_SPRINT patch $"row"("patch")
 
@@ -50,7 +50,7 @@ DEFINE_ACTION_FUNCTION install_extended_symbols STR_VAR table = "" patches = "*"
                         level = level
                     STR_VAR
                         symbol = "%symbol%"
-                        class = "%class%"
+                        namespace = "%class%"
                         patch = "%patch%"
                     END
                 END

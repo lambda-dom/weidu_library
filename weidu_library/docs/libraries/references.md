@@ -118,7 +118,7 @@ Treats `value` as a symbolic spell reference in the extended namespace table and
 ```
 
 note(s):
-* Safe use of this function requires no changes to the master .2da file before the last `CLEAR_ARRAYS`. The safest way to ensure it is to put all changes in a (sub)component and all uses of the function is a different (sub)component.
+* Safe use of this function requires no changes to the extended namespace .2da files before the last `CLEAR_ARRAYS`. The safest way to ensure this is to put all changes in a (sub)component and all uses of this function is a different (sub)component; this will guarantee reloading of the arrays and that the indexes are synched.
 
 ## B. 4. Projectile-related formats.
 
