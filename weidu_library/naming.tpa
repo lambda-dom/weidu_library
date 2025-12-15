@@ -9,19 +9,19 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 //Constants.
 //Tables.
 LAF load_table STR_VAR
-    file = "%WEIDU_LIBRARY_DIR%/resources/2da/naming/namespaces.2da"
+    file = "%WEIDU_LIBRARY_DIR%/resources/2da/naming/master_namespaces.2da"
     fields = "class,abbrev,index"
-RET_ARRAY table_namespaces = table END
+RET_ARRAY master_namespaces = table END
 
 //Indexes.
 LAF array_from_table STR_VAR
-    table = "table_namespaces"
+    table = "master_namespaces"
     key = "class"
     value = "abbrev"
 RET_ARRAY namespace_abbrevs = array END
 
 LAF array_from_table STR_VAR
-    table = "table_namespaces"
+    table = "master_namespaces"
     key = "class"
     value = "index"
 RET_ARRAY namespace_indices = array END

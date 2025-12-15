@@ -12,9 +12,12 @@ All tables and arrays below are loaded on `INCLUDE`-ing.
 
 ## A. 1. Tables.
 
-`table_namespaces`
+`master_namespaces`
 
-The [table](../../resources/2da/naming/namespaces.2da) of namespaces.
+The master [table](../../resources/2da/naming/master_namespaces.2da) of pairs `class => abbreviation`.
+
+note(s):
+* The master [table](../../resources/2da/naming/master_namespaces.2da) is *not* copied into `override` so adding new namespaces or changing abbreviations is not possible without changing the weidu_library source. This is such, at least for the time being, to avoid bootstrapping issues.
 
 # B. Basic functions.
 
