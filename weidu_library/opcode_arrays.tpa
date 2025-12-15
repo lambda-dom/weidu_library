@@ -1,8 +1,65 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/opcodes.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
 
+
+//Arrays.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY opcode_field_encoders BEGIN
+    "parameter1"    => "encode_opcode_parameter"
+    "parameter2"    => "encode_opcode_parameter"
+    "power"         => "encode_opcode_power"
+    "duration"      => "encode_positive"
+    "probability1"  => "encode_opcode_probability"
+    "probability2"  => "encode_opcode_probability"
+    "dicesize"      => "encode_positive"
+    "dicenumber"    => "encode_positive"
+    "savingthrow"   => "encode_opcode_parameter"
+    "savebonus"     => "encode_opcode_save_bonus"
+    "special"       => "encode_opcode_parameter"
+END
+
+
+//Encoders.
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_parameter STR_VAR value = "" RET return BEGIN
+    ACTION_IF NOT (IS_AN_INT value) BEGIN
+        FAIL "encode_opcode_parameter: value '%value%' is not an integer."
+    END
+
+    OUTER_TEXT_SPRINT return "#num:%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_power STR_VAR value = "" RET return BEGIN
+    ACTION_IF NOT (IS_AN_INT value) BEGIN
+        FAIL "encode_opcode_power: value '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 <= value) AND (value <= 9)) BEGIN
+        FAIL "encode_opcode_power: value '%value%' is not in the [0-9] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_probability STR_VAR value = "" RET return BEGIN
+    ACTION_IF NOT (IS_AN_INT value) BEGIN
+        FAIL "encode_opcode_probability: value '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT ((0 <= value) AND (value <= 100)) BEGIN
+        FAIL "encode_opcode_probability: value '%value%' is not in the [0-100] range."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_resource STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT return "#nul:"
+    ACTION_IF NOT ("%value%" STRING_EQUAL_CASE "") BEGIN
+        OUTER_TEXT_SPRINT return "#lit:%value%"
+    END
+END
 
 //Opcodes as arrays.
 DEFINE_PATCH_FUNCTION get_opcode_array INT_VAR offset = 0 RET_ARRAY array BEGIN

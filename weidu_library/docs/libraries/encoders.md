@@ -21,6 +21,8 @@ The trivial encoder, returning `value` unchanged.
 
 `encode_percentage STR_VAR value RET return`
 
+`encode_integer STR_VAR value RET return`
+
 `encode_positive STR_VAR value RET return`
 
 `encode_strictly_positive STR_VAR value RET return`

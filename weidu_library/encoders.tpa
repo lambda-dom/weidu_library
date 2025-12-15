@@ -26,6 +26,15 @@ DEFINE_DIMORPHIC_FUNCTION encode_percentage STR_VAR value = "" RET return BEGIN
     OUTER_TEXT_SPRINT return "%value%"
 END
 
+DEFINE_DIMORPHIC_FUNCTION encode_integer STR_VAR value = "" RET return BEGIN
+    //Sanitize.
+    ACTION_IF NOT (IS_AN_INT "%value%") BEGIN
+        FAIL "encode_integer: value '%value%' is not an integer."
+    END
+
+    OUTER_TEXT_SPRINT return "%value%"
+END
+
 DEFINE_DIMORPHIC_FUNCTION encode_positive STR_VAR value = "" RET return BEGIN
     //Sanitize.
     ACTION_IF NOT (IS_AN_INT "%value%") BEGIN

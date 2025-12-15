@@ -8,6 +8,9 @@ file(s):
 
 # A. Basic functions.
 
+note(s):
+* all functions in this section are patching functions.
+
 `get_opcode_array INT_VAR offset RET_ARRAY array`
 
 Get opcode `array` at `offset`.
@@ -23,8 +26,8 @@ note(s):
 
 `get_zero_opcode RET_ARRAY array`
 
-Return the opcode `array` with all fields zero-out out, except `target` (set to `projectile`) and `probability1` set to `100`.
+Return the opcode `array` with all fields zeroed-out out, except `target` set to `projectile` and `probability1` set to `100`.
 
 `get_equipped_zero_opcode RET_ARRAY array`
 
-Return the zeroed-out opcode `array` with timing mode equipped and target self.
+Return the zeroed-out opcode `array` with timing mode equipped and target `self`.
