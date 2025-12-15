@@ -101,7 +101,11 @@ Specializations of the generic reader and writer for items.
 
 `insert_item_equipped_opcode INT_VAR index`
 
+`append_item_equipped_opcode`
+
 `insert_item_header_opcode INT_VAR header index`
+
+`append_item_header_opcode INT_VAR header`
 
 # E. Getters.
 

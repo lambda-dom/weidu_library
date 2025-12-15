@@ -222,7 +222,7 @@ DEFINE_PATCH_FUNCTION insert_item_equipped_opcode INT_VAR index = 0 BEGIN
 
     //Sanitize.
     PATCH_IF NOT ((0 <= index) AND (index <= op_count)) BEGIN
-        PATCH_FAIL "insert_item_equipped_opcode: 'index' not in the range [-1, %op_count%]."
+        PATCH_FAIL "insert_item_equipped_opcode: '%index%' not in the range [-1, %op_count%]."
     END
 
     //Insert offset.
@@ -231,7 +231,7 @@ DEFINE_PATCH_FUNCTION insert_item_equipped_opcode INT_VAR index = 0 BEGIN
     ins_offset = fx_start + (op_size * index)
 
     //Insert opcode.
-    INSERT_BYTES ins_offset opcode_size
+    INSERT_BYTES ins_offset op_size
 
     //Adjust opcode count.
     WRITE_SHORT 0x70 (THIS + 1)
@@ -255,6 +255,10 @@ DEFINE_PATCH_FUNCTION insert_item_equipped_opcode INT_VAR index = 0 BEGIN
     END
 END
 
+DEFINE_PATCH_FUNCTION append_item_equipped_opcode BEGIN
+    LPF insert_item_equipped_opcode INT_VAR index = 0 - 1 END
+END
+
 DEFINE_PATCH_FUNCTION insert_item_header_opcode INT_VAR header = 0 index = 0 BEGIN
     //Sanitize.
     LPF get_item_header_count RET headers_count = count END
@@ -276,7 +280,7 @@ DEFINE_PATCH_FUNCTION insert_item_header_opcode INT_VAR header = 0 index = 0 BEG
     ins_offset = fx_start + (op_size * index)
 
     //Insert opcode.
-    INSERT_BYTES ins_offset opcode_size
+    INSERT_BYTES ins_offset op_size
 
     //Adjust header opcode count.
     LPF get_item_header_offset INT_VAR header = header RET fx_start = offset END
@@ -295,6 +299,13 @@ DEFINE_PATCH_FUNCTION insert_item_header_opcode INT_VAR header = 0 index = 0 BEG
     STR_VAR
         field = "probability1"
         value = "100"
+    END
+END
+
+DEFINE_PATCH_FUNCTION append_item_header_opcode INT_VAR header = 0 BEGIN
+    LPF insert_item_header_opcode INT_VAR
+        header = header
+        index = 0 - 1
     END
 END
 
