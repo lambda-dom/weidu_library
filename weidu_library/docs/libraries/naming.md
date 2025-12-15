@@ -23,7 +23,7 @@ note(s):
 
 `initialize_namespaces`
 
-This function is idempotent, so it is safe to call it more than oince to guarantee initialization.
+This function is idempotent, so it is safe to call it more than once to guarantee initialization.
 
 `get_spell_namespaces RET path`
 
@@ -47,4 +47,4 @@ note(s):
 Return the spell `resource` associated to `symbol` in the namespaces table, `*` if it does not exist. `namespaces` is the namespaces table loaded with `load_spell_namespaces`. In general it is better to use table references so that the dance to prep and set up table indices is already done -- see the [References module](./references.md).
 
 note(s):
-* This function is linear in the size of the table.
+* This function is linear in the size of the table. The encoder in the [References module](./references.md) is better for performance (but needs some care in setting up).
