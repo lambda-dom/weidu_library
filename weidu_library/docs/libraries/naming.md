@@ -26,7 +26,7 @@ note(s):
 
 `get_namespaces_resource RET resource`
 
-Return the in-game `resource` of the master namespaces table (no extension).
+Return the in-game `resource` of the extended namespaces table (no extension).
 
 `initialize_namespaces`
 
@@ -37,12 +37,12 @@ note(s):
 
 `load_spell_namespaces RET_ARRAY namespaces`
 
-Load the master namespaces table for reading.
+Load the extended namespaces table for reading.
 
 # C. Patching functions.
 
 note(s):
-* All functions in this section are patching functions for the master `namespaces` table file.
+* All functions in this section are patching functions for the extended `namespaces` table file (loaded by `load_spell_namespaces`).
 
 `add_extended_spell_symbol INT_VAR level STR_VAR symbol class patch = "*"`
 
@@ -50,7 +50,7 @@ note(s):
 
 `get_namespace_spell_resource STR_VAR namespaces symbol RET resource `
 
-Return the spell `resource` associated to `symbol` in the namespaces table, `*` if it does not exist. `namespaces` is the namespaces table loaded with `load_spell_namespaces`. In general, it is better to use table references -- see the [References module](./references.md).
+Return the spell `resource` associated to `symbol` in the extended namespaces table, `*` if it does not exist. In general, it is better to use table references -- see the [References module](./references.md).
 
 note(s):
 * This function is linear in the size of the table. The encoder in the [References module](./references.md) has better asymptotic performance.
