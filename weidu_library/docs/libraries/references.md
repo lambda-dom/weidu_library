@@ -109,6 +109,17 @@ Returns the symbolic spell reference suffixed with a character and the first two
 #afx:<two alphanumeric characters>:<one alphanumeric character>:<spell symbolic reference>
 ```
 
+`encode_extended_spell_resource STR_VAR value RET return`
+
+Treats `value` as a symbolic spell reference in the extended namespace table and returns the corresponding resource reference. Function FAIL's if `value` not present in the table. Format is:
+
+```
+#spe:<spell symbolic reference>
+```
+
+note(s):
+* Safe use of this function requires no changes to the master .2da file before the last `CLEAR_ARRAYS`. The safest way to ensure it is to put all changes in a (sub)component and all uses of the function is a different (sub)component.
+
 ## B. 4. Projectile-related formats.
 
 `encode_missile_res STR_VAR value RET return`

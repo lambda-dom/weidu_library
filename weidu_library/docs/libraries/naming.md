@@ -23,6 +23,8 @@ note(s):
 
 `initialize_namespaces`
 
+This function is idempotent, so it is safe to call it more than oince to guarantee initialization.
+
 `get_spell_namespaces RET path`
 
 Return the (full) `path` of the master namespaces table. FAIL's if the file does not exist.
@@ -42,7 +44,7 @@ note(s):
 
 `get_namespace_spell_resource STR_VAR namespaces symbol RET resource `
 
-Return the spell `resource` associated to `symbol` in the namespaces table, `*` if it does not exist. `namespaces` is the namespaces table. In general it is better to use table references so that the dance to prep and set up table indices is already done -- see the [References module](./references.md).
+Return the spell `resource` associated to `symbol` in the namespaces table, `*` if it does not exist. `namespaces` is the namespaces table loaded with `load_spell_namespaces`. In general it is better to use table references so that the dance to prep and set up table indices is already done -- see the [References module](./references.md).
 
 note(s):
 * This function is linear in the size of the table.
