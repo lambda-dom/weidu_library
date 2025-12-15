@@ -91,7 +91,9 @@ Builds an `array` from a `,`-separated `string` list of pairs `key = value`. Bot
 
 `load_array INT_VAR col = 1 STR_VAR table RET_ARRAY array`
 
-Builds an array from the `table` file (full path) and a column index. The keys are the values in the first column and the values are the values in the `col` column. This function implicitly assumes the keys are unique.
+Builds an array from the `table` file (full path) and a column index. The keys are the values in the first column and the values are the values in the `col` column. This function implicitly assumes the keys are unique; if they are not, their values are merged and the last one wins.
 
 note(s):
 * if the 2da file has 2 columns and its header is something like the usual 2da header `2DA V1.0`, the array returned will have extra keys. This is a bug in the WeiDU parser. To avoid such a problem, this case is treated especially, and the `2DA` key is _not_ introduced.
+
+`load_array_reverse INT_VAR col = 1 STR_VAR table RET_ARRAY array`
