@@ -23,6 +23,7 @@ For each type of resource there is a template example for the structure of the .
 * [Effects](./installers/effects.md): installers for effect `.eff` files.
 * [Icons](./installers/icons.md): installer for icon `.bam` files.
 * [Items](./installers/items.md): installer for `.itm` items.
+* [Naming](./installers/naming.md): installer for spell symbols in the extended namespace.
 * [Projectiles](./installers/projectiles.md): installers for projectile `.pro` files.
 * [Scripts](./installers/scripts.md): compile script `.baf` files.
 * [Sectypes](./installers/sectypes.md): installer for new sectypes.

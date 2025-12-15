@@ -1,10 +1,35 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/naming.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/projectiles.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 
 
+//Initialization of the extended namespace.
+LAF initialize_namespaces END
+
+
 //Arrays.
+//Reference tables.
+LAF load_spell_namespaces RET_ARRAY
+    table_namespaces = namespaces
+END
+
+//Indexes.
+LAF array_from_table STR_VAR
+    table = "table_namespaces"
+    key = "symbol"
+    value = "index"
+RET_ARRAY index_namespaces = array END
+
+LAF array_from_table STR_VAR
+    table = "table_namespaces"
+    key = "symbol"
+    value = "resource"
+RET_ARRAY resource_namespaces = array END
+
+
+
 //Available formats.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY reference_encoders BEGIN
     "lit" => "encode_resource_literal"
@@ -13,6 +38,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY reference_encoders BEGIN
     "spl" => "encode_spell_res"
     "suf" => "encode_spell_suffix"
     "afx" => "encode_spell_affix"
+    "spe" => "encode_extended_spell_resource"
     "lbl" => "encode_missile_res"
     "sct" => "encode_spell_sectype"
     "opc" => "encode_opcode_type"
@@ -152,6 +178,16 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
         prefix = "%prefix%"
         suffix = "%suffix%"
     RET return = resource END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_extended_spell_resource STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT return $"index_namespaces"("%value%")
+
+    //Sanitize.
+    OUTER_TEXT_SPRINT spell_id $"resource_namespaces"("%value%")
+    ACTION_IF NOT (IS_AN_INT spell_id) BEGIN
+        FAIL "encode_extended_spell_resource: symbol 'symbol' not present in extended namespaces table."
+    END
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_resource_extension STR_VAR value = "" RET return BEGIN

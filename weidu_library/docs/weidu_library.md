@@ -24,6 +24,7 @@ Support libraries: libraries providing basic functionality supporting everything
 * [Ids](./libraries/ids.md): functions for getting values out of .ids files.
 * [Items](./libraries/items.md): handle item .itm files.
 * [Lists](./libraries/lists.md): manipulate lists.
+* [Naming](./libraries/naming.md): extended spell naming scheme.
 * [Opcodes](./libraries/opcodes.md): opcode patching.
 * [Opcode arrays](./libraries/opcode_arrays.md): opcodes as arrays with table references.
 * [Projectiles](./libraries/projectiles.md): handle projectile .pro files.

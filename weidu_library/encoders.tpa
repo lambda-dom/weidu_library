@@ -52,6 +52,21 @@ DEFINE_DIMORPHIC_FUNCTION encode_strictly_positive STR_VAR value = "" RET return
     OUTER_TEXT_SPRINT return "%value%"
 END
 
+DEFINE_DIMORPHIC_FUNCTION encode_hexadecimal STR_VAR value = "" RET return BEGIN
+    ACTION_IF NOT (IS_AN_INT value) BEGIN
+        FAIL "encode_hexadecimal: value '%value%' is not an integer."
+    END
+
+    ACTION_IF NOT (0 <= value) BEGIN
+        FAIL "encode_hexadecimal: value '%value%' is not positive."
+    END
+
+    OUTER_PATCH_SAVE return "" BEGIN
+        SPRINTF return "%x" (value)
+    END
+END
+
+
 //Text.
 DEFINE_DIMORPHIC_FUNCTION encode_tra_ref STR_VAR value = "" RET return BEGIN
     ACTION_IF NOT (IS_AN_INT "%value%") BEGIN

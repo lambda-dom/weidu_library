@@ -1,0 +1,61 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/naming.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
+
+
+//Installer.
+DEFINE_ACTION_FUNCTION install_extended_symbols STR_VAR table = "" patches = "*" BEGIN
+    ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
+        //Sanitize.
+        ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
+            FAIL "install_extended_symbols: patches file '%patches%' does not exist."
+        END
+
+        //Include patches file.
+        INCLUDE "%patches%"
+    END
+
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "symbol,install,namespace,level,patch"
+    RET_ARRAY resources = table END
+
+    LAF get_extended_namespaces RET res_name = path END
+    COPY_EXISTING "%res_name%" "%res_name%"
+        //Loop.
+        LPF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT symbol $"row"("symbol")
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT namespace $"row"("namespace")
+                TEXT_SPRINT level $"row"("level")
+                TEXT_SPRINT patch $"row"("patch")
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Sanitize.
+                    PATCH_IF NOT (IS_AN_INT level) BEGIN
+                        PATCH_FAIL "install_extended_symbols: level '%level%' of row '%i%' is not an integer."
+                    END
+
+                    LPF add_extended_spell_symbol INT_VAR
+                        level = level
+                    STR_VAR
+                        symbol = "%symbol%"
+                        namespace = "%class%"
+                        patch = "%patch%"
+                    END
+                END
+            END
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
