@@ -6,67 +6,16 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
 
 
 //Arrays.
-ACTION_DEFINE_ASSOCIATIVE_ARRAY opcode_field_read_encoders BEGIN
-    "opcode"        => "encode_opcode_type_reverse"
-    "target"        => "encode_opcode_type_reverse"
-    "power"         => "encode_opcode_power"
-    "parameter1"    => "encode_opcode_parameter"
-    "parameter2"    => "encode_opcode_parameter"
-    "timing"        => "encode_opcode_type_reverse"
-    "resist_dispel" => "encode_opcode_type_reverse"
-    "duration"      => "encode_positive"
-    "probability1"  => "encode_opcode_probability"
-    "probability2"  => "encode_opcode_probability"
-    "resource"      => "encode_opcode_resource"
-    "dicenumber"    => "encode_positive"
-    "dicesize"      => "encode_positive"
-    "savingthrow"   => "encode_opcode_parameter"
-    "savebonus"     => "encode_opcode_save_bonus"
-    "special"       => "encode_opcode_parameter"
-END
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/opcode_arrays/readers.2da"
+RET_ARRAY opcode_field_read_encoders = array END
+
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/opcode_arrays/writers.2da"
+RET_ARRAY opcode_field_write_encoders = array END
 
 
 //Encoders.
-DEFINE_DIMORPHIC_FUNCTION encode_opcode_type_reverse STR_VAR value = ""  RET return BEGIN
-    LAF find_key STR_VAR
-        array = "opcode_types"
-        value = "%value%"
-    RET return = key END
-    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "encode_opcode_type_reverse: '%value%' not a valid opcode type."
-    END
-END
-
-DEFINE_DIMORPHIC_FUNCTION encode_opcode_target_reverse STR_VAR value = ""  RET return BEGIN
-    LAF find_key STR_VAR
-        array = "opcode_targets"
-        value = "%value%"
-    RET return = key END
-    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "encode_opcode_target_reverse: '%value%' not a valid opcode target."
-    END
-END
-
-DEFINE_DIMORPHIC_FUNCTION encode_opcode_timing_reverse STR_VAR value = ""  RET return BEGIN
-    LAF find_key STR_VAR
-        array = "opcode_timings"
-        value = "%value%"
-    RET return = key END
-    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "encode_opcode_timing_reverse: '%value%' not a valid opcode timing."
-    END
-END
-
-DEFINE_DIMORPHIC_FUNCTION encode_opcode_resist_dispel_reverse STR_VAR value = ""  RET return BEGIN
-    LAF find_key STR_VAR
-        array = "opcode_resist_dispels"
-        value = "%value%"
-    RET return = key END
-    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
-        FAIL "encode_opcode_resist_dispel_reverse: '%value%' not a valid opcode resist_dispel."
-    END
-END
-
 DEFINE_DIMORPHIC_FUNCTION encode_opcode_parameter STR_VAR value = "" RET return BEGIN
     ACTION_IF NOT (IS_AN_INT value) BEGIN
         FAIL "encode_opcode_parameter: value '%value%' is not an integer."
@@ -126,56 +75,16 @@ DEFINE_PATCH_FUNCTION get_opcode_array INT_VAR offset = 0 RET_ARRAY array BEGIN
 END
 
 DEFINE_PATCH_FUNCTION set_opcode_array INT_VAR offset = 0 STR_VAR array = "" BEGIN
-    TEXT_SPRINT value $"%array%"("opcode")
-    LPF get_opcode_type_id STR_VAR value = "%value%" RET opcode_id = id END
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "opcode" value = "%opcode_id%" END
-
-    TEXT_SPRINT value $"%array%"("target")
-    LPF get_opcode_target_id STR_VAR value = "%value%" RET target_id = id END
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "target" value = "%target_id%" END
-
-    TEXT_SPRINT value $"%array%"("power")
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "power" value = "%value%" END
-
-    TEXT_SPRINT value $"%array%"("parameter1")
-    LPF encode_table_reference STR_VAR value = "%value%" RET value = return END
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "parameter1" value = "%value%" END
-    TEXT_SPRINT value $"%array%"("parameter2")
-    LPF encode_table_reference STR_VAR value = "%value%" RET value = return END
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "parameter2" value = "%value%" END
-
-    TEXT_SPRINT value $"%array%"("duration")
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "duration" value = "%value%" END
-
-    //Probability.
-    TEXT_SPRINT value $"%array%"("probability1")
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "probability1" value = "%value%" END
-    TEXT_SPRINT value $"%array%"("probability2")
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "probability2" value = "%value%" END
-
-    //Resource.
-    TEXT_SPRINT value $"%array%"("resource")
-    LPF encode_table_reference STR_VAR value = "%value%" RET value = return END
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "resource" value = "%value%" END
-
-    //Dice.
-    TEXT_SPRINT value $"%array%"("dicenumber")
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "dicenumber" value = "%value%" END
-    TEXT_SPRINT value $"%array%"("dicesize")
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "dicesize" value = "%value%" END
-
-    //Savingthrow.
-    TEXT_SPRINT value $"%array%"("savingthrow")
-    LPF encode_table_reference STR_VAR value = "%value%" RET value = return END
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "savingthrow" value = "%value%" END
-
-    TEXT_SPRINT value $"%array%"("savebonus")
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "savebonus" value = "%value%" END
-
-    //Special.
-    TEXT_SPRINT value $"%array%"("special")
-    LPF encode_table_reference STR_VAR value = "%value%" RET value = return END
-    LPF set_opcode_field INT_VAR offset = offset STR_VAR field = "special" value = "%value%" END
+    PHP_EACH "%array%" AS field => value BEGIN
+        TEXT_SPRINT encoder $"opcode_field_write_encoders"("%field%")
+        LPF "%encoder%" STR_VAR value = "%value%" RET value = return END
+        LPF set_opcode_field INT_VAR
+            offset = offset
+        STR_VAR
+            field = "%field%"
+            value = "%value%"
+        END
+    END
 END
 
 

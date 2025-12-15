@@ -1,0 +1,16 @@
+opcode          encode_opcode_type_reverse
+target          encode_opcode_target_reverse
+power           encode_opcode_power
+parameter1      encode_opcode_parameter
+parameter2      encode_opcode_parameter
+timing          encode_opcode_timing_reverse
+resist_dispel   encode_opcode_resist_dispel_reverse
+duration        encode_positive
+probability1    encode_opcode_probability
+probability2    encode_opcode_probability
+resource        encode_opcode_resource
+dicenumber      encode_positive
+dicesize        encode_positive
+savingthrow     encode_opcode_parameter
+savebonus       encode_opcode_save_bonus
+special         encode_opcode_parameter

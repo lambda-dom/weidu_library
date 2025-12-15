@@ -139,6 +139,47 @@ DEFINE_DIMORPHIC_FUNCTION encode_opcode_save_bonus STR_VAR value = "" RET return
     OUTER_TEXT_SPRINT return "%value%"
 END
 
+//Reverse encoders.
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_type_reverse STR_VAR value = ""  RET return BEGIN
+    LAF find_key STR_VAR
+        array = "opcode_types"
+        value = "%value%"
+    RET return = key END
+    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "encode_opcode_type_reverse: '%value%' not a valid opcode type."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_target_reverse STR_VAR value = ""  RET return BEGIN
+    LAF find_key STR_VAR
+        array = "opcode_targets"
+        value = "%value%"
+    RET return = key END
+    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "encode_opcode_target_reverse: '%value%' not a valid opcode target."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_timing_reverse STR_VAR value = ""  RET return BEGIN
+    LAF find_key STR_VAR
+        array = "opcode_timings"
+        value = "%value%"
+    RET return = key END
+    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "encode_opcode_timing_reverse: '%value%' not a valid opcode timing."
+    END
+END
+
+DEFINE_DIMORPHIC_FUNCTION encode_opcode_resist_dispel_reverse STR_VAR value = ""  RET return BEGIN
+    LAF find_key STR_VAR
+        array = "opcode_resist_dispels"
+        value = "%value%"
+    RET return = key END
+    ACTION_IF ("%return%" STRING_EQUAL_CASE "*") BEGIN
+        FAIL "encode_opcode_resist_dispel_reverse: '%value%' not a valid opcode resist_dispel."
+    END
+END
+
 
 //Projectiles.
 DEFINE_DIMORPHIC_FUNCTION encode_missile_res STR_VAR value = "" RET return BEGIN
