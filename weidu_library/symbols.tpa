@@ -43,7 +43,7 @@ BEGIN
 
     ADD_SPELL "%resource%.spl" id level "%symbol%"
         PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
-            LPF "%patch%" END
+            LPF "%patch%" STR_VAR destination = "%resource%" END
         END
 END
 

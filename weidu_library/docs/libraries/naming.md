@@ -21,13 +21,16 @@ The [table](../../resources/2da/naming/namespaces.2da) of namespaces.
 note(s):
 * All functions in this section are action functions.
 
+`get_namespaces_resource RET resource`
+
+Return the in-game `resource` of the master namespaces table (no extension).
+
 `initialize_namespaces`
 
-This function is idempotent, so it is safe to call it more than once to guarantee initialization.
+Make sure the master namespaces table exist, and if not, initialize it. This function is idempotent, so it is safe to call it more than once.
 
-`get_spell_namespaces RET path`
-
-Return the (full) `path` of the master namespaces table. FAIL's if the file does not exist.
+note(s):
+* Currently this table is called `extended_namespaces.2da` and is assumed that no other mod is using such a resource (otherwise you will get errors).
 
 `load_spell_namespaces RET_ARRAY namespaces`
 
@@ -38,13 +41,13 @@ Load the master namespaces table for reading.
 note(s):
 * All functions in this section are patching functions for the master `namespaces` table file.
 
-`add_spell INT_VAR level STR_VAR symbol class`
+`add_extended_spell_symbol INT_VAR level STR_VAR symbol class patch = "*"`
 
 # D. Searchers.
 
 `get_namespace_spell_resource STR_VAR namespaces symbol RET resource `
 
-Return the spell `resource` associated to `symbol` in the namespaces table, `*` if it does not exist. `namespaces` is the namespaces table loaded with `load_spell_namespaces`. In general it is better to use table references so that the dance to prep and set up table indices is already done -- see the [References module](./references.md).
+Return the spell `resource` associated to `symbol` in the namespaces table, `*` if it does not exist. `namespaces` is the namespaces table loaded with `load_spell_namespaces`. In general, it is better to use table references -- see the [References module](./references.md).
 
 note(s):
-* This function is linear in the size of the table. The encoder in the [References module](./references.md) is better for performance (but needs some care in setting up).
+* This function is linear in the size of the table. The encoder in the [References module](./references.md) has better asymptotic performance.

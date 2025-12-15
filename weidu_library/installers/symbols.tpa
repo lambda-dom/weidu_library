@@ -3,7 +3,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/symbols.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
-//Table interface.
+//Installer.
 DEFINE_ACTION_FUNCTION install_symbols STR_VAR table = "" patches = "*" BEGIN
     OUTER_TEXT_SPRINT blank "%WEIDU_LIBRARY_DIR%/resources/spl/blank"
 
@@ -63,6 +63,7 @@ DEFINE_ACTION_FUNCTION install_symbols STR_VAR table = "" patches = "*" BEGIN
         END
     END
 END
+
 
 //Other installers.
 DEFINE_ACTION_FUNCTION alias_spell_symbols STR_VAR table = "" BEGIN

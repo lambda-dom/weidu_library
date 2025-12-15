@@ -2,6 +2,7 @@
 INCLUDE "%WEIDU_LIBRARY_DIR%/2da.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/arrays.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/lists.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
@@ -27,32 +28,63 @@ RET_ARRAY namespace_indices = array END
 
 
 //Basic functions.
-DEFINE_DIMORPHIC_FUNCTION initialize_namespaces BEGIN
-    OUTER_TEXT_SPRINT dest_dir "weidu_external/data/weidu_library/resources/2da"
-    ACTION_IF NOT (FILE_EXISTS "%dest_dir%/spellext.2da") BEGIN
-        OUTER_TEXT_SPRINT source_dir "%WEIDU_LIBRARY_DIR%/resources/2da/naming"
-        COPY "%source_dir%/extended_namespaces.2da" "%dest_dir%/spellext.2da"
-    END
+DEFINE_DIMORPHIC_FUNCTION get_namespaces_resource RET resource BEGIN
+    OUTER_TEXT_SPRINT resource "extended_namespaces"
 END
 
-DEFINE_DIMORPHIC_FUNCTION get_spell_namespaces_path RET path BEGIN
-    OUTER_TEXT_SPRINT path "weidu_external/data/weidu_library/resources/2da/spellext.2da"
-    ACTION_IF NOT (FILE_EXISTS "%dest_dir%/spellext.2da") BEGIN
-        FAIL "get_spell_namespaces: master namespaces table '%path%' does not exist."
+DEFINE_DIMORPHIC_FUNCTION initialize_namespaces BEGIN
+    LAF get_namespaces_resource RET resource END
+    ACTION_IF NOT (FILE_EXISTS_IN_GAME "%resource%.2da") BEGIN
+        OUTER_TEXT_SPRINT dir "%WEIDU_LIBRARY_DIR%/resources/2da/naming"
+        ACTION_IF NOT (FILE_EXISTS "%dir%/%resource%.2da") BEGIN
+            FAIL "initialize_namespaces: table '%dir%/%resource%.2da' not found."
+        END
+
+        COPY "%dir%/%resource%.2da" "override"
     END
 END
 
 DEFINE_DIMORPHIC_FUNCTION load_namespaces RET_ARRAY namespaces BEGIN
-    LAF get_namespaces_path RET path END
-    LAF load_table STR_VAR
-        file = "%path%"
-        fields = "spell,class,level,index,resource"
-    RET_ARRAY namespaces = table END
+    //Intialize.
+    OUTER_TEXT_SPRINT fields_list "symbol,class,level,index,resource"
+    LAF list_from_string STR_VAR
+        string = "%fields_list%"
+    RET _ = count RET_ARRAY fields = list END
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY namespaces BEGIN END
+
+    LAF get_namespaces_resource RET res_name = resource END
+    COPY_EXISTING "%res_name%.2da" "override"
+        COUNT_2DA_COLS cols
+
+        //Sanitize.
+        PATCH_IF NOT (5 = cols) BEGIN
+            PATCH_FAIL "load_namespaces: expected 5 columns, got '%cols%'."
+        END
+
+        READ_2DA_ENTRIES_NOW "namespaces#rows" cols
+        //Loop.
+        FOR (j = 0; j < cols; ++j) BEGIN
+            TEXT_SPRINT field $fields("%j%")
+            FOR (i = 0; i < namespaces#rows; ++i) BEGIN
+                READ_2DA_ENTRY_FORMER "namespaces#rows" i j value
+                TEXT_SPRINT $"namespaces"("%i%" "%field%") "%value%"
+            END
+        END
+
+        //Insert row count and fields.
+        TEXT_SPRINT $"namespaces"("table#count") "%namespaces#rows%"
+        TEXT_SPRINT $"namespaces"("table#fields") "%fields_list%"
 END
 
 
 //Patching functions.
-DEFINE_PATCH_FUNCTION add_spell INT_VAR level = 0 STR_VAR symbol = "" class = "" BEGIN
+DEFINE_PATCH_FUNCTION add_extended_spell_symbol INT_VAR
+    level = 0
+STR_VAR
+    symbol = ""
+    class = ""
+    patch = "*"
+BEGIN
     //Sanitize.
     PATCH_IF NOT ((0 <= level) AND (level <= 9)) BEGIN
         PATCH_FAIL "add_spell: level '%level%' is not in the range [0,9]."
@@ -123,6 +155,9 @@ DEFINE_PATCH_FUNCTION add_spell INT_VAR level = 0 STR_VAR symbol = "" class = ""
     //Copy spell and insert row.
     INNER_ACTION BEGIN
         COPY "%blank%" "override/%resource%.spl"
+            PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
+                LPF "%patch%" STR_VAR destination = "%resource%" END
+            END
     END
 
     INSERT_2DA_ROW rows cols "%symbol% %class% %level% %found% %resource%"
