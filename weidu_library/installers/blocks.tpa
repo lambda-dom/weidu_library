@@ -25,15 +25,23 @@ DEFINE_PATCH_FUNCTION append_item_equipped_block STR_VAR table = "" BEGIN
             //Append equipped opcode.
             LPF append_item_equipped_opcode END
 
-            //Default values.
+            //Form array.
             LPF get_equipped_zero_opcode RET_ARRAY opc_array = array END
             PHP_EACH "row" AS field => value BEGIN
                 TEXT_SPRINT $opc_array("%field%") "%value%"
             END
 
-            //Set it.
+            //Apply.
             LPF get_equipped_opcode_offset INT_VAR index = i RET opc_offset = offset END
             LPF set_opcode_array INT_VAR offset = opc_offset STR_VAR array = "opc_array" END
         END
+    END
+END
+
+DEFINE_PATCH_FUNCTION append_item_header_block INT_VAR header = 0 STR_VAR table = "" BEGIN
+    //Sanitize.
+    LPF get_item_header_count RET headers_count = count END
+    PATCH_IF NOT ((0 <= header) AND (header < headers_count)) BEGIN
+        PATCH_FAIL "append_item_header_block: header '%header%' not in the range [0, %headers_count%[."
     END
 END
