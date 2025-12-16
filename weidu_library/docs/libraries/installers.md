@@ -18,6 +18,7 @@ For each type of resource there is a template example for the structure of the .
 
 # B. Available installers.
 
+* [Blocks](./installers/blocks.md): patch in standardized blocks of opcodes.
 * [Creatures](./installers/creatures.md): installer for creature `.cre` files.
 * [Dialogs](./installers/dialogs.md): compile dialog `.d` files.
 * [Effects](./installers/effects.md): installers for effect `.eff` files.

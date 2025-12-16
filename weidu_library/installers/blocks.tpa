@@ -1,0 +1,39 @@
+//Libraries.
+INCLUDE "%WEIDU_LIBRARY_DIR%/items.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/opcode_arrays.tpa"
+
+
+//Item patchers.
+DEFINE_PATCH_FUNCTION append_item_equipped_block STR_VAR table = "" BEGIN
+    //Load table
+    LPF load_table STR_VAR
+        file = "%table%"
+        fields = "opcode,parameter1,parameter2,resource,dicenumber,dicesize,special"
+    RET_ARRAY opcodes = table END
+
+    //Loop.
+    LPF get_table_row_count STR_VAR table = "opcodes" RET row_count = count END
+    LPF get_equipped_opcode_count RET opc_count = count END
+    FOR (i = opc_count; i < opc_count + row_count; ++i) BEGIN
+        LPF get_row_from_table INT_VAR row = i STR_VAR
+            table = "opcodes"
+        RET_ARRAY
+            row = array
+        END
+
+        PATCH_WITH_SCOPE BEGIN
+            //Append equipped opcode.
+            LPF append_item_equipped_opcode END
+
+            //Default values.
+            LPF get_equipped_zero_opcode RET_ARRAY opc_array = array END
+            PHP_EACH "row" AS field => value BEGIN
+                TEXT_SPRINT $opc_array("%field%") "%value%"
+            END
+
+            //Set it.
+            LPF get_equipped_opcode_offset INT_VAR index = i RET opc_offset = offset END
+            LPF set_opcode_array INT_VAR offset = opc_offset STR_VAR array = "opc_array" END
+        END
+    END
+END
