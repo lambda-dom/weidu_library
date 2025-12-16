@@ -172,7 +172,7 @@ DEFINE_DIMORPHIC_FUNCTION load_array INT_VAR col = 1 STR_VAR table = "" RET_ARRA
         //Sanity bounds check.
         COUNT_2DA_COLS cols
         PATCH_IF NOT ((1 <= col) AND (col < cols)) BEGIN
-            PATCH_FAIL "load_array: column index '%col%' out of bounds."
+            PATCH_FAIL "load_array: column index '%col%' out of bounds [1, %cols%]."
         END
 
         READ_2DA_ENTRIES_NOW "table#rows" cols
@@ -180,6 +180,30 @@ DEFINE_DIMORPHIC_FUNCTION load_array INT_VAR col = 1 STR_VAR table = "" RET_ARRA
             READ_2DA_ENTRY_FORMER "table#rows" i 0 key
             READ_2DA_ENTRY_FORMER "table#rows" i col value
             PATCH_IF NOT ((2 = cols) AND ("%key%" STRING_EQUAL_CASE "2DA")) BEGIN
+                TEXT_SPRINT $"array"("%key%") "%value%"
+            END
+        END
+END
+
+DEFINE_DIMORPHIC_FUNCTION load_array_reverse INT_VAR col = 1 STR_VAR table = "" RET_ARRAY array BEGIN
+    //Existence check.
+    ACTION_IF NOT (FILE_EXISTS "%table%") BEGIN
+        FAIL "load_array_reverse: file '%table%' does not exist."
+    END
+
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY array BEGIN END
+    COPY - "%table%" "override"
+        //Sanity bounds check.
+        COUNT_2DA_COLS cols
+        PATCH_IF NOT ((1 <= col) AND (col < cols)) BEGIN
+            PATCH_FAIL "load_array_reverse: column index '%col%' out of bounds [1, %cols%]."
+        END
+
+        READ_2DA_ENTRIES_NOW "table#rows" cols
+        FOR (i = 0; i < table#rows; ++i) BEGIN
+            READ_2DA_ENTRY_FORMER "table#rows" i 0 value
+            READ_2DA_ENTRY_FORMER "table#rows" i col key
+            PATCH_IF NOT ((2 = cols) AND ("%value%" STRING_EQUAL_CASE "2DA")) BEGIN
                 TEXT_SPRINT $"array"("%key%") "%value%"
             END
         END

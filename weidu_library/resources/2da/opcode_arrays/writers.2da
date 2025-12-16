@@ -1,0 +1,16 @@
+opcode          encode_opcode_type
+target          encode_opcode_target
+power           encode_identity
+parameter1      encode_table_reference
+parameter2      encode_table_reference
+timing          encode_opcode_timing
+resist_dispel   encode_opcode_resist_dispel
+duration        encode_identity
+probability1    encode_identity
+probability2    encode_identity
+resource        encode_table_reference
+dicenumber      encode_identity
+dicesize        encode_identity
+savingthrow     encode_table_reference
+savebonus       encode_identity
+special         encode_table_reference

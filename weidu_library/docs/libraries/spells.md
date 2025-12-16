@@ -109,6 +109,16 @@ Specializations of the generic reader and writer for spells.
 
 `set_spell_header_field INT_VAR header STR_VAR field value`
 
+## D. 1. Mutators.
+
+`insert_spell_casting_opcode INT_VAR index`
+
+`append_spell_casting_opcode`
+
+`insert_spell_header_opcode INT_VAR header index`
+
+`append_spell_header_opcode INT_VAR header`
+
 # E. Getters.
 
 `get_spell_res STR_VAR spell RET resource`

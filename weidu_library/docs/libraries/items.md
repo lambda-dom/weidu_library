@@ -97,6 +97,16 @@ Specializations of the generic reader and writer for items.
 
 `set_item_header_field INT_VAR header STR_VAR field value`
 
+## D. 1. Mutators.
+
+`insert_item_equipped_opcode INT_VAR index`
+
+`append_item_equipped_opcode`
+
+`insert_item_header_opcode INT_VAR header index`
+
+`append_item_header_opcode INT_VAR header`
+
 # E. Getters.
 
 `get_item_category_id STR_VAR category RET id`

@@ -21,6 +21,8 @@ The trivial encoder, returning `value` unchanged.
 
 `encode_percentage STR_VAR value RET return`
 
+`encode_integer STR_VAR value RET return`
+
 `encode_positive STR_VAR value RET return`
 
 `encode_strictly_positive STR_VAR value RET return`
@@ -44,6 +46,16 @@ Resolves the tra reference `value`, adding its text to the .tlk and returning th
 `encode_opcode_resist_dispel STR_VAR value RET return`
 
 `encode_opcode_save_bonus STR_VAR value RET return`
+
+## D. 1. Reverse encoders.
+
+`encode_opcode_type_reverse STR_VAR value RET return`
+
+`encode_opcode_target_reverse STR_VAR value RET return`
+
+`encode_opcode_timing_reverse STR_VAR value RET return`
+
+`encode_opcode_resist_dispel_reverse STR_VAR value RET return`
 
 # E. Projectiles.
 
