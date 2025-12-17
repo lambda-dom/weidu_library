@@ -168,6 +168,14 @@ Returns a resource reference, checking its in-game existence. Associated format 
 note(s):
 * this format is used in the (rare) case where a column contains resource references but their type can vary and one needs existence validation.
 
+`encode_reference_suffix STR_VAR value RET return`
+
+A generalization of `encode_spell_suffix`, where the second component is a general table reference. Returns the table reference suffixed with the character. Format is:
+
+```
+#etr:<one alphanumeric character>:<resource reference>
+```
+
 # C. Other resource encoders.
 
 The next set of encoders have no format associated and are mainly used as value sanitizers.
