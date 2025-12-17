@@ -44,4 +44,6 @@ DEFINE_PATCH_FUNCTION append_item_header_block INT_VAR header = 0 STR_VAR table 
     PATCH_IF NOT ((0 <= header) AND (header < headers_count)) BEGIN
         PATCH_FAIL "append_item_header_block: header '%header%' not in the range [0, %headers_count%[."
     END
+
+    PATCH_FAIL "append_item_header_block: not implemented yet."
 END
