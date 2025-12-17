@@ -6,7 +6,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 
 
 //Initialization of the extended namespace.
-LAF initialize_namespaces END
+LAF initialize_extended_namespaces END
 
 
 //Arrays.
