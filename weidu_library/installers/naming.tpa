@@ -50,7 +50,7 @@ DEFINE_ACTION_FUNCTION install_extended_symbols STR_VAR table = "" patches = "*"
                         level = level
                     STR_VAR
                         symbol = "%symbol%"
-                        namespace = "%class%"
+                        namespace = "%namespace%"
                         patch = "%patch%"
                     END
                 END

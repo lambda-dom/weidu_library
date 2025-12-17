@@ -19,13 +19,13 @@ DEFINE_DIMORPHIC_FUNCTION initialize_extended_namespaces BEGIN
     LAF get_master_namespaces RET destination = path END
     ACTION_IF NOT (FILE_EXISTS "%destination%") BEGIN
         OUTER_TEXT_SPRINT source "%WEIDU_LIBRARY_DIR%/resources/2da/naming/master_namespaces.2da"
-        COPY "%source%/" "%destination%"
+        COPY "%source%" "%destination%"
     END
 
     LAF get_extended_namespaces RET destination = path END
     ACTION_IF NOT (FILE_EXISTS "%destination%") BEGIN
         OUTER_TEXT_SPRINT source "%WEIDU_LIBRARY_DIR%/resources/2da/naming/extended_namespaces.2da"
-        COPY "%source%/" "%destination%"
+        COPY "%source%" "%destination%"
     END
 END
 
@@ -40,7 +40,7 @@ LAF get_master_namespaces RET path_master_namespaces = path END
 //Order: load table and indexes *after* initialization.
 //Tables.
 LAF load_table STR_VAR
-    file = "%master_namespaces_path%"
+    file = "%path_master_namespaces%"
     fields = "namespace,abbrev,index"
 RET_ARRAY master_namespaces = table END
 
@@ -67,7 +67,7 @@ DEFINE_DIMORPHIC_FUNCTION load_master_namespaces RET_ARRAY namespaces BEGIN
     RET_ARRAY namespaces = table END
 END
 
-DEFINE_DIMORPHIC_FUNCTION load_namespaces RET_ARRAY namespaces BEGIN
+DEFINE_DIMORPHIC_FUNCTION load_extended_namespaces RET_ARRAY namespaces BEGIN
     LAF get_extended_namespaces RET path END
     LAF load_table STR_VAR
         file = "%path%"
@@ -129,9 +129,9 @@ BEGIN
         PATCH_FAIL "add_extended_spell_symbol: expected 5 columns in namespaces table, got '%cols%'."
     END
 
-    //Sanitize class.
+    //Sanitize namespace.
     TEXT_SPRINT namespace_id $"namespace_indices"("%namespace%")
-    PATCH_IF NOT (IS_AN_INT class_id) BEGIN
+    PATCH_IF NOT (IS_AN_INT namespace_id) BEGIN
         PATCH_FAIL "add_extended_spell_symbol: invalid namespace '%namespace%'."
     END
 
@@ -142,9 +142,9 @@ BEGIN
     END
 
     //Find last existing index.
-    last_index = 0
-    COUNT_2DA_ROWS cols rows
-    FOR (i = 0; i < rows; ++i) BEGIN
+    COUNT_2DA_ROWS cols row_count
+    last_index = row_count
+    FOR (i = 0; i < row_count; ++i) BEGIN
         READ_2DA_ENTRY i 1 cols spl_namespace
         READ_2DA_ENTRY i 2 cols spl_level
         PATCH_IF ("%spl_namespace%" STRING_EQUAL_CASE "%namespace%") AND (spl_level = level) BEGIN
@@ -196,7 +196,7 @@ BEGIN
         END
     END
 
-    INSERT_2DA_ROW rows cols "%symbol% %namespace% %level% %found% %resource%"
+    INSERT_2DA_ROW row_count cols "%symbol% %namespace% %level% %found% %resource%"
 END
 
 

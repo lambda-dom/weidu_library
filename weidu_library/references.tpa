@@ -6,12 +6,12 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/encoders.tpa"
 
 
 //Initialization of the extended namespace.
-LAF initialize_namespaces END
+LAF initialize_extended_namespaces END
 
 
 //Arrays.
 //Reference tables.
-LAF load_spell_namespaces RET_ARRAY
+LAF load_extended_namespaces RET_ARRAY
     table_namespaces = namespaces
 END
 
@@ -43,6 +43,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY reference_encoders BEGIN
     "sct" => "encode_spell_sectype"
     "opc" => "encode_opcode_type"
     "ext" => "encode_resource_extension"
+    "etr" => "encode_reference_suffix"
 END
 
 
@@ -57,7 +58,7 @@ DEFINE_DIMORPHIC_FUNCTION replace_affixes STR_VAR spell = "" prefix = "" suffix 
         FAIL "replace_affixes: prefix '%suffix%' is not 1 character long or less."
     END
 
-    OUTER_TEXT_SPRINT regexp "^[sS][pP]\([a-zA-Z][a-zA-Z][0-9][0-9][0-9]\)$"
+    OUTER_TEXT_SPRINT regexp "^[sS][pP]\([a-zA-Z][a-zA-Z][0-9][0-9a-fA-F][0-9a-fA-F]\)$"
     ACTION_IF NOT (0 = ("%spell%" STRING_MATCHES_REGEXP "%regexp%")) BEGIN
         FAIL "replace_spell_affixes: string '%spell%' not a valid 7-character spell resource name."
     END
@@ -77,6 +78,7 @@ END
 //Main function.
 DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return BEGIN
     OUTER_TEXT_SPRINT regexp "^#\([a-zA-Z0-9][a-zA-Z0-9_-]*\):\(.*\)$"
+
     //Sanitize.
     ACTION_IF NOT (("%value%" STRING_MATCHES_REGEXP "%regexp%") = 0) THEN BEGIN
         FAIL "encode_table_reference: string '%value%' does not have the format of a table reference."
@@ -124,7 +126,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_num_literal STR_VAR value = "" RET return BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_empty_string STR_VAR value = "" RET return BEGIN
-    ACTION_IF NOT (0 = STRING_LENGTH value) BEGIN
+    ACTION_IF NOT (0 = STRING_LENGTH "%value%") BEGIN
         FAIL "encode_empty_string: value '%value%' is not the null string."
     END
 
@@ -172,6 +174,10 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
         FAIL "encode_resource_extension: string '%value%' does not have a valid format."
     END
 
+    ACTION_IF NOT (1 = (STRING_LENGTH "%suffix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
+    END
+
     LAF encode_spell_res STR_VAR value = "%spell%" RET return END
     LAF replace_affixes STR_VAR
         spell = "%return%"
@@ -181,13 +187,13 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_extended_spell_resource STR_VAR value = "" RET return BEGIN
-    OUTER_TEXT_SPRINT return $"index_namespaces"("%value%")
-
     //Sanitize.
-    OUTER_TEXT_SPRINT spell_id $"resource_namespaces"("%value%")
+    OUTER_TEXT_SPRINT spell_id $"index_namespaces"("%value%")
     ACTION_IF NOT (IS_AN_INT spell_id) BEGIN
         FAIL "encode_extended_spell_resource: symbol 'symbol' not present in extended namespaces table."
     END
+
+    OUTER_TEXT_SPRINT return $"resource_namespaces"("%value%")
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_resource_extension STR_VAR value = "" RET return BEGIN
@@ -212,6 +218,29 @@ DEFINE_DIMORPHIC_FUNCTION encode_resource_extension STR_VAR value = "" RET retur
     END
 END
 
+DEFINE_DIMORPHIC_FUNCTION encode_reference_suffix STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT regexp "^\([a-zA-Z0-9]\):\(.+\)$"
+
+    //Generate name.
+    OUTER_PATCH "%value%" BEGIN
+        REPLACE_EVALUATE CASE_INSENSITIVE "%regexp%" BEGIN
+            TEXT_SPRINT suffix "%MATCH1%"
+            TEXT_SPRINT reference "%MATCH2%"
+        END ~~
+    END
+
+    //Sanitize.
+    ACTION_IF NOT (1 = (STRING_LENGTH "%suffix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
+    END
+
+    LAF encode_table_reference STR_VAR value = "%reference%" RET return END   
+    LAF replace_affixes STR_VAR
+        spell = "%return%"
+        prefix = "sp"
+        suffix = "%suffix%"
+    RET return = resource END
+END
 
 //Fixed extension encoders.
 DEFINE_DIMORPHIC_FUNCTION encode_bam_ref STR_VAR value = "" RET return BEGIN
