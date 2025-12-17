@@ -19,13 +19,13 @@ DEFINE_DIMORPHIC_FUNCTION initialize_extended_namespaces BEGIN
     LAF get_master_namespaces RET destination = path END
     ACTION_IF NOT (FILE_EXISTS "%destination%") BEGIN
         OUTER_TEXT_SPRINT source "%WEIDU_LIBRARY_DIR%/resources/2da/naming/master_namespaces.2da"
-        COPY "%source%/" "%destination%"
+        COPY "%source%" "%destination%"
     END
 
     LAF get_extended_namespaces RET destination = path END
     ACTION_IF NOT (FILE_EXISTS "%destination%") BEGIN
         OUTER_TEXT_SPRINT source "%WEIDU_LIBRARY_DIR%/resources/2da/naming/extended_namespaces.2da"
-        COPY "%source%/" "%destination%"
+        COPY "%source%" "%destination%"
     END
 END
 
