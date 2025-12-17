@@ -129,9 +129,9 @@ BEGIN
         PATCH_FAIL "add_extended_spell_symbol: expected 5 columns in namespaces table, got '%cols%'."
     END
 
-    //Sanitize class.
+    //Sanitize namespace.
     TEXT_SPRINT namespace_id $"namespace_indices"("%namespace%")
-    PATCH_IF NOT (IS_AN_INT class_id) BEGIN
+    PATCH_IF NOT (IS_AN_INT namespace_id) BEGIN
         PATCH_FAIL "add_extended_spell_symbol: invalid namespace '%namespace%'."
     END
 
