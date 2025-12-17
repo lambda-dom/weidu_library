@@ -11,7 +11,7 @@ LAF initialize_extended_namespaces END
 
 //Arrays.
 //Reference tables.
-LAF load_spell_namespaces RET_ARRAY
+LAF load_extended_namespaces RET_ARRAY
     table_namespaces = namespaces
 END
 

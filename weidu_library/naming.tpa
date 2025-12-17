@@ -67,7 +67,7 @@ DEFINE_DIMORPHIC_FUNCTION load_master_namespaces RET_ARRAY namespaces BEGIN
     RET_ARRAY namespaces = table END
 END
 
-DEFINE_DIMORPHIC_FUNCTION load_namespaces RET_ARRAY namespaces BEGIN
+DEFINE_DIMORPHIC_FUNCTION load_extended_namespaces RET_ARRAY namespaces BEGIN
     LAF get_extended_namespaces RET path END
     LAF load_table STR_VAR
         file = "%path%"
