@@ -142,9 +142,9 @@ BEGIN
     END
 
     //Find last existing index.
-    last_index = 0
-    COUNT_2DA_ROWS cols rows
-    FOR (i = 0; i < rows; ++i) BEGIN
+    COUNT_2DA_ROWS cols row_count
+    last_index = row_count
+    FOR (i = 0; i < row_count; ++i) BEGIN
         READ_2DA_ENTRY i 1 cols spl_namespace
         READ_2DA_ENTRY i 2 cols spl_level
         PATCH_IF ("%spl_namespace%" STRING_EQUAL_CASE "%namespace%") AND (spl_level = level) BEGIN
@@ -196,7 +196,7 @@ BEGIN
         END
     END
 
-    INSERT_2DA_ROW rows cols "%symbol% %namespace% %level% %found% %resource%"
+    INSERT_2DA_ROW row_count cols "%symbol% %namespace% %level% %found% %resource%"
 END
 
 

@@ -70,7 +70,8 @@ DEFINE_DIMORPHIC_FUNCTION encode_hexadecimal STR_VAR value = "" RET return BEGIN
         FAIL "encode_hexadecimal: value '%value%' is not positive."
     END
 
-    OUTER_PATCH_SAVE return "" BEGIN
+    OUTER_TEXT_SPRINT return ""
+    OUTER_INNER_PATCH "" BEGIN
         SPRINTF return "%x" (value)
     END
 END
