@@ -40,7 +40,7 @@ LAF get_master_namespaces RET path_master_namespaces = path END
 //Order: load table and indexes *after* initialization.
 //Tables.
 LAF load_table STR_VAR
-    file = "%master_namespaces_path%"
+    file = "%path_master_namespaces%"
     fields = "namespace,abbrev,index"
 RET_ARRAY master_namespaces = table END
 
