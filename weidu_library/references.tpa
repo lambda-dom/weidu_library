@@ -43,6 +43,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY reference_encoders BEGIN
     "sct" => "encode_spell_sectype"
     "opc" => "encode_opcode_type"
     "ext" => "encode_resource_extension"
+    "etr" => "encode_reference_suffix"
 END
 
 
@@ -77,6 +78,7 @@ END
 //Main function.
 DEFINE_DIMORPHIC_FUNCTION encode_table_reference STR_VAR value = "" RET return BEGIN
     OUTER_TEXT_SPRINT regexp "^#\([a-zA-Z0-9][a-zA-Z0-9_-]*\):\(.*\)$"
+
     //Sanitize.
     ACTION_IF NOT (("%value%" STRING_MATCHES_REGEXP "%regexp%") = 0) THEN BEGIN
         FAIL "encode_table_reference: string '%value%' does not have the format of a table reference."
@@ -142,11 +144,6 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_suffix STR_VAR value = "" RET return BEGI
         END ~~
     END
 
-    //Sanitize.
-    ACTION_IF NOT (1 = (STRING_LENGTH "%suffix%")) BEGIN
-        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
-    END
-
     LAF encode_spell_res STR_VAR value = "%spell%" RET return END   
     LAF replace_affixes STR_VAR
         spell = "%return%"
@@ -165,11 +162,6 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
             TEXT_SPRINT suffix "%MATCH2%"
             TEXT_SPRINT spell "%MATCH3%"
         END ~~
-    END
-
-    //Sanitize.
-    ACTION_IF NOT (2 = (STRING_LENGTH "%prefix%")) BEGIN
-        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
     END
 
     LAF encode_spell_res STR_VAR value = "%spell%" RET return END
@@ -201,17 +193,30 @@ DEFINE_DIMORPHIC_FUNCTION encode_resource_extension STR_VAR value = "" RET retur
         END ~~
     END
 
-    //Sanitize.
-    ACTION_IF NOT (3 = (STRING_LENGTH "%prefix%")) BEGIN
-        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
-    END
-
     LAF encode_table_reference STR_VAR value = "%suffix%" RET return END
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.%prefix%") BEGIN
         FAIL "encode_resource_extension: resource '%return%.%prefix%' for table reference '%value%' does not exist."
     END
 END
 
+DEFINE_DIMORPHIC_FUNCTION encode_reference_suffix STR_VAR value = "" RET return BEGIN
+    OUTER_TEXT_SPRINT regexp "^\([a-zA-Z0-9]\):\(.+\)$"
+
+    //Generate name.
+    OUTER_PATCH "%value%" BEGIN
+        REPLACE_EVALUATE CASE_INSENSITIVE "%regexp%" BEGIN
+            TEXT_SPRINT suffix "%MATCH1%"
+            TEXT_SPRINT reference "%MATCH2%"
+        END ~~
+    END
+
+    LAF encode_table_reference STR_VAR value = "%reference%" RET return END   
+    LAF replace_affixes STR_VAR
+        spell = "%return%"
+        prefix = "sp"
+        suffix = "%suffix%"
+    RET return = resource END
+END
 
 //Fixed extension encoders.
 DEFINE_DIMORPHIC_FUNCTION encode_bam_ref STR_VAR value = "" RET return BEGIN
