@@ -58,7 +58,7 @@ DEFINE_DIMORPHIC_FUNCTION replace_affixes STR_VAR spell = "" prefix = "" suffix 
         FAIL "replace_affixes: prefix '%suffix%' is not 1 character long or less."
     END
 
-    OUTER_TEXT_SPRINT regexp "^[sS][pP]\([a-zA-Z][a-zA-Z][0-9][a-fA-F0-9][a-fA-F0-9]\)$"
+    OUTER_TEXT_SPRINT regexp "^[sS][pP]\([a-zA-Z][a-zA-Z][0-9][0-9a-fA-F][0-9a-fA-F]\)$"
     ACTION_IF NOT (0 = ("%spell%" STRING_MATCHES_REGEXP "%regexp%")) BEGIN
         FAIL "replace_spell_affixes: string '%spell%' not a valid 7-character spell resource name."
     END
@@ -126,7 +126,7 @@ DEFINE_DIMORPHIC_FUNCTION encode_num_literal STR_VAR value = "" RET return BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION encode_empty_string STR_VAR value = "" RET return BEGIN
-    ACTION_IF NOT (0 = STRING_LENGTH value) BEGIN
+    ACTION_IF NOT (0 = STRING_LENGTH "%value%") BEGIN
         FAIL "encode_empty_string: value '%value%' is not the null string."
     END
 
@@ -142,6 +142,11 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_suffix STR_VAR value = "" RET return BEGI
             TEXT_SPRINT suffix "%MATCH1%"
             TEXT_SPRINT spell "%MATCH2%"
         END ~~
+    END
+
+    //Sanitize.
+    ACTION_IF NOT (1 = (STRING_LENGTH "%suffix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
     END
 
     LAF encode_spell_res STR_VAR value = "%spell%" RET return END   
@@ -162,6 +167,15 @@ DEFINE_DIMORPHIC_FUNCTION encode_spell_affix STR_VAR value = "" RET return BEGIN
             TEXT_SPRINT suffix "%MATCH2%"
             TEXT_SPRINT spell "%MATCH3%"
         END ~~
+    END
+
+    //Sanitize.
+    ACTION_IF NOT (2 = (STRING_LENGTH "%prefix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
+    END
+
+    ACTION_IF NOT (1 = (STRING_LENGTH "%suffix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
     END
 
     LAF encode_spell_res STR_VAR value = "%spell%" RET return END
@@ -193,6 +207,11 @@ DEFINE_DIMORPHIC_FUNCTION encode_resource_extension STR_VAR value = "" RET retur
         END ~~
     END
 
+    //Sanitize.
+    ACTION_IF NOT (3 = (STRING_LENGTH "%prefix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
+    END
+
     LAF encode_table_reference STR_VAR value = "%suffix%" RET return END
     ACTION_IF NOT (FILE_EXISTS_IN_GAME "%return%.%prefix%") BEGIN
         FAIL "encode_resource_extension: resource '%return%.%prefix%' for table reference '%value%' does not exist."
@@ -208,6 +227,11 @@ DEFINE_DIMORPHIC_FUNCTION encode_reference_suffix STR_VAR value = "" RET return 
             TEXT_SPRINT suffix "%MATCH1%"
             TEXT_SPRINT reference "%MATCH2%"
         END ~~
+    END
+
+    //Sanitize.
+    ACTION_IF NOT (1 = (STRING_LENGTH "%suffix%")) BEGIN
+        FAIL "encode_resource_extension: string '%value%' does not have a valid format."
     END
 
     LAF encode_table_reference STR_VAR value = "%reference%" RET return END   
