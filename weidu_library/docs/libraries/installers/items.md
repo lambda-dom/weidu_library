@@ -12,6 +12,8 @@ Installer for copying items (`.itm` files) with information from `table` (full p
 
 # B. Other installers.
 
+`patch_items STR_VAR table tra = "*" patches = "*"`
+
 `install_item_tooltips STR_VAR table references tra = "*"`
 
 `install_item_exclusion STR_VAR table references`
