@@ -141,3 +141,107 @@ BEGIN
         END
     END
 END
+
+
+//Other installers.
+DEFINE_ACTION_FUNCTION install_item_tooltips STR_VAR table = "" references = "" BEGIN
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,ability1,ability2,ability3"
+    RET_ARRAY resources = table END
+
+    //Loop.
+    LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+    COPY_EXISTING "tooltip.2da" "override"
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT resource $"row"("resource")
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT ability1 $"row"("ability1")
+                TEXT_SPRINT ability2 $"row"("ability2")
+                TEXT_SPRINT ability3 $"row"("ability3")
+
+                //Sanitize.
+                PATCH_IF NOT (IS_AN_INT install) BEGIN
+                    PATCH_FAIL "install_item_tooltips: '%install%' flag for '%resource%' is not an integer."
+                END
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Sanitize.
+                    PATCH_IF NOT (IS_AN_INT ability1) BEGIN
+                        PATCH_FAIL "install_item_tooltips: '%ability1%' for '%resource%' is not an integer."
+                    END
+
+                    PATCH_IF NOT (IS_AN_INT ability2) BEGIN
+                        PATCH_FAIL "install_item_tooltips: '%ability2%' for '%resource%' is not an integer."
+                    END
+
+                    PATCH_IF NOT (IS_AN_INT ability3) BEGIN
+                        PATCH_FAIL "install_item_tooltips: '%ability3%' for '%resource%' is not an integer."
+                    END
+
+                    TEXT_SPRINT item $"%references%"("%resource%")
+                    LPF set_ability_tooltip INT_VAR
+                        ability1 = ability1
+                        ability2 = ability2
+                        ability3 = ability3
+                    STR_VAR item = "%item%" END
+                END
+            END
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
+
+DEFINE_ACTION_FUNCTION install_item_exclusion STR_VAR table = "" references = "" BEGIN
+    //Load table
+    LAF load_table STR_VAR
+        file = "%table%"
+        fields = "resource,install,exclusion"
+    RET_ARRAY resources = table END
+
+    //Loop.
+    LAF get_table_row_count STR_VAR table = "resources" RET row_count = count END
+    COPY_EXISTING "itemexcl.2da" "override"
+        FOR (i = 0; i < row_count; ++i) BEGIN
+            LPF get_row_from_table INT_VAR row = i STR_VAR
+                table = "resources"
+            RET_ARRAY
+                row = array
+            END
+
+            PATCH_WITH_SCOPE BEGIN
+                //Inject names in local scope.
+                TEXT_SPRINT resource $"row"("resource")
+                TEXT_SPRINT install $"row"("install")
+                TEXT_SPRINT exclusion $"row"("exclusion")
+
+                //Sanitize.
+                PATCH_IF NOT (IS_AN_INT install) BEGIN
+                    PATCH_FAIL "install_item_exclusion: '%install%' flag for '%resource%' is not an integer."
+                END
+
+                PATCH_IF NOT (install = 0) BEGIN
+                    //Sanitize.
+                    PATCH_IF NOT (IS_AN_INT ability1) BEGIN
+                        PATCH_FAIL "install_item_exclusion: '%exclusion%' for '%resource%' is not an integer."
+                    END
+
+                    TEXT_SPRINT item $"%references%"("%resource%")
+                    LPF set_item_exclusion INT_VAR
+                        exclusion = exclusion
+                    STR_VAR item = "%item%" END
+                END
+            END
+        END
+    PRETTY_PRINT_2DA
+    BUT_ONLY
+END
