@@ -243,7 +243,7 @@ DEFINE_ACTION_FUNCTION install_item_exclusion STR_VAR table = "" references = ""
 
                 PATCH_IF NOT (install = 0) BEGIN
                     //Sanitize.
-                    PATCH_IF NOT (IS_AN_INT ability1) BEGIN
+                    PATCH_IF NOT (IS_AN_INT exclusion) BEGIN
                         PATCH_FAIL "install_item_exclusion: '%exclusion%' for '%resource%' is not an integer."
                     END
 
