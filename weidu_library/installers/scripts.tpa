@@ -8,7 +8,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 //Installer.
 DEFINE_ACTION_FUNCTION install_scripts STR_VAR
     table = ""
-    resources_dir = ""
+    dir = ""
     tra = "*"
     patches = "*"
 BEGIN
@@ -32,8 +32,8 @@ BEGIN
         FAIL "install_scripts: tra file '%tra%' does not exist."
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%destination_dir%") BEGIN
-        FAIL "install_scripts: destination directory '%destination_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_scripts: resources directory '%dir%' does not exist."
     END
 
     //Load table
@@ -76,7 +76,7 @@ BEGIN
                     //Have to first copy the script because COMPILE does not allow renaming.
                     LAF get_component_external_dir RET temp_dir = dir END
                     OUTER_TEXT_SPRINT temp_dir "%temp_dir%/resources/baf"
-                    COPY "%resources_dir%/%resource%.baf" "%temp_dir%/%destination%.baf"
+                    COPY "%dir%/%resource%.baf" "%temp_dir%/%destination%.baf"
                         PATCH_IF NOT ("%patch%" STRING_EQUAL_CASE "*") BEGIN
                             LPF "%patch%" STR_VAR
                                 destination = "%destination%"
