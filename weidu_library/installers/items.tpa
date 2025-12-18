@@ -172,7 +172,7 @@ BEGIN
     //Load table
     LAF load_table STR_VAR
         file = "%table%"
-        fields = "resource,install,name,description,id_name,id_description,type,proficiency,flags,inventory_icon,ground_icon,description_icon,price,stack,lore,weight,enchantment,patch,override,destination"
+        fields = "resource,install,name,description,id_name,id_description,type,proficiency,flags,inventory_icon,ground_icon,description_icon,price,stack,lore,weight,enchantment,patch,destination"
     RET_ARRAY resources = table END
 
     WITH_TRA "%tra%" BEGIN
@@ -186,7 +186,7 @@ BEGIN
             END
 
             LAF split_array_with_fields STR_VAR
-                fields = "resource,install,patch,override,destination"
+                fields = "resource,install,patch,destination"
                 array = "row"
             RET_ARRAY split remainder END
 
@@ -195,7 +195,6 @@ BEGIN
                 OUTER_TEXT_SPRINT resource $"split"("resource")
                 OUTER_TEXT_SPRINT install $"split"("install")
                 OUTER_TEXT_SPRINT patch $"split"("patch")
-                OUTER_TEXT_SPRINT override $"split"("override")
                 OUTER_TEXT_SPRINT destination $"split"("destination")
 
                 ACTION_IF NOT (install = 0) BEGIN
