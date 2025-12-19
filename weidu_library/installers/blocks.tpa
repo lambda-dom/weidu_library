@@ -87,6 +87,7 @@ DEFINE_PATCH_FUNCTION append_item_header_block INT_VAR header = 0 STR_VAR table 
     END
 END
 
+//Spell patchers.
 DEFINE_PATCH_FUNCTION append_spell_header_block INT_VAR header = 0 STR_VAR table = "" BEGIN
     //Sanitize.
     LPF get_spell_header_count RET headers_count = count END
