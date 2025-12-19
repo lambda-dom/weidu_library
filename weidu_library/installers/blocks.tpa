@@ -30,7 +30,9 @@ DEFINE_PATCH_FUNCTION append_item_equipped_block STR_VAR table = "" BEGIN
             //Form array.
             LPF get_equipped_zero_opcode RET_ARRAY opc_array = array END
             PHP_EACH "row" AS field => value BEGIN
-                TEXT_SPRINT $opc_array("%field%") "%value%"
+                PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                    TEXT_SPRINT $opc_array("%field%") "%value%"
+                END
             END
 
             //Apply.
@@ -68,9 +70,11 @@ DEFINE_PATCH_FUNCTION append_item_header_block INT_VAR header = 0 STR_VAR table 
             LPF append_item_header_opcode INT_VAR header = header END
 
             //Form array.
-            DEFINE_ASSOCIATIVE_ARRAY opc_array BEGIN END
+            LPF get_zero_opcode RET_ARRAY opc_array = array END
             PHP_EACH "row" AS field => value BEGIN
-                TEXT_SPRINT $opc_array("%field%") "%value%"
+                PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                    TEXT_SPRINT $opc_array("%field%") "%value%"
+                END
             END
 
             //Apply.
@@ -111,9 +115,11 @@ DEFINE_PATCH_FUNCTION append_spell_header_block INT_VAR header = 0 STR_VAR table
             LPF append_spell_header_opcode INT_VAR header = header END
 
             //Form array.
-            DEFINE_ASSOCIATIVE_ARRAY opc_array BEGIN END
+            LPF get_zero_opcode RET_ARRAY opc_array = array END
             PHP_EACH "row" AS field => value BEGIN
-                TEXT_SPRINT $opc_array("%field%") "%value%"
+                PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+                    TEXT_SPRINT $opc_array("%field%") "%value%"
+                END
             END
 
             //Apply.
