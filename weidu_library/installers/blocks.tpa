@@ -1,6 +1,8 @@
 //Libraries.
 INCLUDE "%WEIDU_LIBRARY_DIR%/items.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/opcode_arrays.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/spells.tpa"
+INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
 //Item patchers.
@@ -73,6 +75,49 @@ DEFINE_PATCH_FUNCTION append_item_header_block INT_VAR header = 0 STR_VAR table 
 
             //Apply.
             LPF get_item_header_opcode_offset INT_VAR
+                header = header
+                index = opc_count + i
+            RET opc_offset = offset END
+            LPF set_opcode_array INT_VAR offset = opc_offset STR_VAR array = "opc_array" END
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION append_spell_header_block INT_VAR header = 0 STR_VAR table = "" BEGIN
+    //Sanitize.
+    LPF get_spell_header_count RET headers_count = count END
+    PATCH_IF NOT ((0 <= header) AND (header < headers_count)) BEGIN
+        PATCH_FAIL "append_spell_header_block: header '%header%' not in the range [0, %headers_count%[."
+    END
+
+    //Load table
+    LPF load_table STR_VAR
+        file = "%table%"
+        fields = "opcode,target,power,parameter1,parameter2,timing,resist_dispel,duration,probability1,probability2,resource,dicenumber,dicesize,savingthrow,savebonus,special"
+    RET_ARRAY opcodes = table END
+
+    //Loop.
+    LPF get_table_row_count STR_VAR table = "opcodes" RET row_count = count END
+    LPF get_spell_header_opcode_count INT_VAR header = header RET opc_count = count END
+    FOR (i = 0; i < row_count; ++i) BEGIN
+        LPF get_row_from_table INT_VAR row = i STR_VAR
+            table = "opcodes"
+        RET_ARRAY
+            row = array
+        END
+
+        PATCH_WITH_SCOPE BEGIN
+            //Append equipped opcode.
+            LPF append_spell_header_opcode INT_VAR header = header END
+
+            //Form array.
+            DEFINE_ASSOCIATIVE_ARRAY opc_array BEGIN END
+            PHP_EACH "row" AS field => value BEGIN
+                TEXT_SPRINT $opc_array("%field%") "%value%"
+            END
+
+            //Apply.
+            LPF get_spell_header_opcode_offset INT_VAR
                 header = header
                 index = opc_count + i
             RET opc_offset = offset END

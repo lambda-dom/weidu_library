@@ -4,7 +4,7 @@ file(s):
 
 * [Source code](../../../installers/blocks.tpa).
 
-# A. Primitives.
+# A. Patchers.
 
 ## A. 1. Items.
 
@@ -17,3 +17,9 @@ Append the block of opcodes from `table` to an item as equipped opcodes. `table`
 `append_item_header_block INT_VAR header STR_VAR table`
 
 Append the block of opcodes from `table` to an item `header`. `table` is the (full) path to a .2da table in the format of [Template Block Table](../../../resources/2da/installers/templates/opcode.2da) containing the info on the opcodes to add. Function FAIL's if `header` out of bounds.
+
+## A. 2. Spells.
+
+`append_spell_header_block INT_VAR header STR_VAR table`
+
+Spell version of `append_item_header_block`
