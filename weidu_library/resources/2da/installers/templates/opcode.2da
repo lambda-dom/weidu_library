@@ -1,5 +1,5 @@
 2DA V1.0
 *
 
-        opcode          target      power   parameter1  parameter2  timing  resist_dispel   duration    probability1    probability2    resource    dicenumber  dicesize    savingthrow savebonus   special
-name    ac_damage_type  projectile  0       #num:0      #num:0      limited natural         0           100             0               #nul:       0           0           #num:0      0           #num:0
+                target      power   parameter1  parameter2  timing  resist_dispel   duration    probability1    probability2    resource    dicenumber  dicesize    savingthrow savebonus   special
+ac_damage_type  projectile  0       #num:0      #num:0      limited natural         0           100             0               #nul:       0           0           #num:0      0           #num:0
