@@ -78,11 +78,13 @@ DEFINE_PATCH_FUNCTION set_opcode_array INT_VAR offset = 0 STR_VAR array = "" BEG
     PHP_EACH "%array%" AS field => value BEGIN
         TEXT_SPRINT encoder $"opcode_field_write_encoders"("%field%")
         LPF "%encoder%" STR_VAR value = "%value%" RET value = return END
-        LPF set_opcode_field INT_VAR
-            offset = offset
-        STR_VAR
-            field = "%field%"
-            value = "%value%"
+        PATCH_IF NOT ("%value%" STRING_EQUAL_CASE "*") BEGIN
+            LPF set_opcode_field INT_VAR
+                offset = offset
+            STR_VAR
+                field = "%field%"
+                value = "%value%"
+            END
         END
     END
 END
