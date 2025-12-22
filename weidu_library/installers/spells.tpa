@@ -109,8 +109,8 @@ DEFINE_PATCH_FUNCTION encode_spell_speed STR_VAR value = "" RET return BEGIN
 END
 
 DEFINE_PATCH_FUNCTION encode_spell_flags_mask STR_VAR value = "" RET return BEGIN
-    LPF encode_spell_flags STR_VAR value = "%value%" RET lhand = return END
-    LPF set_spell_field STR_VAR field = "flags" value = "%value%" END
+    LPF encode_spell_flags STR_VAR value = "%value%" RET mask = return END
+    LPF set_spell_field STR_VAR field = "flags" value = "%mask%" END
     TEXT_SPRINT return "*"
 END
 
