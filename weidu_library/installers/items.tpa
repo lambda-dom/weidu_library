@@ -29,8 +29,8 @@ DEFINE_PATCH_FUNCTION encode_item_inventory_icon STR_VAR value = "" RET return B
 END
 
 DEFINE_PATCH_FUNCTION encode_item_flags_mask STR_VAR value = "" RET return BEGIN
-    LPF encode_item_flags STR_VAR value = "%value%" RET lhand = return END
-    LPF set_item_field STR_VAR field = "flags" value = "%value%" END
+    LPF encode_item_flags STR_VAR value = "%value%" RET mask = return END
+    LPF set_item_field STR_VAR field = "flags" value = "%mask%" END
     TEXT_SPRINT return "*"
 END
 
