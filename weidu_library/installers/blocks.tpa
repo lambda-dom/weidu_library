@@ -132,3 +132,86 @@ DEFINE_PATCH_FUNCTION append_spell_header_block INT_VAR header = 0 STR_VAR table
         END
     END
 END
+
+//Higher-order patchers.
+DEFINE_PATCH_FUNCTION find_item_equipped_opcode STR_VAR
+    predicate = ""
+    arguments = ""
+RET_ARRAY offsets BEGIN
+    //Initialize.
+    DEFINE_ASSOCIATIVE_ARRAY offsets BEGIN END
+
+    //Loop.
+    LPF get_equipped_opcode_count RET opc_count = count END
+    index = 0
+    FOR (i = 0; i < opc_count; ++i) BEGIN
+        LPF get_equipped_opcode_offset INT_VAR index = i RET opc_offset = offset END
+        LPF "%predicate%" INT_VAR offset = opc_offset STR_VAR arguments = "%arguments%" RET bool END
+        PATCH_IF NOT (0 = bool) BEGIN
+            TEXT_SPRINT $"offsets"("%index%") "%opc_offset%"
+            index += 1
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION find_item_header_opcode INT_VAR
+    header = 0
+STR_VAR
+    predicate = ""
+    arguments = ""
+RET_ARRAY offsets BEGIN
+    //Sanitize.
+    LPF get_item_header_count RET headers_count = count END
+    PATCH_IF NOT ((0 <= header) AND (header < headers_count)) BEGIN
+        PATCH_FAIL "find_item_header_opcode: header '%header%' not in the range [0, %headers_count%[."
+    END
+
+    //Initialize.
+    DEFINE_ASSOCIATIVE_ARRAY offsets BEGIN END
+
+    //Loop.
+    LPF get_item_header_opcode_count INT_VAR header = header RET opc_count = count END
+    index = 0
+    FOR (i = 0; i < opc_count; ++i) BEGIN
+        LPF get_item_header_opcode_offset INT_VAR
+            header = header
+            index = i
+        RET opc_offset = offset END
+        LPF "%predicate%" INT_VAR offset = opc_offset STR_VAR arguments = "%arguments%" RET bool END
+        PATCH_IF NOT (0 = bool) BEGIN
+            TEXT_SPRINT $"offsets"("%index%") "%opc_offset%"
+            index += 1
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION find_spell_header_opcode INT_VAR
+    header = 0
+STR_VAR
+    predicate = ""
+    arguments = ""
+RET_ARRAY offsets BEGIN
+    //Sanitize.
+    LPF get_spell_header_count RET headers_count = count END
+    PATCH_IF NOT ((0 <= header) AND (header < headers_count)) BEGIN
+        PATCH_FAIL "find_spell_header_opcode: header '%header%' not in the range [0, %headers_count%[."
+    END
+
+    //Initialize.
+    DEFINE_ASSOCIATIVE_ARRAY offsets BEGIN END
+
+    //Loop.
+    LPF get_spell_header_opcode_count INT_VAR header = header RET opc_count = count END
+    index = 0
+    FOR (i = 0; i < opc_count; ++i) BEGIN
+        LPF get_spell_header_opcode_offset INT_VAR
+            header = header
+            index = i
+        RET opc_offset = offset END
+        LPF "%predicate%" INT_VAR offset = opc_offset STR_VAR arguments = "%arguments%" RET bool END
+        PATCH_IF NOT (0 = bool) BEGIN
+            TEXT_SPRINT $"offsets"("%index%") "%opc_offset%"
+            index += 1
+        END
+    END
+END
