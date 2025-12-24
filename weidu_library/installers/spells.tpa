@@ -111,7 +111,7 @@ END
 DEFINE_PATCH_FUNCTION encode_spell_flags_mask STR_VAR value = "" RET return BEGIN
     LPF encode_spell_flags STR_VAR value = "%value%" RET mask = return END
     LPF get_spell_field STR_VAR field = "flags" RET value  END
-    value = value BAND mask
+    value = value BOR mask
     LPF set_spell_field STR_VAR field = "flags" value = "%value%" END
     TEXT_SPRINT return "*"
 END
