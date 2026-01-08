@@ -2,7 +2,7 @@
 INCLUDE "%WEIDU_LIBRARY_DIR%/installers.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/references.tpa"
 INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
-
+INCLUDE "%WEIDU_LIBRARY_DIR%/vvcs.tpa"
 
 
 //Installers.
