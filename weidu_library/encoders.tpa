@@ -194,7 +194,7 @@ END
 
 
 //Spells.
-DEFINE_ACTION_FUNCTION encode_spell_res STR_VAR value = "" RET return BEGIN
+DEFINE_DIMORPHIC_FUNCTION encode_spell_res STR_VAR value = "" RET return BEGIN
     LAF get_spell_res STR_VAR spell = "%value%" RET return = resource END
 
     //Sanitize.

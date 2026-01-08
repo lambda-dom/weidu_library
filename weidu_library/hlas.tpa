@@ -21,6 +21,8 @@ DEFINE_DIMORPHIC_FUNCTION get_hla_table STR_VAR kit = "" RET table BEGIN
 END
 
 DEFINE_DIMORPHIC_FUNCTION set_hla_table STR_VAR kit = "" table = "" BEGIN
+    //Avoid casing mismatches.
+    ACTION_TO_UPPER table
     //Table name length check.
     ACTION_IF NOT (3 = STRING_LENGTH "%table%") BEGIN
         FAIL "set_hla_table: table name '%table%' must be 3 characters long."
@@ -138,6 +140,7 @@ BEGIN
         END
 
         //Fill in attribute.
+        TO_UPPER prerequisite
         SET_2DA_ENTRY row 7 cols "%prerequisite%"
     END
 
@@ -148,6 +151,7 @@ BEGIN
         END
 
         //Fill in attribute.
+        TO_UPPER excluded
         SET_2DA_ENTRY row 8 cols "%excluded%"
     END
 END
@@ -173,6 +177,9 @@ BEGIN
         res = resource
     END
 
+    //Upper case (by convention and to avoid casing mismatches).
+    TO_UPPER prefix
+    TO_UPPER res
     PATCH_IF NOT (FILE_EXISTS_IN_GAME "%res%.spl") BEGIN
         PATCH_FAIL "add_hla: spell '%res%.spl' does not exist in-game."
     END
@@ -244,6 +251,9 @@ END
 
 //TODO: change algorithm to search and replace.
 DEFINE_PATCH_FUNCTION rename_hla STR_VAR old = "" new = "" BEGIN
+    //Upper case (by convention and to avoid casing mismatches).
+    TO_UPPER new
+
     //Existence check.
     LPF deconstruct_ability STR_VAR
         ability = "%new%"
