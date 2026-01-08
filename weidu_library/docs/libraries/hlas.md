@@ -92,6 +92,6 @@ Desconstruct an ability string into an ability `prefix` and a `resource`. If the
 
 These two functions perform batch HLA deletion and addition using tables.
 
-`patch_hla_table STR_VAR kit deletions additions`
+`patch_hla_table STR_VAR kit deletions = "*" additions = "*"`
 
 Combine batch addition and deletion.
