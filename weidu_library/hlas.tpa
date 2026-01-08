@@ -54,7 +54,8 @@ DEFINE_ACTION_FUNCTION replace_table STR_VAR kit = "" original = "" new = "" BEG
     ACTION_IF ("%tbl%" STRING_EQUAL_CASE "%original%") BEGIN
         //Existence check.
         ACTION_IF (FILE_EXISTS_IN_GAME "lu%new%.2da") BEGIN
-            FAIL "replace_table: table 'lu%new%.2da' already exists in game."
+            //Seemingly, this is the norm in vanilla so only print-warn not fail.
+            PRINT "replace_table: table 'lu%new%.2da' already exists in game. Overriding it."
         END
 
         //Clone and set table.
