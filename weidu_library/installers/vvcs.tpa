@@ -6,7 +6,7 @@ INCLUDE "%WEIDU_LIBRARY_DIR%/tables.tpa"
 
 
 //Installers.
-DEFINE_ACTION_FUNCTION install_vvcs STR_VAR table = "" resources_dir = "" patches = "*" BEGIN
+DEFINE_ACTION_FUNCTION install_vvcs STR_VAR table = "" dir = "" patches = "*" BEGIN
     //Sanitize.
     ACTION_IF NOT ("%patches%" STRING_EQUAL_CASE "*") BEGIN
         ACTION_IF NOT (FILE_EXISTS "%patches%") BEGIN
@@ -17,8 +17,8 @@ DEFINE_ACTION_FUNCTION install_vvcs STR_VAR table = "" resources_dir = "" patche
         INCLUDE "%patches%"
     END
 
-    ACTION_IF NOT (DIRECTORY_EXISTS "%resources_dir%") BEGIN
-        FAIL "install_vvcs: resources directory '%resources_dir%' does not exist."
+    ACTION_IF NOT (DIRECTORY_EXISTS "%dir%") BEGIN
+        FAIL "install_vvcs: resources directory '%dir%' does not exist."
     END
 
     //Load table
@@ -57,7 +57,7 @@ DEFINE_ACTION_FUNCTION install_vvcs STR_VAR table = "" resources_dir = "" patche
                     resource = "%resource%"
                 END
 
-                COPY "%resources_dir%/%resource%.vvc" "override/%destination%.vvc"
+                COPY "%dir%/%resource%.vvc" "override/%destination%.vvc"
                     PATCH_WITH_SCOPE BEGIN
                         //Inject names in local scope.
                         TEXT_SPRINT animation $"row"("animation")
