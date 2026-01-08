@@ -375,7 +375,7 @@ DEFINE_PATCH_FUNCTION add_hlas STR_VAR table = "" BEGIN
     END
 END
 
-DEFINE_ACTION_FUNCTION patch_hla_table STR_VAR kit = "" deletions = "" additions = "" BEGIN
+DEFINE_ACTION_FUNCTION patch_hla_table STR_VAR kit = "" deletions = "*" additions = "*" BEGIN
     LAF get_hla_table STR_VAR kit = "%kit%" RET table END
 
     //Sanitize.
@@ -384,8 +384,13 @@ DEFINE_ACTION_FUNCTION patch_hla_table STR_VAR kit = "" deletions = "" additions
     END
 
     COPY_EXISTING "%table%.2da" "override"
-        LPF delete_hlas STR_VAR table = "%deletions%" END
-        LPF add_hlas STR_VAR table = "%additions%" END
+        PATCH_IF NOT ("%deletions%" STRING_EQUAL_CASE "*") BEGIN
+            LPF delete_hlas STR_VAR table = "%deletions%" END
+        END
+
+        PATCH_IF NOT ("%additions%" STRING_EQUAL_CASE "*") BEGIN
+            LPF add_hlas STR_VAR table = "%additions%" END
+        END
     PRETTY_PRINT_2DA
     BUT_ONLY
 END
