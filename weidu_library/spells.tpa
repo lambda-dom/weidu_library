@@ -360,3 +360,114 @@ DEFINE_PATCH_FUNCTION append_spell_header_opcode INT_VAR header = 0 BEGIN
         index = 0 - 1
     END
 END
+
+
+//Block mutators.
+DEFINE_PATCH_FUNCTION insert_spell_casting_block INT_VAR amount = 1 index = 0 BEGIN
+    //Normalize.
+    LPF get_casting_opcode_count RET op_count = count END
+    PATCH_IF (0 - 1 = index) BEGIN
+        index = op_count
+    END
+
+    //Sanitize.
+    PATCH_IF NOT ((0 <= index) AND (index <= op_count)) BEGIN
+        PATCH_FAIL "insert_spell_casting_block: '%index%' not in the range [-1, %op_count%]."
+    END
+
+    PATCH_IF (amount < 1) BEGIN
+        PATCH_FAIL "insert_spell_casting_block: amount '%amount%' is not strictly positive."
+    END
+
+    //Insert offset.
+    LPF get_opcode_size RET op_size = size END
+    LPF get_spell_opcodes_offset RET fx_start = offset END
+    ins_offset = fx_start + (op_size * index)
+
+    //Insert opcode.
+    INSERT_BYTES ins_offset (op_size * amount)
+
+    //Adjust opcode count.
+    WRITE_SHORT 0x70 (THIS + amount)
+
+    //Adjust header opcode indices.
+    LPF get_spell_header_count RET headers_count = count END
+    PATCH_IF NOT (headers_count = 0) BEGIN
+        LPF get_spell_headers_offset RET fx_start = offset END
+        LPF get_spell_header_size RET header_size = size END
+        FOR (i = 0; i < headers_count; ++i) BEGIN
+            WRITE_SHORT (fx_start + (i * header_size) + 0x20) (THIS + amount)
+        END
+    END
+
+    //Write probability1.
+    FOR (i = 0; i < amount; ++i) BEGIN
+        LPF set_opcode_field INT_VAR
+            offset = ins_offset + i
+        STR_VAR
+            field = "probability1"
+            value = "100"
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION append_spell_casting_block INT_VAR amount = 1 BEGIN
+    LPF insert_spell_casting_block INT_VAR amount = amount index = 0 - 1 END
+END
+
+DEFINE_PATCH_FUNCTION insert_spell_header_block INT_VAR amount = 1 header = 0 index = 0 BEGIN
+    //Sanitize.
+    LPF get_spell_header_count RET headers_count = count END
+    PATCH_IF NOT ((0 <= header) AND (header < headers_count)) BEGIN
+        PATCH_FAIL "insert_spell_header_block: header '%header%' not in the range [0, %headers_count%[."
+    END
+
+    //Normalize and sanitize.
+    LPF get_spell_header_opcode_count INT_VAR header = header RET op_count = count END
+    PATCH_IF (0 - 1 = index) BEGIN
+        index = op_count
+    END
+    PATCH_IF NOT ((0 <= index) AND (index <= op_count)) BEGIN
+        PATCH_FAIL "insert_spell_header_block: '%index%' not in the range [-1, %op_count%]."
+    END
+
+    PATCH_IF (amount < 1) BEGIN
+        PATCH_FAIL "insert_spell_header_block: amount '%amount%' is not strictly positive."
+    END
+
+    LPF get_opcode_size RET op_size = size END
+    LPF get_spell_header_opcode_block_offset INT_VAR header = header RET fx_start = offset END
+    ins_offset = fx_start + (op_size * index)
+
+    //Insert opcode.
+    INSERT_BYTES ins_offset (op_size * amount)
+
+    //Adjust header opcode count.
+    LPF get_spell_header_offset INT_VAR header = header RET fx_start = offset END
+    WRITE_SHORT (fx_start + 0x1e) (THIS + amount)
+
+    //Adjust opcode block indices.
+    LPF get_spell_headers_offset RET header_offset = offset END
+    LPF get_spell_header_size RET header_size = size END
+    FOR (i = header + 1; i < headers_count; ++i) BEGIN
+        WRITE_SHORT (fx_start + (i * header_size) + 0x20) (THIS + amount)
+    END
+
+    //Write probability1.
+    FOR (i = 0; i < amount; ++i) BEGIN
+        LPF set_opcode_field INT_VAR
+            offset = ins_offset + i
+        STR_VAR
+            field = "probability1"
+            value = "100"
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION append_spell_header_block INT_VAR amount = 1 header = 0 BEGIN
+    LPF insert_spell_header_opcode INT_VAR
+        amount = amount
+        header = header
+        index = 0 - 1
+    END
+END
