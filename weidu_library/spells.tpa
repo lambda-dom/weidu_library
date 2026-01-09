@@ -363,7 +363,7 @@ END
 
 
 //Block mutators.
-DEFINE_PATCH_FUNCTION insert_spell_casting_block INT_VAR amount = 1 index = 0 BEGIN
+DEFINE_PATCH_FUNCTION insert_spell_casting_block INT_VAR index = 0 amount = 1 BEGIN
     //Normalize.
     LPF get_casting_opcode_count RET op_count = count END
     PATCH_IF (0 - 1 = index) BEGIN
@@ -403,7 +403,7 @@ DEFINE_PATCH_FUNCTION insert_spell_casting_block INT_VAR amount = 1 index = 0 BE
     //Write probability1.
     FOR (i = 0; i < amount; ++i) BEGIN
         LPF set_opcode_field INT_VAR
-            offset = ins_offset + i
+            offset = ins_offset + (i * op_size)
         STR_VAR
             field = "probability1"
             value = "100"
@@ -412,10 +412,13 @@ DEFINE_PATCH_FUNCTION insert_spell_casting_block INT_VAR amount = 1 index = 0 BE
 END
 
 DEFINE_PATCH_FUNCTION append_spell_casting_block INT_VAR amount = 1 BEGIN
-    LPF insert_spell_casting_block INT_VAR amount = amount index = 0 - 1 END
+    LPF insert_spell_casting_block INT_VAR
+        index = 0 - 1
+        amount = amount
+    END
 END
 
-DEFINE_PATCH_FUNCTION insert_spell_header_block INT_VAR amount = 1 header = 0 index = 0 BEGIN
+DEFINE_PATCH_FUNCTION insert_spell_header_block INT_VAR header = 0 index = 0 amount = 1 BEGIN
     //Sanitize.
     LPF get_spell_header_count RET headers_count = count END
     PATCH_IF NOT ((0 <= header) AND (header < headers_count)) BEGIN
@@ -456,7 +459,7 @@ DEFINE_PATCH_FUNCTION insert_spell_header_block INT_VAR amount = 1 header = 0 in
     //Write probability1.
     FOR (i = 0; i < amount; ++i) BEGIN
         LPF set_opcode_field INT_VAR
-            offset = ins_offset + i
+            offset = ins_offset + (i * op_size)
         STR_VAR
             field = "probability1"
             value = "100"
@@ -464,10 +467,10 @@ DEFINE_PATCH_FUNCTION insert_spell_header_block INT_VAR amount = 1 header = 0 in
     END
 END
 
-DEFINE_PATCH_FUNCTION append_spell_header_block INT_VAR amount = 1 header = 0 BEGIN
-    LPF insert_spell_header_opcode INT_VAR
-        amount = amount
+DEFINE_PATCH_FUNCTION append_spell_header_block INT_VAR header = 0 amount = 1 BEGIN
+    LPF insert_spell_header_block INT_VAR
         header = header
         index = 0 - 1
+        amount = amount
     END
 END
