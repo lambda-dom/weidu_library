@@ -113,11 +113,25 @@ Specializations of the generic reader and writer for spells.
 
 `insert_spell_casting_opcode INT_VAR index`
 
+Insert a blank casting opcode (only non-zero field is probability1 that is set to 100) at `index`. Function FAIL's if `index` out of bounds.
+
+note(s):
+* use index `-1` if you want to insert at the end, or append, or use the `append_spell_casting_opcode` function.
+
 `append_spell_casting_opcode`
+
+Append a blank casting opcode (only non-zero field is probability1 that is set to 100).
 
 `insert_spell_header_opcode INT_VAR header index`
 
+Insert a blank opcode (only non-zero field is probability1 that is set to 100) at `index` of `header`. Function FAIL's if either `header` or `index` out of bounds.
+
+note(s):
+* use index `-1` if you want to insert at the end, or append, or use the `append_spell_header_opcode` function.
+
 `append_spell_header_opcode INT_VAR header`
+
+Append a blank opcode (only non-zero field is probability1 that is set to 100) to `header`. Function FAIL's if `header` out of bounds.
 
 # E. Getters.
 
