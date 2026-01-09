@@ -121,6 +121,30 @@ note(s):
 
 Append a blank opcode (only non-zero field is probability1 that is set to 100) to `header`. Function FAIL's if `header` out of bounds.
 
+### D. 1. 1. Block versions.
+
+`insert_item_equipped_block INT_VAR index amount = 1`
+
+Insert a contiguous block of `amount` blank equipped opcodes (only non-zero field is probability1 that is set to 100) at `index`. Function FAIL's if `index` out of bounds.
+
+note(s):
+* use index `-1` if you want to insert at the end, or append, or use the `append_item_casting_block` function.
+
+`append_item_equipped_block INT_VAR amount = 1`
+
+Append a contiguous block of `amount` blank equipped opcodes (only non-zero field is probability1 that is set to 100).
+
+`insert_item_header_block INT_VAR header index amount = 1`
+
+Insert a contiguous block of `amount` blank opcodes (only non-zero field is probability1 that is set to 100) at `index` of `header`. Function FAIL's if either `header` or `index` out of bounds.
+
+note(s):
+* use index `-1` if you want to insert at the end, or append, or use the `append_item_header_block` function.
+
+`append_item_header_opcode INT_VAR header amount = 1`
+
+Append a contiguous block of `amount` blank opcodes (only non-zero field is probability1 that is set to 100) to `header`. Function FAIL's if `header` out of bounds.
+
 # E. Getters.
 
 `get_item_category_id STR_VAR category RET id`
