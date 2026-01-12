@@ -70,6 +70,10 @@ LAF load_array STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/flags.2da"
 RET_ARRAY spell_flags = array END
 
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/header_locations.2da"
+RET_ARRAY spell_header_locations = array END
+
 
 //Basic reading functions.
 DEFINE_PATCH_FUNCTION get_spell_header_count RET count BEGIN

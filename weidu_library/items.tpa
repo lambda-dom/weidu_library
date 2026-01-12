@@ -59,6 +59,14 @@ LAF load_array STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/flags.2da"
 RET_ARRAY item_flags = array END
 
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/header_types.2da"
+RET_ARRAY item_header_types = array END
+
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/items/header_locations.2da"
+RET_ARRAY item_header_locations = array END
+
 
 //Basic functions.
 DEFINE_DIMORPHIC_FUNCTION get_item_size RET size BEGIN

@@ -40,6 +40,10 @@ All tables and arrays are loaded on `INCLUDE`-ing.
 
 [Array](../../resources/2da/spells/flags.2da) with keys the names for spell flags and values the associated bit index for the flags word.
 
+`spell_header_locations`
+
+[Array](../../resources/2da/spells/header_locations.2da) of possible spell header locations.
+
 # C. Spell functions.
 
 note(s):
