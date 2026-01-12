@@ -83,9 +83,9 @@ Return `offset` of (0-indexed) `header`. If `header` out of bounds, return -1.
 
 ### C. 3. 1. Item header mutators.
 
-`insert_spell_header INT_VAR index`
+`insert_spell_header INT_VAR index STR_VAR location`
 
-`append_spell_header`
+`append_spell_header STR_VAR location`
 
 ## C. 4. Spell header opcode functions.
 

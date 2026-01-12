@@ -123,7 +123,7 @@ END
 
 
 //Item header mutators.
-DEFINE_PATCH_FUNCTION insert_item_header INT_VAR index = 0 BEGIN
+DEFINE_PATCH_FUNCTION insert_item_header INT_VAR index = 0 STR_VAR type = "melee" location = "weapon" BEGIN
     //Normalize.
     LPF get_item_header_count RET header_count = count END
     PATCH_IF (0 - 1 = index) BEGIN
@@ -133,6 +133,16 @@ DEFINE_PATCH_FUNCTION insert_item_header INT_VAR index = 0 BEGIN
     //Sanitize.
     PATCH_IF NOT ((0 <= index) AND (index <= header_count)) BEGIN
         PATCH_FAIL "insert_item_header: '%index%' not in the range [-1, %header_count%]."
+    END
+
+    TEXT_SPRINT location_id $item_header_locations("%location%")
+    PATCH_IF NOT (IS_AN_INT location_id) BEGIN
+        PATCH_FAIL "insert_item_header: location '%location%' not valid."
+    END
+
+    TEXT_SPRINT type_id $item_header_types("%type%")
+    PATCH_IF NOT (IS_AN_INT type_id) BEGIN
+        PATCH_FAIL "insert_item_header: type '%type%' not valid."
     END
 
     //Insert offset.
@@ -157,10 +167,27 @@ DEFINE_PATCH_FUNCTION insert_item_header INT_VAR index = 0 BEGIN
         READ_SHORT (pre_offset + 0x1e) amount
     END
     WRITE_SHORT (ins_offset + 0x20) (start_index + amount)
+    LPF set_item_header_field INT_VAR
+        header = index
+    STR_VAR
+        field = "location"
+        value = "%location_id%"
+    END
+    LPF set_item_header_field INT_VAR
+        header = index
+    STR_VAR
+        field = "type"
+        value = "%type_id%"
+    END
 END
 
-DEFINE_PATCH_FUNCTION append_item_header BEGIN
-    LPF insert_item_header INT_VAR index = 0 - 1 END
+DEFINE_PATCH_FUNCTION append_item_header STR_VAR type = "melee" location = "weapon" BEGIN
+    LPF insert_item_header INT_VAR
+        index = 0 - 1
+    STR_VAR
+        type = "%type%"
+        location = "%location%"
+    END
 END
 
 
@@ -266,7 +293,7 @@ DEFINE_PATCH_FUNCTION set_item_header_field INT_VAR header = 0 STR_VAR field = "
 END
 
 
-//Mutators.
+//Opcode mutators.
 DEFINE_PATCH_FUNCTION insert_item_equipped_opcode INT_VAR index = 0 BEGIN
     //Normalize.
     LPF get_equipped_opcode_count RET op_count = count END

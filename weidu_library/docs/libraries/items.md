@@ -81,9 +81,9 @@ Return `offset` of `header` (0-indexed). If `header` out of bounds, return -1.
 
 ### C. 3. 1. Item header mutators.
 
-`insert_item_header INT_VAR index`
+`insert_item_header INT_VAR index STR_VAR type location`
 
-`append_item_header`
+`append_item_header STR_VAR type location`
 
 ## C. 3. Item header opcode functions.
 

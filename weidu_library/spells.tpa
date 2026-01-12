@@ -157,7 +157,7 @@ DEFINE_PATCH_FUNCTION get_spell_header_offset INT_VAR header = 0 RET offset BEGI
 END
 
 //Header mutators.
-DEFINE_PATCH_FUNCTION insert_spell_header INT_VAR index = 0 BEGIN
+DEFINE_PATCH_FUNCTION insert_spell_header INT_VAR index = 0 STR_VAR location = "spell" BEGIN
     //Normalize.
     LPF get_spell_header_count RET header_count = count END
     PATCH_IF (0 - 1 = index) BEGIN
@@ -167,6 +167,11 @@ DEFINE_PATCH_FUNCTION insert_spell_header INT_VAR index = 0 BEGIN
     //Sanitize.
     PATCH_IF NOT ((0 <= index) AND (index <= header_count)) BEGIN
         PATCH_FAIL "insert_spell_header: '%index%' not in the range [-1, %header_count%]."
+    END
+
+    TEXT_SPRINT location_id $spell_header_locations("%location%")
+    PATCH_IF NOT (IS_AN_INT location_id) BEGIN
+        PATCH_FAIL "insert_spell_header: location '%location%' not valid."
     END
 
     //Insert offset.
@@ -192,10 +197,16 @@ DEFINE_PATCH_FUNCTION insert_spell_header INT_VAR index = 0 BEGIN
     END
     WRITE_SHORT (ins_offset + 0x20) (start_index + amount)
     WRITE_BYTE ins_offset 1
+    LPF set_spell_header_field INT_VAR
+        header = index
+    STR_VAR
+        field = "location"
+        value = "%location_id%"
+    END
 END
 
-DEFINE_PATCH_FUNCTION append_spell_header BEGIN
-    LPF insert_spell_header INT_VAR index = 0 - 1 END
+DEFINE_PATCH_FUNCTION append_spell_header STR_VAR location = "spell" BEGIN
+    LPF insert_spell_header INT_VAR index = 0 - 1 STR_VAR location = "%location%" END
 END
 
 
