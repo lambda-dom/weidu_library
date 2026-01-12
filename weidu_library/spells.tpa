@@ -187,6 +187,7 @@ DEFINE_PATCH_FUNCTION insert_spell_header INT_VAR index = 0 BEGIN
         READ_SHORT (pre_offset + 0x1e) amount
     END
     WRITE_SHORT (ins_offset + 0x20) (start_index + amount)
+    WRITE_BYTE ins_offset 1
 END
 
 DEFINE_PATCH_FUNCTION append_spell_header BEGIN
