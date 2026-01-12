@@ -70,6 +70,10 @@ LAF load_array STR_VAR
     table = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/flags.2da"
 RET_ARRAY spell_flags = array END
 
+LAF load_array STR_VAR
+    table = "%WEIDU_LIBRARY_DIR%/resources/2da/spells/header_locations.2da"
+RET_ARRAY spell_header_locations = array END
+
 
 //Basic reading functions.
 DEFINE_PATCH_FUNCTION get_spell_header_count RET count BEGIN
@@ -124,6 +128,7 @@ DEFINE_DIMORPHIC_FUNCTION get_spell_school_id STR_VAR school = "" RET id BEGIN
     END
 END
 
+
 //Casting opcode functions.
 DEFINE_PATCH_FUNCTION get_casting_opcode_offset INT_VAR index = 0 RET offset BEGIN
     LPF get_opcode_size RET opcode_size = size END
@@ -138,6 +143,7 @@ DEFINE_PATCH_FUNCTION get_casting_opcode_offset INT_VAR index = 0 RET offset BEG
     END
 END
 
+
 //Spell header functions.
 DEFINE_PATCH_FUNCTION get_spell_header_offset INT_VAR header = 0 RET offset BEGIN
     LPF get_spell_header_size RET spell_header_size = size END
@@ -149,6 +155,60 @@ DEFINE_PATCH_FUNCTION get_spell_header_offset INT_VAR header = 0 RET offset BEGI
         offset = headers_offset + (header * spell_header_size)
     END
 END
+
+//Header mutators.
+DEFINE_PATCH_FUNCTION insert_spell_header INT_VAR index = 0 STR_VAR location = "spell" BEGIN
+    //Normalize.
+    LPF get_spell_header_count RET header_count = count END
+    PATCH_IF (0 - 1 = index) BEGIN
+        index = header_count
+    END
+
+    //Sanitize.
+    PATCH_IF NOT ((0 <= index) AND (index <= header_count)) BEGIN
+        PATCH_FAIL "insert_spell_header: '%index%' not in the range [-1, %header_count%]."
+    END
+
+    TEXT_SPRINT location_id $spell_header_locations("%location%")
+    PATCH_IF NOT (IS_AN_INT location_id) BEGIN
+        PATCH_FAIL "insert_spell_header: location '%location%' not valid."
+    END
+
+    //Insert offset.
+    LPF get_spell_header_size RET header_size = size END
+    LPF get_spell_headers_offset RET fx_start = offset END
+    ins_offset = fx_start + (header_size * index)
+
+    //Insert opcode.
+    INSERT_BYTES ins_offset header_size
+
+    //Correct header amount and opcodes block offset.
+    WRITE_SHORT 0x68 (THIS + 1)
+    WRITE_LONG 0x6a (THIS + header_size)
+
+    //Fill header fields.
+    PATCH_IF (0 = index) BEGIN
+        start_index = 0
+        LPF get_casting_opcode_count RET amount = count END
+    END ELSE BEGIN
+        LPF get_spell_header_offset INT_VAR header = i - 1 RET pre_offset = offset END
+        READ_SHORT (pre_offset + 0x20) start_index
+        READ_SHORT (pre_offset + 0x1e) amount
+    END
+    WRITE_SHORT (ins_offset + 0x20) (start_index + amount)
+    WRITE_BYTE ins_offset 1
+    LPF set_spell_header_field INT_VAR
+        header = index
+    STR_VAR
+        field = "location"
+        value = "%location_id%"
+    END
+END
+
+DEFINE_PATCH_FUNCTION append_spell_header STR_VAR location = "spell" BEGIN
+    LPF insert_spell_header INT_VAR index = 0 - 1 STR_VAR location = "%location%" END
+END
+
 
 //Spell header opcode functions.
 DEFINE_PATCH_FUNCTION get_spell_header_opcode_count INT_VAR header = 0 RET count BEGIN

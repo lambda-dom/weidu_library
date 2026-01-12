@@ -40,6 +40,10 @@ All tables and arrays are loaded on `INCLUDE`-ing.
 
 [Array](../../resources/2da/spells/flags.2da) with keys the names for spell flags and values the associated bit index for the flags word.
 
+`spell_header_locations`
+
+[Array](../../resources/2da/spells/header_locations.2da) of possible spell header locations.
+
 # C. Spell functions.
 
 note(s):
@@ -76,6 +80,12 @@ Return `offset` of `index` casting, or global, opcode. If `index` out of bounds,
 `get_spell_header_offset INT_VAR header RET offset`
 
 Return `offset` of (0-indexed) `header`. If `header` out of bounds, return -1.
+
+### C. 3. 1. Item header mutators.
+
+`insert_spell_header INT_VAR index STR_VAR location`
+
+`append_spell_header STR_VAR location`
 
 ## C. 4. Spell header opcode functions.
 

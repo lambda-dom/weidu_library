@@ -24,6 +24,14 @@ file(s):
 
 [Array](../../resources/2da/items/flags.2da) with keys the names for item flags and values the associated bit index for the flags word.
 
+`item_header_locations`
+
+[Array](../../resources/2da/items/header_types.2da) of item header types.
+
+`item_header_locations`
+
+[Array](../../resources/2da/items/header_locations.2da) of possible item header locations.
+
 # B. Basic functions.
 
 `get_item_size RET size`
@@ -61,15 +69,21 @@ Return `count` of equipped opcodes in the item.
 
 ## C. 2. Equipped opcode functions.
 
-`get_equipped_opcode_offset INT_VAR index = 0 RET offset`
+`get_equipped_opcode_offset INT_VAR index RET offset`
 
 Return `offset` of `index` equipped, or global, opcode. If index out of bounds, return -1.
 
 ## C. 3. Item header functions.
 
-`get_item_header_offset INT_VAR header = 0 RET offset`
+`get_item_header_offset INT_VAR header RET offset`
 
 Return `offset` of `header` (0-indexed). If `header` out of bounds, return -1.
+
+### C. 3. 1. Item header mutators.
+
+`insert_item_header INT_VAR index STR_VAR type location`
+
+`append_item_header STR_VAR type location`
 
 ## C. 3. Item header opcode functions.
 
