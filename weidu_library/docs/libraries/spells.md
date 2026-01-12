@@ -77,6 +77,12 @@ Return `offset` of `index` casting, or global, opcode. If `index` out of bounds,
 
 Return `offset` of (0-indexed) `header`. If `header` out of bounds, return -1.
 
+### C. 3. 1. Item header mutators.
+
+`insert_spell_header INT_VAR index`
+
+`append_spell_header`
+
 ## C. 4. Spell header opcode functions.
 
 `get_spell_header_opcode_count INT_VAR header RET count`

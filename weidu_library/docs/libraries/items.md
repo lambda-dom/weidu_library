@@ -61,15 +61,21 @@ Return `count` of equipped opcodes in the item.
 
 ## C. 2. Equipped opcode functions.
 
-`get_equipped_opcode_offset INT_VAR index = 0 RET offset`
+`get_equipped_opcode_offset INT_VAR index RET offset`
 
 Return `offset` of `index` equipped, or global, opcode. If index out of bounds, return -1.
 
 ## C. 3. Item header functions.
 
-`get_item_header_offset INT_VAR header = 0 RET offset`
+`get_item_header_offset INT_VAR header RET offset`
 
 Return `offset` of `header` (0-indexed). If `header` out of bounds, return -1.
+
+### C. 3. 1. Item header mutators.
+
+`insert_item_header INT_VAR index`
+
+`append_item_header`
 
 ## C. 3. Item header opcode functions.
 

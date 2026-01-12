@@ -100,6 +100,7 @@ DEFINE_PATCH_FUNCTION get_equipped_opcode_offset INT_VAR index = 0 RET offset BE
     END
 END
 
+
 //Item header functions.
 DEFINE_PATCH_FUNCTION get_item_header_offset INT_VAR header = 0 RET offset BEGIN
     LPF get_item_header_size RET item_header_size = size END
@@ -111,6 +112,49 @@ DEFINE_PATCH_FUNCTION get_item_header_offset INT_VAR header = 0 RET offset BEGIN
         offset = headers_offset + (header * item_header_size)
     END
 END
+
+
+//Item header mutators.
+DEFINE_PATCH_FUNCTION insert_item_header INT_VAR index = 0 BEGIN
+    //Normalize.
+    LPF get_item_header_count RET header_count = count END
+    PATCH_IF (0 - 1 = index) BEGIN
+        index = header_count
+    END
+
+    //Sanitize.
+    PATCH_IF NOT ((0 <= index) AND (index <= header_count)) BEGIN
+        PATCH_FAIL "insert_item_header: '%index%' not in the range [-1, %header_count%]."
+    END
+
+    //Insert offset.
+    LPF get_item_header_size RET header_size = size END
+    LPF get_item_headers_offset RET fx_start = offset END
+    ins_offset = fx_start + (header_size * index)
+
+    //Insert opcode.
+    INSERT_BYTES ins_offset header_size
+
+    //Correct header amount and opcodes block offset.
+    WRITE_SHORT 0x68 (THIS + 1)
+    WRITE_LONG 0x6a (THIS + header_size)
+
+    //Fill header fields.
+    PATCH_IF (0 = index) BEGIN
+        start_index = 0
+        LPF get_equipped_opcode_count RET amount = count END
+    END ELSE BEGIN
+        LPF get_item_header_offset INT_VAR header = i - 1 RET pre_offset = offset END
+        READ_SHORT (pre_offset + 0x20) start_index
+        READ_SHORT (pre_offset + 0x1e) amount
+    END
+    WRITE_SHORT (ins_offset + 0x20) (start_index + amount)
+END
+
+DEFINE_PATCH_FUNCTION append_item_header BEGIN
+    LPF insert_item_header INT_VAR index = 0 - 1 END
+END
+
 
 //Item header opcode functions.
 DEFINE_PATCH_FUNCTION get_item_header_opcode_count INT_VAR header = 0 RET count BEGIN
@@ -150,6 +194,7 @@ DEFINE_PATCH_FUNCTION get_item_header_opcode_offset INT_VAR header = 0 index = 0
         END
     END
 END
+
 
 //Readers and writers.
 DEFINE_PATCH_FUNCTION get_item_field STR_VAR field = "" RET value BEGIN
@@ -211,6 +256,7 @@ DEFINE_PATCH_FUNCTION set_item_header_field INT_VAR header = 0 STR_VAR field = "
         value = "%value%"
     END
 END
+
 
 //Mutators.
 DEFINE_PATCH_FUNCTION insert_item_equipped_opcode INT_VAR index = 0 BEGIN
@@ -309,7 +355,8 @@ DEFINE_PATCH_FUNCTION append_item_header_opcode INT_VAR header = 0 BEGIN
     END
 END
 
-//Block mutators.
+
+//Opcode block mutators.
 DEFINE_PATCH_FUNCTION insert_item_equipped_block INT_VAR index = 0 amount = 1 BEGIN
     //Normalize.
     LPF get_equipped_opcode_count RET op_count = count END
@@ -440,7 +487,8 @@ DEFINE_DIMORPHIC_FUNCTION get_item_proficiency_id STR_VAR proficiency = "" RET i
     END
 END
 
-//Patches for itemexcl.2da.
+
+//Patchers for itemexcl.2da.
 DEFINE_PATCH_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item = "" BEGIN
     //Existence check.
     PATCH_IF NOT (FILE_EXISTS_IN_GAME "%item%.itm") BEGIN
@@ -458,7 +506,8 @@ DEFINE_PATCH_FUNCTION set_item_exclusion INT_VAR exclusion = 1 STR_VAR item = ""
     END
 END
 
-//Patches for tooltip.2da.
+
+//Patchers for tooltip.2da.
 DEFINE_PATCH_FUNCTION set_ability_tooltip INT_VAR
     ability1 = 0 - 1
     ability2 = 0 - 1
